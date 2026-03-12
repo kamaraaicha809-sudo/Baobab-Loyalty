@@ -7,12 +7,16 @@
 ### Prérequis
 Installez Git : [https://git-scm.com/download/win](https://git-scm.com/download/win)
 
-### Méthode 1 : Script PowerShell
+### Méthode 1 : Double-clic (le plus simple)
+Double-cliquez sur **`PUSH_VERS_GITHUB.bat`** dans le dossier du projet.  
+Une fenêtre s'ouvrira : si Git demande vos identifiants, entrez votre token GitHub comme mot de passe.
+
+### Méthode 2 : Script PowerShell
 ```powershell
 .\scripts\push-to-github.ps1
 ```
 
-### Méthode 2 : Commandes manuelles
+### Méthode 3 : Commandes manuelles
 Ouvrez un terminal dans le dossier du projet :
 
 ```bash
