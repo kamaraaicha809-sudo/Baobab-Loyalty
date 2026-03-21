@@ -15,6 +15,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
   try {
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
+    if (isDemoMode) return errors.forbidden("File deletion is disabled in demo mode");
+
     const { user, userClient, error: authError } = await requireAuth(req);
     if (authError || !user || !userClient) {
       return errors.unauthorized(authError || "Authentication required");

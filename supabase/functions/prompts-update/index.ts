@@ -15,6 +15,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
   try {
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
+    if (isDemoMode) return errors.forbidden("Prompt update is disabled in demo mode");
+
     const { error: authError } = await requireAdmin(req);
     if (authError) return errors.forbidden(authError);
 

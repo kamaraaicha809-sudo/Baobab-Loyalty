@@ -7,7 +7,7 @@ import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients } from "@/src/sdk/clients";
-import { isDemoMode, demoUser } from "@/src/lib/demo";
+import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/demo";
 
 const SEGMENT_LABELS: Record<string, string> = {
   "3mois": "Clients - 3 mois",
@@ -29,9 +29,9 @@ export default function ConfigurationPage() {
   const loadProfile = useCallback(async () => {
     if (isDemoMode) {
       setProfileId(demoUser.id);
-      setHotelName("Hôtel Le Baobab");
-      setConfigComplete(true);
-      setCounts({ "3mois": 124, "6mois": 89, "9mois": 56, tous: 450 });
+      setHotelName(demoProfile.hotel_name);
+      setConfigComplete(demoProfile.config_complete);
+      setCounts(demoSegmentCounts);
       setLoading(false);
       return;
     }

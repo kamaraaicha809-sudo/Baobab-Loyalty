@@ -2,7 +2,7 @@
  * ai-generate
  * Generates content using OpenRouter AI API
  *
- * Auth: Required (JWT + active subscription)
+ * Auth: Required (JWT + active subscription) — bypassed in DEMO_MODE
  * Method: POST
  * Body: { prompt, model?, maxTokens?, temperature? }
  */
@@ -20,26 +20,30 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify authentication
-    const { user, userClient, error: authError } = await requireAuth(req);
-    if (authError || !user || !userClient) {
-      return errors.unauthorized(authError || "Authentication required");
-    }
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
 
-    // Check subscription
-    const { data: profile } = await userClient
-      .from("profiles")
-      .select("has_access")
-      .eq("id", user.id)
-      .single();
+    if (!isDemoMode) {
+      // Verify authentication
+      const { user, userClient, error: authError } = await requireAuth(req);
+      if (authError || !user || !userClient) {
+        return errors.unauthorized(authError || "Authentication required");
+      }
 
-    if (!profile?.has_access) {
-      return errors.forbidden("Active subscription required");
+      // Check subscription
+      const { data: profile } = await userClient
+        .from("profiles")
+        .select("has_access")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile?.has_access) {
+        return errors.forbidden("Active subscription required");
+      }
     }
 
     // Parse body
     const body = await req.json();
-    const { prompt, model = DEFAULT_MODEL, maxTokens = 1024, temperature = 0.7 } = body;
+    const { prompt, system, model = DEFAULT_MODEL, maxTokens = 1024, temperature = 0.7 } = body;
 
     // Validate prompt
     if (!prompt || typeof prompt !== "string") {
@@ -51,6 +55,13 @@ Deno.serve(async (req) => {
     if (!apiKey) {
       return errors.internal("AI service not configured");
     }
+
+    // Build messages array (system prompt + user message)
+    const messages = [];
+    if (system && typeof system === "string") {
+      messages.push({ role: "system", content: system });
+    }
+    messages.push({ role: "user", content: prompt });
 
     // Call OpenRouter
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -64,7 +75,7 @@ Deno.serve(async (req) => {
         model,
         max_tokens: maxTokens,
         temperature,
-        messages: [{ role: "user", content: prompt }],
+        messages,
       }),
     });
 

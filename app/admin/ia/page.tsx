@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { prompts as promptsApi } from "@/src/sdk";
 import toast from "react-hot-toast";
-import { isDemoMode } from "@/src/lib/demo";
+import { isDemoMode, demoPrompts, demoAdminStats } from "@/src/lib/demo";
+import { callEdgeFunction } from "@/src/sdk/_core";
 
 /**
  * AI Configuration Page
@@ -37,40 +38,23 @@ export default function IAConfigPage() {
 
   const loadModel = async () => {
     if (isDemoMode) {
-      setModel("openai/gpt-4o-mini");
+      setModel(demoAdminStats.model);
       return;
     }
 
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      
-      if (!url || !anonKey) return;
-
-      const response = await fetch(`${url}/functions/v1/config-get?key=default_model`, {
-        headers: { apikey: anonKey },
-      });
-      const data = await response.json();
-      if (data.ok && data.data?.value) {
-        setModel(data.data.value.replace(/"/g, ""));
+      const result = await callEdgeFunction<{ value: string }>("config-get?key=default_model", { method: "GET", requireAuth: false });
+      if (result?.value) {
+        setModel(result.value.replace(/"/g, ""));
       }
-    } catch (err) {
+    } catch {
       // Erreur silencieuse - le modèle par défaut sera utilisé
     }
   };
 
   const loadPrompts = async () => {
     if (isDemoMode) {
-      setPromptsList([
-        {
-          id: "demo-1",
-          name: "system",
-          description: "Prompt système principal",
-          content: "Tu es un assistant IA utile et professionnel.",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]);
+      setPromptsList(demoPrompts);
       setLoadingPrompts(false);
       return;
     }
@@ -93,34 +77,10 @@ export default function IAConfigPage() {
 
     setSavingModel(true);
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const { createClient } = await import("@/libs/supabase/client");
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
-        toast.error("Non authentifié");
-        return;
-      }
-
-      const response = await fetch(`${url}/functions/v1/config-update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ key: "default_model", value: model }),
-      });
-
-      const data = await response.json();
-      if (data.ok) {
-        toast.success("Modèle sauvegardé");
-      } else {
-        throw new Error(data.error?.message || "Erreur");
-      }
+      await callEdgeFunction("config-update", { body: { key: "default_model", value: model } });
+      toast.success("Modèle sauvegardé");
     } catch (err) {
-      toast.error(err.message || "Erreur lors de la sauvegarde");
+      toast.error(err instanceof Error ? err.message : "Erreur lors de la sauvegarde");
     } finally {
       setSavingModel(false);
     }

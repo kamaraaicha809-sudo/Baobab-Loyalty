@@ -33,8 +33,9 @@ function CheckoutContent() {
       try {
         setStatus("redirecting");
         const { url } = await billing.createCheckout({
-          priceId: plan.priceId,
-          mode: "subscription",
+          planSlug,
+          amount: plan.price,
+          planName: plan.name,
           successUrl: `${window.location.origin}/dashboard`,
           cancelUrl: `${window.location.origin}/#tarifs`,
         });

@@ -18,6 +18,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
   try {
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
+    if (isDemoMode) return errors.forbidden("File upload is disabled in demo mode");
+
     const { user, error: authError } = await requireAuth(req);
     if (authError || !user) return errors.unauthorized(authError || "Authentication required");
 

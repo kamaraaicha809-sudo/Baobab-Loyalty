@@ -6,31 +6,7 @@ import { useRouter } from "next/navigation";
 import { user, billing } from "@/src/sdk";
 import { reservations } from "@/src/sdk/reservations";
 import config from "@/config";
-import { isDemoMode, demoUser } from "@/src/lib/demo";
-
-// Données démo pour le graphique (LUN-DIM)
-const DEMO_CHART = [
-  { jour: "LUN", directes: 8, autres: 3 },
-  { jour: "MAR", directes: 12, autres: 5 },
-  { jour: "MER", directes: 6, autres: 4 },
-  { jour: "JEU", directes: 14, autres: 2 },
-  { jour: "VEN", directes: 10, autres: 6 },
-  { jour: "SAM", directes: 22, autres: 8 },
-  { jour: "DIM", directes: 18, autres: 5 },
-];
-
-// Données démo flux en direct
-const DEMO_FLUX = [
-  { client: "Moussa Diop", hotel: "Hôtel Terrou-Bi", offre: "REMISE EXCEPTIONNELLE", time: "Il y a 15 min" },
-  { client: "Fatou Ndiaye", hotel: "Pullman Dakar", offre: "SAINT VALENTIN", time: "Il y a 45 min" },
-  { client: "Omar Sy", hotel: "Pullman Dakar", offre: "SURCLASSEMENT", time: "12:08" },
-];
-
-// Données démo dernières campagnes
-const DEMO_CAMPAGNES = [
-  { date: "24 Fév 2024", segment: "Clients - 6 mois", offre: "Remise 15%", resultats: "8 résas", statut: "TERMINÉE" },
-  { date: "18 Fév 2024", segment: "Tous les clients", offre: "Cocktail offert", resultats: "14 résas", statut: "TERMINÉE" },
-];
+import { isDemoMode, demoUser, demoChartData, demoFlux, demoCampagnesSummary, demoMetrics } from "@/src/lib/demo";
 
 const maxChartFromData = (data: { directes: number; autres: number }[]) =>
   Math.max(1, ...data.flatMap((d) => d.directes + d.autres));
@@ -40,7 +16,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<{ id?: string; email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
-  const [chartData, setChartData] = useState(DEMO_CHART);
+  const [chartData, setChartData] = useState(demoChartData);
   const [impactCount, setImpactCount] = useState<number>(0);
   const [totalFromApp, setTotalFromApp] = useState<number>(12);
 
@@ -48,20 +24,15 @@ export default function Dashboard() {
     ? demoUser.user_metadata.full_name
     : profile?.email?.split("@")[0] || "Utilisateur";
 
-  // Valeur démo pour Impact global : total du jour actuel (LUN-DIM) depuis DEMO_CHART
-  const getDemoImpactCount = () => {
-    const dayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const dayData = DEMO_CHART[dayIndex];
-    return (dayData?.directes ?? 0) + (dayData?.autres ?? 0);
-  };
+  const getDemoImpactCount = () => demoMetrics.impactToday;
 
   useEffect(() => {
     const loadProfile = async () => {
       if (isDemoMode) {
         setProfile({ email: demoUser.email, id: demoUser.id });
-        setChartData(DEMO_CHART);
+        setChartData(demoChartData);
         setImpactCount(getDemoImpactCount());
-        setTotalFromApp(12);
+        setTotalFromApp(demoMetrics.totalReservationsFromApp);
         setLoading(false);
         return;
       }
@@ -192,7 +163,7 @@ export default function Dashboard() {
           <div className="flex items-end justify-end mb-2">
             <span className="text-xs text-slate-500">Derniers 3 jours</span>
           </div>
-          <p className="text-3xl font-bold text-slate-900">120 000 FCFA</p>
+          <p className="text-3xl font-bold text-slate-900">{isDemoMode ? demoMetrics.revenueFormatted : "120 000"} FCFA</p>
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mt-0.5">
             Généré via {config.appName}
           </p>
@@ -203,7 +174,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Colonne gauche - 2/3 */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Performance des réservations obtenues grâce à Baobab Loyalty */}
+          {/* Performance */}
           <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-base text-slate-900">
@@ -266,7 +237,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {DEMO_CAMPAGNES.map((c, i) => (
+                  {demoCampagnesSummary.map((c, i) => (
                     <tr key={i} className="border-b border-slate-50">
                       <td className="py-3 pr-4 text-slate-600">{c.date}</td>
                       <td className="py-3 pr-4 text-slate-600">{c.segment}</td>
@@ -294,7 +265,7 @@ export default function Dashboard() {
               Flux en direct
             </h2>
             <div className="space-y-3">
-              {DEMO_FLUX.map((f, i) => (
+              {demoFlux.map((f, i) => (
                 <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">

@@ -8,6 +8,7 @@ import { callEdgeFunction } from "./_core";
 // Types
 export interface GenerateParams {
   prompt: string;
+  system?: string;
   model?: string;
   maxTokens?: number;
   temperature?: number;

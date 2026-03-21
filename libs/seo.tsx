@@ -31,17 +31,17 @@ export const getSEOTags = ({
   robots,
   extraTags,
 }: SEOTagsOptions = {}): Metadata => {
-  // Default keywords for Micro SaaS template
+  // Keywords Baobab Loyalty
   const defaultKeywords = [
     config.appName,
-    "Micro SaaS template",
-    "Next.js template",
-    "Supabase",
-    "Stripe",
-    "boilerplate",
-    "starter kit",
-    "micro-SaaS",
-    "template React",
+    "fidélisation clients hôtel",
+    "campagnes WhatsApp hôtel",
+    "segmentation clients",
+    "CRM hôtelier Afrique",
+    "marketing hôtel FCFA",
+    "engagement client hôtellerie",
+    "automatisation WhatsApp",
+    "loyauté client Afrique francophone",
   ];
 
   return {
@@ -132,7 +132,7 @@ export const renderSchemaTags = () => {
           },
           datePublished: "2024-01-01",
           dateModified: new Date().toISOString().split("T")[0],
-          applicationCategory: "DeveloperApplication",
+          applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
           aggregateRating: {
             "@type": "AggregateRating",
@@ -145,7 +145,7 @@ export const renderSchemaTags = () => {
             ? {
                 "@type": "Offer",
                 price: String(featuredPlan.price),
-                priceCurrency: "EUR",
+                priceCurrency: "XOF",
                 availability: "https://schema.org/InStock",
                 priceValidUntil: new Date(
                   new Date().setFullYear(new Date().getFullYear() + 1)
@@ -153,12 +153,12 @@ export const renderSchemaTags = () => {
               }
             : undefined,
           featureList: [
-            "Authentification Supabase",
-            "Paiements Stripe",
-            "Edge Functions",
-            "Dashboard Admin",
-            "Emails Resend",
-            "TailwindCSS 4",
+            "Segmentation clients hôtel",
+            "Campagnes WhatsApp automatisées",
+            "Génération de messages par IA",
+            "Tracking des réservations",
+            "Dashboard temps réel",
+            "Import CSV clients",
           ],
         }),
       }}

@@ -5,6 +5,15 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Icons } from "@/components/common/Icons";
 import toast from "react-hot-toast";
+import config from "@/config";
+import { linkedin } from "@/src/sdk";
+import {
+  demoGeneratedTemplate,
+  demoLinkedinPost,
+  demoMessageTemplates,
+  demoProfile,
+} from "@/src/lib/demo";
+import type { MessageTemplate } from "@/src/sdk/linkedin";
 
 const SEGMENT_NAMES: Record<string, string> = {
   "3mois": "Clients - 3 mois",
@@ -19,35 +28,35 @@ const TEMPLATES = [
     name: "Remise Exceptionnelle",
     description: "20% de réduction sur votre chambre",
     icon: "tag",
-    message: "🔥 Offre exceptionnelle ! Bénéficiez de 20% de réduction sur votre prochaine chambre. Valable 7 jours.",
+    message: "Offre exceptionnelle ! Bénéficiez de 20% de réduction sur votre prochaine chambre. Valable 7 jours.",
   },
   {
     id: "surclassement",
     name: "Surclassement Offert",
     description: "Un surclassement gratuit en Suite Junior",
     icon: "star",
-    message: "⭐ Surprise ! Nous vous offrons un surclassement gratuit en Suite Junior pour votre prochain séjour.",
+    message: "Surprise ! Nous vous offrons un surclassement gratuit en Suite Junior pour votre prochain séjour.",
   },
   {
     id: "cocktail",
     name: "Cocktail de Bienvenue",
     description: "Deux cocktails signature offerts à votre arrivée",
     icon: "cocktail",
-    message: "🍸 Bienvenue ! Deux cocktails signature vous sont offerts à votre arrivée. À très bientôt !",
+    message: "Bienvenue ! Deux cocktails signature vous sont offerts à votre arrivée. À très bientôt !",
   },
   {
     id: "famille",
     name: "Offre Famille",
     description: "-25% sur la deuxième chambre communicante",
     icon: "users",
-    message: "👨‍👩‍👧‍👦 Offre famille ! -25% sur la deuxième chambre communicante. Parfait pour vos vacances en famille.",
+    message: "Offre famille ! -25% sur la deuxième chambre communicante. Parfait pour vos vacances en famille.",
   },
   {
     id: "evenements",
     name: "Événements Spéciaux",
     description: "Une surprise vous attend pour votre séjour",
     icon: "calendar",
-    message: "🎉 Un séjour spécial vous attend ! Une surprise vous sera réservée. Réservez dès maintenant.",
+    message: "Un séjour spécial vous attend ! Une surprise vous sera réservée. Réservez dès maintenant.",
     defaultIntro: "Célébrons ensemble cet événement spécial ! Profitez de notre offre exclusive :",
     fetes: [
       { id: "ramadan", name: "Ramadan", intro: "Ramadan Kareem ! Pour ce mois sacré, nous vous proposons :", avantage: "IFTAR offert et tarif spécial sur les chambres" },
@@ -69,11 +78,11 @@ const ICON_MAP = {
 
 type Fete = { id: string; name: string; intro: string; avantage: string };
 
-function TemplatesContent() {
-  const searchParams = useSearchParams();
+// ============================================================
+// ONGLET 1 : Offres standards (contenu original)
+// ============================================================
+function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName: string }) {
   const router = useRouter();
-  const segmentId = searchParams.get("segment") || "";
-  const segmentName = SEGMENT_NAMES[segmentId] || "un segment";
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedFete, setSelectedFete] = useState<Fete | null>(null);
   const [avantage, setAvantage] = useState("");
@@ -82,7 +91,6 @@ function TemplatesContent() {
   const SelectedIcon = selected ? ICON_MAP[selected.icon as keyof typeof ICON_MAP] : null;
   const fetes = selected?.id === "evenements" && "fetes" in selected ? (selected.fetes as Fete[]) : null;
 
-  // Initialiser l'avantage quand on change de template ou de fête
   useEffect(() => {
     if (selected?.id === "evenements" && selectedFete) {
       setAvantage(selectedFete.avantage);
@@ -98,7 +106,6 @@ function TemplatesContent() {
     setSelectedFete(null);
   };
 
-  // Message d'aperçu : différent pour Événements Spéciaux (avec ou sans fête)
   const getPreviewMessage = () => {
     if (selected?.id === "evenements") {
       const evt = selected as { defaultIntro?: string; fetes?: Fete[] };
@@ -121,6 +128,503 @@ function TemplatesContent() {
     if (selectedFete) params.set("fete", selectedFete.name);
     router.push(`/dashboard/campaign/confirm?${params.toString()}`);
   };
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-6">
+      {/* Colonne gauche : Liste des templates */}
+      <div className="lg:w-[380px] shrink-0 space-y-3">
+        {TEMPLATES.map((template) => {
+          const IconComponent = ICON_MAP[template.icon as keyof typeof ICON_MAP];
+          const isSelected = selectedId === template.id;
+          return (
+            <button
+              key={template.id}
+              onClick={() => handleSelectTemplate(template.id)}
+              className={`w-full p-4 rounded-xl border text-left transition-all ${
+                isSelected
+                  ? "bg-white border-primary/40 shadow-md"
+                  : "bg-slate-50/80 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <span className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isSelected && template.id === "evenements" ? "bg-primary/20 text-primary" : "bg-slate-200/80 text-slate-500"}`}>
+                  {IconComponent && <IconComponent />}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-slate-900">{template.name}</h3>
+                  <p className="text-sm text-slate-500 mt-0.5">{template.description}</p>
+                </div>
+                {isSelected && (
+                  <span className="w-6 h-6 rounded-full bg-slate-900 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Colonne droite : Personnalisation */}
+      <div className="flex-1 min-w-0">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 min-h-[320px]">
+          <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <Icons.Menu />
+            Personnalisation rapide
+          </h3>
+
+          {selected ? (
+            <div className="space-y-5">
+              {fetes ? (
+                <>
+                  <p className="text-sm font-medium text-slate-700">Choisissez une fête :</p>
+                  <div className="flex flex-wrap gap-2">
+                    {fetes.map((fete) => (
+                      <button
+                        key={fete.id}
+                        onClick={() => setSelectedFete(fete)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          selectedFete?.id === fete.id
+                            ? "bg-primary text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        {fete.name}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Modifier l&apos;avantage (1-2 lignes)
+                </label>
+                <textarea
+                  value={avantage}
+                  onChange={(e) => setAvantage(e.target.value)}
+                  placeholder="Ex : Un surclassement gratuit en Suite Junior"
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Aperçu du message
+                </label>
+                <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
+                  <p className="text-sm text-slate-700">
+                    {previewMessage}
+                    <span className="text-primary font-medium italic">&quot;{avantage || "…"}&quot;</span>
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Bouton interactif
+                </label>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-200/80 border border-slate-200 text-slate-700 text-sm font-medium">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Réserver
+                </div>
+              </div>
+
+              <button
+                onClick={handleValiderEnvoyer}
+                disabled={!avantage.trim()}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Valider et envoyer
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Icons.Cursor />
+              <p className="mt-4 text-slate-400 text-sm max-w-[260px]">
+                Sélectionnez une offre à gauche pour commencer la personnalisation.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// ONGLET 2 : Générer depuis LinkedIn
+// ============================================================
+function LinkedInTab() {
+  const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [postPreview, setPostPreview] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [variablesFound, setVariablesFound] = useState<string[]>([]);
+  const [templateName, setTemplateName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [savedTemplates, setSavedTemplates] = useState<MessageTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
+
+  const profileId = config.isDemoMode ? "demo-user-id" : demoProfile.id;
+
+  // Charger les templates sauvegardés
+  useEffect(() => {
+    const loadTemplates = async () => {
+      setLoadingTemplates(true);
+      try {
+        if (config.isDemoMode) {
+          setSavedTemplates(demoMessageTemplates as MessageTemplate[]);
+        } else {
+          const templates = await linkedin.getTemplates(profileId);
+          setSavedTemplates(templates);
+        }
+      } catch {
+        // Silencieux si l'utilisateur n'est pas encore connecté
+      } finally {
+        setLoadingTemplates(false);
+      }
+    };
+    loadTemplates();
+  }, [profileId]);
+
+  const handleGenerate = async () => {
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) {
+      toast.error("Collez l'URL d'un post LinkedIn.");
+      return;
+    }
+    if (!trimmedUrl.includes("linkedin.com")) {
+      toast.error("L'URL doit être un lien LinkedIn valide.");
+      return;
+    }
+
+    setLoading(true);
+    setPostPreview(null);
+    setGeneratedContent(null);
+    setVariablesFound([]);
+
+    try {
+      if (config.isDemoMode) {
+        // Simulation en mode démo
+        await new Promise((r) => setTimeout(r, 1200));
+        setPostPreview(demoLinkedinPost.preview);
+        setGeneratedContent(demoGeneratedTemplate.content);
+        setVariablesFound(demoGeneratedTemplate.variables_found);
+        toast.success("Template généré avec succès !");
+      } else {
+        const result = await linkedin.generateTemplate({ url: trimmedUrl });
+        setPostPreview(result.post_preview);
+        setGeneratedContent(result.content);
+        setVariablesFound(result.variables_found);
+        toast.success("Template généré avec succès !");
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la génération.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!generatedContent || !templateName.trim()) {
+      toast.error("Donnez un nom à votre template avant de sauvegarder.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (config.isDemoMode) {
+        await new Promise((r) => setTimeout(r, 600));
+        const newTemplate: MessageTemplate = {
+          id: `tpl-${Date.now()}`,
+          profile_id: "demo-user-id",
+          name: templateName.trim(),
+          content: generatedContent,
+          variables: variablesFound,
+          source: "linkedin",
+          linkedin_url: url.trim() || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setSavedTemplates((prev) => [newTemplate, ...prev]);
+        toast.success("Template sauvegardé !");
+      } else {
+        const saved = await linkedin.saveTemplate({
+          profileId,
+          name: templateName.trim(),
+          content: generatedContent,
+          variables: variablesFound,
+          linkedinUrl: url.trim() || undefined,
+        });
+        setSavedTemplates((prev) => [saved, ...prev]);
+        toast.success("Template sauvegardé !");
+      }
+      setTemplateName("");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la sauvegarde.";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      if (!config.isDemoMode) {
+        await linkedin.deleteTemplate(id);
+      }
+      setSavedTemplates((prev) => prev.filter((t) => t.id !== id));
+      toast.success("Template supprimé.");
+    } catch {
+      toast.error("Erreur lors de la suppression.");
+    }
+  };
+
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast.success("Copié dans le presse-papiers !");
+  };
+
+  return (
+    <div className="space-y-6">
+      {config.isDemoMode && (
+        <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          Mode démo — les appels Unipile et LinkedIn sont simulés.
+        </div>
+      )}
+
+      {/* Champ URL + bouton */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <h3 className="font-semibold text-slate-900 mb-1">URL du post LinkedIn</h3>
+        <p className="text-sm text-slate-500 mb-4">
+          Collez l&apos;URL d&apos;un post LinkedIn pour le convertir en template WhatsApp.
+        </p>
+        <div className="flex gap-3">
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://www.linkedin.com/posts/..."
+            className="flex-1 px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+          />
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !url.trim()}
+            className="flex items-center gap-2 px-5 py-3 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+          >
+            {loading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Génération...
+              </>
+            ) : (
+              <>Générer</>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Résultat : aperçu + template généré */}
+      {(postPreview || generatedContent) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Aperçu du post */}
+          {postPreview && (
+            <div className="bg-white rounded-xl border border-slate-200 p-5">
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                Contenu du post LinkedIn
+              </h4>
+              <p className="text-sm text-slate-700 leading-relaxed">{postPreview}</p>
+            </div>
+          )}
+
+          {/* Template généré */}
+          {generatedContent && (
+            <div className="bg-white rounded-xl border border-primary/30 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Template WhatsApp généré
+                </h4>
+                <button
+                  onClick={() => handleCopy(generatedContent)}
+                  className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copier
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 mb-4">
+                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
+                  {generatedContent}
+                </p>
+              </div>
+
+              {/* Variables détectées */}
+              {variablesFound.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    Variables détectées
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {variablesFound.map((v) => (
+                      <span
+                        key={v}
+                        className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-mono font-medium"
+                      >
+                        {`{{${v}}}`}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sauvegarder */}
+              <div className="border-t border-slate-100 pt-4 space-y-3">
+                <input
+                  type="text"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="Nom du template (ex : Offre fidélité printemps)"
+                  className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                />
+                <button
+                  onClick={handleSave}
+                  disabled={saving || !templateName.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-white text-sm font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  {saving ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Sauvegarde...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                      </svg>
+                      Sauvegarder comme template
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Liste des templates sauvegardés */}
+      <div>
+        <h3 className="font-semibold text-slate-900 mb-3">
+          Templates LinkedIn sauvegardés
+          {savedTemplates.length > 0 && (
+            <span className="ml-2 text-sm font-normal text-slate-500">
+              ({savedTemplates.length})
+            </span>
+          )}
+        </h3>
+
+        {loadingTemplates ? (
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : savedTemplates.length === 0 ? (
+          <div className="py-10 text-center rounded-xl border border-dashed border-slate-200 text-slate-400 text-sm">
+            Aucun template LinkedIn sauvegardé pour l&apos;instant.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {savedTemplates.map((tpl) => (
+              <div
+                key={tpl.id}
+                className="bg-white rounded-xl border border-slate-200 p-4"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-semibold text-slate-900 text-sm">{tpl.name}</h4>
+                      {tpl.source === "linkedin" && (
+                        <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium">
+                          LinkedIn
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                      {tpl.content}
+                    </p>
+                    {tpl.variables && tpl.variables.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {tpl.variables.map((v: string) => (
+                          <span
+                            key={v}
+                            className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-xs font-mono"
+                          >
+                            {`{{${v}}}`}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={() => handleCopy(tpl.content)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                      title="Copier le template"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(tpl.id)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      title="Supprimer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// COMPOSANT PRINCIPAL
+// ============================================================
+function TemplatesContent() {
+  const searchParams = useSearchParams();
+  const segmentId = searchParams.get("segment") || "";
+  const segmentName = SEGMENT_NAMES[segmentId] || "un segment";
+  const [activeTab, setActiveTab] = useState<"offres" | "linkedin">("offres");
 
   return (
     <div className="space-y-6">
@@ -147,150 +651,48 @@ function TemplatesContent() {
           )}
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-          Quelle offre envoyer ?
+          Templates de messages
         </h1>
         <p className="text-slate-600 text-base">
           {segmentId
-            ? `Vous ciblez « ${segmentName} ». Sélectionnez un template parmi nos 5 offres les plus performantes.`
-            : "Sélectionnez un template parmi nos 5 offres les plus performantes."}
+            ? `Vous ciblez « ${segmentName} ». Choisissez un template ou générez-en un depuis LinkedIn.`
+            : "Choisissez un template prêt à l'emploi ou générez-en un depuis un post LinkedIn."}
         </p>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Colonne gauche : Liste des templates */}
-        <div className="lg:w-[380px] shrink-0 space-y-3">
-          {TEMPLATES.map((template) => {
-            const IconComponent = ICON_MAP[template.icon as keyof typeof ICON_MAP];
-            const isSelected = selectedId === template.id;
-            return (
-              <button
-                key={template.id}
-                onClick={() => handleSelectTemplate(template.id)}
-                className={`w-full p-4 rounded-xl border text-left transition-all ${
-                  isSelected
-                    ? "bg-white border-primary/40 shadow-md"
-                    : "bg-slate-50/80 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <span className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isSelected && template.id === "evenements" ? "bg-primary/20 text-primary" : "bg-slate-200/80 text-slate-500"}`}>
-                    {IconComponent && <IconComponent />}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-slate-900">{template.name}</h3>
-                    <p className="text-sm text-slate-500 mt-0.5">{template.description}</p>
-                  </div>
-                  {isSelected && (
-                    <span className="w-6 h-6 rounded-full bg-slate-900 flex items-center justify-center shrink-0">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Colonne droite : Personnalisation */}
-        <div className="flex-1 min-w-0">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 min-h-[320px]">
-            <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Icons.Menu />
-              Personnalisation rapide
-            </h3>
-
-            {selected ? (
-              <div className="space-y-5">
-                {/* Choix fête (événements uniquement) */}
-                {fetes ? (
-                  <>
-                    <p className="text-sm font-medium text-slate-700">Choisissez une fête :</p>
-                    <div className="flex flex-wrap gap-2">
-                      {fetes.map((fete) => (
-                        <button
-                          key={fete.id}
-                          onClick={() => setSelectedFete(fete)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            selectedFete?.id === fete.id
-                              ? "bg-primary text-white"
-                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                          }`}
-                        >
-                          {fete.name}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
-
-                {/* MODIFIER L'AVANTAGE */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Modifier l&apos;avantage (1-2 lignes)
-                  </label>
-                  <textarea
-                    value={avantage}
-                    onChange={(e) => setAvantage(e.target.value)}
-                    placeholder="Ex : Un surclassement gratuit en Suite Junior"
-                    rows={2}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
-                  />
-                </div>
-
-                {/* APERÇU DU MESSAGE */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Aperçu du message
-                  </label>
-                  <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
-                    <p className="text-sm text-slate-700">
-                      {previewMessage}
-                      <span className="text-primary font-medium italic">&quot;{avantage || "…"}&quot;</span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* BOUTON INTERACTIF */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Bouton interactif
-                  </label>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-200/80 border border-slate-200 text-slate-700 text-sm font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Réserver
-                  </div>
-                </div>
-
-                {/* Valider et envoyer */}
-                <button
-                  onClick={handleValiderEnvoyer}
-                  disabled={!avantage.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Valider et envoyer
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <Icons.Cursor />
-                <p className="mt-4 text-slate-400 text-sm max-w-[260px]">
-                  Sélectionnez une offre à gauche pour commencer la personnalisation.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Onglets */}
+      <div className="flex gap-1 p-1 bg-slate-100 rounded-xl w-fit">
+        <button
+          onClick={() => setActiveTab("offres")}
+          className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+            activeTab === "offres"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          Offres standards
+        </button>
+        <button
+          onClick={() => setActiveTab("linkedin")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+            activeTab === "linkedin"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+          Générer depuis LinkedIn
+        </button>
       </div>
+
+      {/* Contenu des onglets */}
+      {activeTab === "offres" ? (
+        <OffresTab segmentId={segmentId} segmentName={segmentName} />
+      ) : (
+        <LinkedInTab />
+      )}
     </div>
   );
 }

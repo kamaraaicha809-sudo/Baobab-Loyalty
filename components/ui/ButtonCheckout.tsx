@@ -5,22 +5,24 @@ import { billing } from "@/src/sdk";
 import toast from "react-hot-toast";
 
 interface ButtonCheckoutProps {
-  priceId: string;
-  mode?: "payment" | "subscription";
+  planSlug: string;
+  amount: number;
+  planName: string;
   extraStyle?: string;
   children?: React.ReactNode;
 }
 
-const ButtonCheckout = ({ priceId, mode = "payment", extraStyle = "", children }: ButtonCheckoutProps) => {
+const ButtonCheckout = ({ planSlug, amount, planName, extraStyle = "", children }: ButtonCheckoutProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
     setIsLoading(true);
     try {
       const { url } = await billing.createCheckout({
-        priceId,
-        mode,
-        successUrl: window.location.href,
+        planSlug,
+        amount,
+        planName,
+        successUrl: `${window.location.origin}/dashboard`,
         cancelUrl: window.location.href,
       });
       window.location.href = url;

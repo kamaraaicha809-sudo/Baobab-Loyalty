@@ -25,7 +25,7 @@ const config = {
   appDescription: "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et leur base de données clients en automatisant l'envoi via WhatsApp en 2 minutes",
   // → Description courte pour le SEO et la homepage
   
-  domainName: "example.com",
+  domainName: "baobab-loyalty.com",
   // → Domaine de production (sans https://)
 
   // ============================================
@@ -62,13 +62,13 @@ const config = {
   // Remplacez par votre domaine vérifié dans Resend
   
   resend: {
-    fromNoReply: `Baobab Loyalty <noreply@example.com>`,
+    fromNoReply: `Baobab Loyalty <noreply@baobab-loyalty.com>`,
     // → Emails automatiques (confirmations, etc.)
-    
-    fromAdmin: `Support Baobab Loyalty <support@example.com>`,
+
+    fromAdmin: `Support Baobab Loyalty <support@baobab-loyalty.com>`,
     // → Emails de support
-    
-    supportEmail: "support@example.com",
+
+    supportEmail: "support@baobab-loyalty.com",
     // → Adresse affichée pour contacter le support
   },
 
@@ -89,11 +89,9 @@ const config = {
     currency: "FCFA",
     plans: [
       {
-        priceId: process.env.NODE_ENV === "development" ? "price_essentiel_test" : "price_essentiel_live",
         name: "Essentiel",
         description: "Pour les petits hôtels",
         price: 29000,
-        priceAnchor: null,
         features: [
           { name: "Jusqu'à 30 chambres" },
           { name: "Segments IA de base" },
@@ -102,11 +100,9 @@ const config = {
       },
       {
         isFeatured: true,
-        priceId: process.env.NODE_ENV === "development" ? "price_croissance_test" : "price_croissance_live",
         name: "Croissance",
         description: "Le plus populaire",
         price: 49000,
-        priceAnchor: null,
         features: [
           { name: "Jusqu'à 100 chambres" },
           { name: "Tous les segments IA" },
@@ -114,11 +110,9 @@ const config = {
         ],
       },
       {
-        priceId: process.env.NODE_ENV === "development" ? "price_premium_test" : "price_premium_live",
         name: "Premium",
         description: "Pour les grands établissements",
         price: 69000,
-        priceAnchor: null,
         features: [
           { name: "Chambres illimitées" },
           { name: "IA personnalisée" },

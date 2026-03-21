@@ -17,6 +17,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
+    if (isDemoMode) {
+      return success({
+        id: "demo-user-id",
+        email: "demo@baobab-loyalty.com",
+        has_access: true,
+        role: "admin",
+        hotel_name: "Hôtel Demo",
+        config_complete: true,
+        customer_id: null,
+        price_id: null,
+      });
+    }
+
     // Verify authentication
     const { user, userClient, error: authError } = await requireAuth(req);
     if (authError || !user || !userClient) {

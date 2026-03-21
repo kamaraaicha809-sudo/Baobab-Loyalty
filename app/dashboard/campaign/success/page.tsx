@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { isDemoMode, demoUser } from "@/src/lib/demo";
+import { isDemoMode, demoUser, demoProfile } from "@/src/lib/demo";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -22,7 +22,7 @@ function SuccessContent() {
     load();
   }, []);
 
-  const hotelName = "Hôtel Le Baobab";
+  const hotelName = isDemoMode ? demoProfile.hotel_name : "Hôtel Le Baobab";
   const offreParams = new URLSearchParams();
   offreParams.set("avantage", avantage);
   offreParams.set("hotel", hotelName);

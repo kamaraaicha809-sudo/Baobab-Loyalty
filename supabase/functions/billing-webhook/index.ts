@@ -1,63 +1,106 @@
 /**
  * billing-webhook
- * Handles Stripe webhook events
+ * Handles Moneroo webhook events
  *
- * Auth: Stripe signature verification (no JWT)
+ * Auth: Moneroo HMAC-SHA256 signature (no JWT)
  * Method: POST
  */
 
-import { createClient, Stripe } from "../_shared/deps.ts";
-import type { SupabaseClient } from "../_shared/deps.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { getServiceClient } from "../_shared/auth.ts";
+
+async function verifySignature(body: string, signature: string, secret: string): Promise<boolean> {
+  try {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
+    const hex = Array.from(new Uint8Array(sig))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hex === signature;
+  } catch {
+    return false;
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
   if (req.method !== "POST") return errors.badRequest("Method not allowed");
 
-  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-  const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-  if (!stripeKey || !webhookSecret) return errors.internal("Server configuration error");
-
-  const stripe = new Stripe(stripeKey, {
-    apiVersion: "2023-10-16",
-    httpClient: Stripe.createFetchHttpClient(),
-  });
+  const webhookSecret = Deno.env.get("MONEROO_WEBHOOK_SECRET");
+  if (!webhookSecret) return errors.internal("Server configuration error");
 
   const body = await req.text();
-  const signature = req.headers.get("stripe-signature");
-  if (!signature) return errors.badRequest("Missing stripe-signature header");
+  const signature = req.headers.get("x-moneroo-signature");
 
-  let event: Stripe.Event;
-  try {
-    event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
-  } catch (err) {
-    console.error("Webhook signature verification failed:", err);
+  if (!signature) return errors.badRequest("Missing x-moneroo-signature header");
+
+  const isValid = await verifySignature(body, signature, webhookSecret);
+  if (!isValid) {
+    console.error("Webhook signature verification failed");
     return errors.badRequest("Invalid signature");
+  }
+
+  let event: { event: string; data: Record<string, unknown>; created_at?: string };
+  try {
+    event = JSON.parse(body);
+  } catch {
+    return errors.badRequest("Invalid JSON body");
+  }
+
+  if (!event?.event || !event?.data || typeof event.event !== "string") {
+    return errors.badRequest("Invalid webhook payload structure");
+  }
+
+  // Replay attack protection: reject events older than 5 minutes
+  if (event.created_at) {
+    const eventTime = new Date(event.created_at).getTime();
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    if (isNaN(eventTime) || now - eventTime > fiveMinutes) {
+      console.error("Webhook rejected: event too old or invalid timestamp");
+      return errors.badRequest("Event timestamp expired");
+    }
   }
 
   const supabase = getServiceClient();
 
   try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        await handleCheckoutCompleted(stripe, supabase, session);
+    switch (event.event) {
+      case "payment.success": {
+        const metadata = event.data.metadata as Record<string, string> | undefined;
+        const userId = metadata?.user_id;
+        const plan = metadata?.plan;
+
+        if (!userId) {
+          console.error("No user_id in payment metadata");
+          break;
+        }
+
+        const { error } = await supabase
+          .from("profiles")
+          .update({ has_access: true, price_id: plan || null })
+          .eq("id", userId);
+
+        if (error) throw error;
+        console.log(`Payment success: user=${userId} plan=${plan}`);
         break;
       }
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        await handleSubscriptionDeleted(supabase, subscription);
+
+      case "payment.failed": {
+        const metadata = event.data.metadata as Record<string, string> | undefined;
+        console.log(`Payment failed: user=${metadata?.user_id}`);
         break;
       }
-      case "invoice.paid": {
-        const invoice = event.data.object as Stripe.Invoice;
-        await handleInvoicePaid(supabase, invoice);
-        break;
-      }
+
       default:
-        console.log(`Unhandled event: ${event.type}`);
+        console.log(`Unhandled event: ${event.event}`);
     }
 
     return success({ received: true });
@@ -66,88 +109,3 @@ Deno.serve(async (req) => {
     return errors.internal("Webhook processing failed");
   }
 });
-
-async function handleCheckoutCompleted(
-  stripe: Stripe,
-  supabase: SupabaseClient,
-  session: Stripe.Checkout.Session
-) {
-  const customerId = session.customer as string;
-  const userId = session.client_reference_id;
-
-  const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-    expand: ["line_items"],
-  });
-  const priceId = fullSession.line_items?.data[0]?.price?.id;
-  const customer = await stripe.customers.retrieve(customerId);
-  const email = (customer as Stripe.Customer).email;
-
-  let profileId = userId;
-
-  if (!profileId && email) {
-    const { data: existingProfile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", email)
-      .single();
-
-    if (existingProfile) {
-      profileId = existingProfile.id;
-    } else {
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        email_confirm: true,
-      });
-      if (authError) throw authError;
-      profileId = authData.user?.id;
-    }
-  }
-
-  if (!profileId) throw new Error("Could not determine user ID for checkout");
-
-  const { error } = await supabase.from("profiles").upsert({
-    id: profileId,
-    email,
-    customer_id: customerId,
-    price_id: priceId,
-    has_access: true,
-  });
-  if (error) throw error;
-  console.log(`Checkout completed for user ${profileId}`);
-}
-
-async function handleSubscriptionDeleted(
-  supabase: SupabaseClient,
-  subscription: Stripe.Subscription
-) {
-  const customerId = subscription.customer as string;
-  const { error } = await supabase
-    .from("profiles")
-    .update({ has_access: false })
-    .eq("customer_id", customerId);
-  if (error) throw error;
-  console.log(`Access revoked for customer ${customerId}`);
-}
-
-async function handleInvoicePaid(
-  supabase: SupabaseClient,
-  invoice: Stripe.Invoice
-) {
-  const customerId = invoice.customer as string;
-  const priceId = invoice.lines.data[0]?.price?.id;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("price_id")
-    .eq("customer_id", customerId)
-    .single();
-
-  if (profile?.price_id !== priceId) return;
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({ has_access: true })
-    .eq("customer_id", customerId);
-  if (error) throw error;
-  console.log(`Invoice paid for customer ${customerId}`);
-}

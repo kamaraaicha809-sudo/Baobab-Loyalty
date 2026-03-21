@@ -18,6 +18,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
+    if (isDemoMode) return errors.forbidden("Prompt creation is disabled in demo mode");
+
     // Verify admin access
     const { error: authError } = await requireAdmin(req);
     if (authError) {

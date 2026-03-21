@@ -22,8 +22,8 @@ Deno.serve(async (req) => {
 
     let isAuthorized = false;
 
-    // Check if using service role key
-    if (authHeader?.includes(serviceRoleKey || "IMPOSSIBLE_MATCH")) {
+    // Check if using service role key (exact match required)
+    if (serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`) {
       isAuthorized = true;
     } else if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.replace("Bearer ", "");

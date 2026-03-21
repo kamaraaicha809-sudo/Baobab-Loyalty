@@ -10,6 +10,7 @@ export interface Client {
   nom: string;
   email: string | null;
   telephone: string | null;
+  whatsapp: string | null; // Numéro WhatsApp dédié (ex. +221...)
   derniere_visite: string;
   notes: string | null;
   created_at?: string;
@@ -29,32 +30,12 @@ export interface SegmentCounts extends Record<string, number> {
  */
 export async function getSegmentCounts(profileId: string): Promise<SegmentCounts> {
   const supabase = createClient();
-  const today = new Date().toISOString().split("T")[0];
 
-  const { data: clients, error } = await supabase
-    .from("clients")
-    .select("derniere_visite")
-    .eq("profile_id", profileId);
-
-  if (error) throw error;
-
-  const counts: SegmentCounts = { "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 };
-  const all = (clients || []).length;
-  counts.tous = all;
-
-  const todayDate = new Date(today);
-
-  (clients || []).forEach((c) => {
-    const dv = new Date(c.derniere_visite + "T12:00:00");
-    const diffMs = todayDate.getTime() - dv.getTime();
-    const diffMonths = diffMs / (1000 * 60 * 60 * 24 * 30.44);
-
-    if (diffMonths >= 9) counts["9mois"]++;
-    if (diffMonths >= 6) counts["6mois"]++;
-    if (diffMonths >= 3) counts["3mois"]++;
+  const { data, error: rpcError } = await supabase.rpc("get_segment_counts", {
+    p_profile_id: profileId,
   });
-
-  return counts;
+  if (rpcError) throw rpcError;
+  return (data ?? { "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 }) as SegmentCounts;
 }
 
 /**
@@ -76,15 +57,16 @@ export async function getClients(profileId: string, limit = 1000): Promise<Clien
 
 /**
  * Importe des clients depuis des lignes CSV parsées
- * Format attendu : nom, email, telephone, derniere_visite (YYYY-MM-DD)
+ * Format attendu : nom, email, telephone, whatsapp?, derniere_visite (YYYY-MM-DD)
+ * Bulk insert optimisé (batch de 100)
  */
 export async function importClients(
   profileId: string,
-  rows: { nom: string; email?: string; telephone?: string; derniere_visite: string }[]
+  rows: { nom: string; email?: string; telephone?: string; whatsapp?: string; derniere_visite: string }[]
 ): Promise<{ inserted: number; errors: string[] }> {
   const supabase = createClient();
   const errors: string[] = [];
-  let inserted = 0;
+  const validRows: { profile_id: string; nom: string; email: string | null; telephone: string | null; whatsapp: string | null; derniere_visite: string }[] = [];
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -92,19 +74,27 @@ export async function importClients(
       errors.push(`Ligne ${i + 2} : nom et dernière visite requis`);
       continue;
     }
-
-    const { error } = await supabase.from("clients").insert({
+    validRows.push({
       profile_id: profileId,
       nom: row.nom.trim(),
       email: row.email?.trim() || null,
       telephone: row.telephone?.trim() || null,
+      whatsapp: row.whatsapp?.trim() || null,
       derniere_visite: row.derniere_visite,
     });
+  }
+
+  const BATCH = 100;
+  let inserted = 0;
+
+  for (let i = 0; i < validRows.length; i += BATCH) {
+    const batch = validRows.slice(i, i + BATCH);
+    const { data, error } = await supabase.from("clients").insert(batch).select("id");
 
     if (error) {
-      errors.push(`Ligne ${i + 2} : ${error.message}`);
+      errors.push(`Lot ${Math.floor(i / BATCH) + 1} : ${error.message}`);
     } else {
-      inserted++;
+      inserted += data?.length ?? 0;
     }
   }
 
@@ -112,19 +102,20 @@ export async function importClients(
 }
 
 /**
- * Parse une chaîne CSV en lignes avec colonnes nom, email, telephone, derniere_visite
- * Gère plusieurs formats de colonnes (nom/prénom, email, tél, date)
+ * Parse une chaîne CSV en lignes avec colonnes nom, email, telephone, whatsapp?, derniere_visite
+ * Gère plusieurs formats de colonnes (nom/prénom, email, tél, whatsapp, date)
  */
-export function parseClientsCSV(csvText: string): { nom: string; email?: string; telephone?: string; derniere_visite: string }[] {
+export function parseClientsCSV(csvText: string): { nom: string; email?: string; telephone?: string; whatsapp?: string; derniere_visite: string }[] {
   const lines = csvText.split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return [];
 
   const headers = lines[0].split(/[,;]/).map((h) => h.trim().toLowerCase());
-  const rows: { nom: string; email?: string; telephone?: string; derniere_visite: string }[] = [];
+  const rows: { nom: string; email?: string; telephone?: string; whatsapp?: string; derniere_visite: string }[] = [];
 
   const colNom = headers.findIndex((h) => /^(nom|name|client|prénom|prenom)$/i.test(h));
   const colEmail = headers.findIndex((h) => /^email$/i.test(h));
   const colTel = headers.findIndex((h) => /^(tel|telephone|phone|téléphone)$/i.test(h));
+  const colWhatsapp = headers.findIndex((h) => /^whatsapp$/i.test(h));
   const colDate = headers.findIndex((h) =>
     /^(derniere|dernière|date|visite|last|sejour|séjour)$/i.test(h)
   );
@@ -137,6 +128,7 @@ export function parseClientsCSV(csvText: string): { nom: string; email?: string;
     const nom = (colNom >= 0 ? parts[colNom] : parts[fallbackNom]) || "";
     const email = colEmail >= 0 ? parts[colEmail] : undefined;
     const telephone = colTel >= 0 ? parts[colTel] : undefined;
+    const whatsapp = colWhatsapp >= 0 ? parts[colWhatsapp] : undefined;
     const derniere_visite = (colDate >= 0 ? parts[colDate] : parts[fallbackDate]) || "";
 
     if (!nom) continue;
@@ -146,6 +138,7 @@ export function parseClientsCSV(csvText: string): { nom: string; email?: string;
       nom,
       email: email || undefined,
       telephone: telephone || undefined,
+      whatsapp: whatsapp || undefined,
       derniere_visite: parsed,
     });
   }

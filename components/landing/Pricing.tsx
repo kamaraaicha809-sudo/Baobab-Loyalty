@@ -39,87 +39,74 @@ const Pricing = () => {
           Des tarifs adaptés à votre hôtel
         </h2>
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {plans.map((plan, i) => (
-            <div
-              key={i}
-              className={`relative rounded-2xl p-6 sm:p-8 ${
-                plan.isFeatured
-                  ? "bg-[#252525] border-2 border-primary"
-                  : "bg-[#252525] border border-[#333]"
-              }`}
-            >
-              {plan.isFeatured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-4 py-1 rounded-full bg-primary text-white text-xs font-medium uppercase">
-                    POPULAIRE
+          {plans.map((plan, i) => {
+            const slug = planSlugs[plan.name] || plan.name.toLowerCase();
+            return (
+              <div
+                key={i}
+                className={`relative rounded-2xl p-6 sm:p-8 ${
+                  plan.isFeatured
+                    ? "bg-[#252525] border-2 border-primary"
+                    : "bg-[#252525] border border-[#333]"
+                }`}
+              >
+                {plan.isFeatured && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="px-4 py-1 rounded-full bg-primary text-white text-xs font-medium uppercase">
+                      POPULAIRE
+                    </span>
+                  </div>
+                )}
+                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                <div className="mb-6">
+                  <span className="text-3xl sm:text-4xl font-bold text-white">
+                    {plan.price.toLocaleString("fr-FR")} {config.stripe.currency}
                   </span>
+                  <span className="text-slate-400 text-sm ml-1">/mois</span>
                 </div>
-              )}
-              <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-              <div className="mb-6">
-                <span className="text-3xl sm:text-4xl font-bold text-white">
-                  {plan.price.toLocaleString("fr-FR")} {config.stripe.currency}
-                </span>
-                <span className="text-slate-400 text-sm ml-1">/mois</span>
+                <ul className="space-y-3 mb-8 text-slate-300 text-sm">
+                  {plan.features.map((f, j) => (
+                    <li key={j}>{f.name}</li>
+                  ))}
+                </ul>
+                <div>
+                  {loading ? (
+                    <div
+                      className={`block w-full py-3 rounded-lg text-center font-medium animate-pulse ${
+                        plan.isFeatured ? "bg-primary/50" : "bg-slate-700"
+                      }`}
+                    >
+                      Chargement...
+                    </div>
+                  ) : isLoggedIn ? (
+                    <ButtonCheckout
+                      planSlug={slug}
+                      amount={plan.price}
+                      planName={plan.name}
+                      extraStyle={`block w-full py-3 rounded-lg text-center font-medium transition-colors ${
+                        plan.isFeatured
+                          ? "bg-primary text-[#1a1a1a] hover:bg-[#c9a84d]"
+                          : "bg-white text-[#1a1a1a] hover:bg-slate-100"
+                      }`}
+                    >
+                      Choisir ce plan
+                    </ButtonCheckout>
+                  ) : (
+                    <Link
+                      href={`/signup?plan=${slug}`}
+                      className={`block w-full py-3 rounded-lg text-center font-medium transition-colors ${
+                        plan.isFeatured
+                          ? "bg-primary text-[#1a1a1a] hover:bg-[#c9a84d]"
+                          : "bg-white text-[#1a1a1a] hover:bg-slate-100"
+                      }`}
+                    >
+                      Choisir ce plan
+                    </Link>
+                  )}
+                </div>
               </div>
-              <ul className="space-y-3 mb-8 text-slate-300 text-sm">
-                {plan.features.map((f, j) => (
-                  <li key={j}>{f.name}</li>
-                ))}
-              </ul>
-              <div>
-              {loading ? (
-                <div
-                  className={`block w-full py-3 rounded-lg text-center font-medium animate-pulse ${
-                    plan.isFeatured ? "bg-primary/50" : "bg-slate-700"
-                  }`}
-                >
-                  Chargement...
-                </div>
-              ) : isLoggedIn ? (
-                <>
-                  <ButtonCheckout
-                    priceId={plan.priceId}
-                    mode="subscription"
-                    extraStyle={`block w-full py-3 rounded-lg text-center font-medium transition-colors ${
-                      plan.isFeatured
-                        ? "bg-primary text-[#1a1a1a] hover:bg-[#c9a84d]"
-                        : "bg-transparent border border-slate-500 text-white hover:border-slate-400"
-                    }`}
-                  >
-                    Choisir ce plan
-                  </ButtonCheckout>
-                  <ButtonCheckout
-                    priceId={plan.priceId}
-                    mode="subscription"
-                    extraStyle="block w-full text-center text-primary/90 text-xs mt-2 bg-transparent border-0 hover:underline cursor-pointer p-0 min-h-0 font-normal"
-                  >
-                    Économisez 20% sur le paiement annuel
-                  </ButtonCheckout>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href={`/signup?plan=${planSlugs[plan.name] || "essentiel"}`}
-                    className={`block w-full py-3 rounded-lg text-center font-medium transition-colors ${
-                      plan.isFeatured
-                        ? "bg-primary text-[#1a1a1a] hover:bg-[#c9a84d]"
-                        : "bg-transparent border border-slate-500 text-white hover:border-slate-400"
-                    }`}
-                  >
-                    Choisir ce plan
-                  </Link>
-                  <Link
-                    href={`/signup?plan=${planSlugs[plan.name] || "essentiel"}`}
-                    className="block text-center text-primary/90 text-xs mt-2 hover:underline cursor-pointer"
-                  >
-                    Économisez 20% sur le paiement annuel
-                  </Link>
-                </>
-              )}
-            </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <p className="text-center text-slate-400 text-sm sm:text-base mt-10">
           Le prix d&apos;installation et de configuration est de 39 000 FCFA, une seule fois.

@@ -1,21 +1,17 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
+import { clients } from "@/src/sdk/clients";
+import { createClient } from "@/libs/supabase/client";
 
 const SEGMENT_NAMES: Record<string, string> = {
   "3mois": "Clients - 3 mois",
   "6mois": "Clients - 6 mois",
   "9mois": "Clients - 9 mois",
   tous: "Tous les clients",
-};
-
-const SEGMENT_COUNTS: Record<string, number> = {
-  "3mois": 124,
-  "6mois": 89,
-  "9mois": 56,
-  tous: 450,
 };
 
 const TEMPLATE_NAMES: Record<string, string> = {
@@ -34,9 +30,30 @@ function ConfirmContent() {
   const feteName = searchParams.get("fete") || "";
   const avantage = searchParams.get("avantage") || "";
 
+  const [counts, setCounts] = useState<Record<string, number>>(demoSegmentCounts);
+
+  useEffect(() => {
+    const load = async () => {
+      if (isDemoMode) {
+        setCounts(demoSegmentCounts);
+        return;
+      }
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      try {
+        const seg = await clients.getSegmentCounts(user.id);
+        setCounts(seg);
+      } catch {
+        setCounts(demoSegmentCounts);
+      }
+    };
+    load();
+  }, []);
+
   const segmentName = SEGMENT_NAMES[segmentId] || segmentId;
   const offerName = feteName ? `${TEMPLATE_NAMES[templateId] || templateId} - ${feteName}` : (TEMPLATE_NAMES[templateId] || templateId);
-  const clientCount = SEGMENT_COUNTS[segmentId] ?? 0;
+  const clientCount = counts[segmentId] ?? 0;
 
   const templatesUrl = `/dashboard/templates?segment=${segmentId}`;
 

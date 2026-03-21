@@ -1,21 +1,23 @@
 /**
  * Billing SDK module
- * Functions for Stripe checkout and customer portal
+ * Functions for Moneroo checkout
  */
 
 import { callEdgeFunction } from "./_core";
 
 // Types
 export interface CreateCheckoutParams {
-  priceId: string;
-  mode: "payment" | "subscription";
+  planSlug: string;
+  amount: number;
+  planName: string;
+  currency?: string;
   successUrl: string;
   cancelUrl: string;
-  couponId?: string;
 }
 
 export interface CreateCheckoutResponse {
   url: string;
+  paymentId?: string;
 }
 
 export interface CreatePortalParams {
@@ -27,8 +29,8 @@ export interface CreatePortalResponse {
 }
 
 /**
- * Create a Stripe Checkout session
- * Redirects user to Stripe for payment
+ * Create a Moneroo payment session
+ * Redirects user to Moneroo checkout
  */
 export async function createCheckout(
   params: CreateCheckoutParams
@@ -40,8 +42,7 @@ export async function createCheckout(
 }
 
 /**
- * Create a Stripe Customer Portal session
- * Allows user to manage subscription and payment methods
+ * Get billing management URL
  */
 export async function createPortal(
   params: CreatePortalParams

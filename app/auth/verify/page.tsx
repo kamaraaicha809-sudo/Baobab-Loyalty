@@ -7,9 +7,7 @@ import toast from "react-hot-toast";
 import config from "@/config";
 import Logo from "@/components/common/Logo";
 import OTPInput from "@/components/ui/OTPInput";
-
-// Mode démo
-const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+import { isDemoMode } from "@/src/lib/demo";
 
 function VerifyContent() {
   const router = useRouter();

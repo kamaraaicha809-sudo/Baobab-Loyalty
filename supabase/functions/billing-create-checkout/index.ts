@@ -1,78 +1,93 @@
 /**
  * billing-create-checkout
- * Creates a Stripe Checkout Session
+ * Creates a Moneroo payment session
  *
  * Auth: Required (JWT)
  * Method: POST
- * Body: { priceId, mode, successUrl, cancelUrl, couponId? }
+ * Body: { planSlug, amount, planName, currency?, successUrl, cancelUrl }
  */
 
-import { Stripe } from "../_shared/deps.ts";
 import { requireAuth } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
+
+const MONEROO_API_URL = "https://api.moneroo.io/v1";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
   try {
+    const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
+    if (isDemoMode) return errors.forbidden("Payments are disabled in demo mode");
+
     const { user, userClient, error: authError } = await requireAuth(req);
     if (authError || !user || !userClient) {
       return errors.unauthorized(authError || "Authentication required");
     }
 
-    // Parse body
     const body = await req.json();
-    const { priceId, mode = "payment", successUrl, cancelUrl, couponId } = body;
+    const { planSlug, amount, planName, currency = "XOF", successUrl, cancelUrl } = body;
 
-    if (!priceId || !successUrl || !cancelUrl) {
-      return errors.badRequest("Missing required fields: priceId, successUrl, cancelUrl");
+    if (!planSlug || !amount || !successUrl || !cancelUrl) {
+      return errors.badRequest("Missing required fields: planSlug, amount, successUrl, cancelUrl");
     }
 
     // Get user profile
     const { data: profile } = await userClient
       .from("profiles")
-      .select("email, customer_id")
+      .select("email, name")
       .eq("id", user.id)
       .single();
 
-    // Initialize Stripe
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) return errors.internal("Payment service not configured");
+    const email = profile?.email || user.email || "";
+    const fullName = (profile?.name || email.split("@")[0] || "Client").trim();
+    const nameParts = fullName.split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || firstName;
 
-    const stripe = new Stripe(stripeKey, {
-      apiVersion: "2023-10-16",
-      httpClient: Stripe.createFetchHttpClient(),
+    const apiKey = Deno.env.get("MONEROO_API_KEY");
+    if (!apiKey) return errors.internal("Payment service not configured");
+
+    const response = await fetch(`${MONEROO_API_URL}/payments/initialize`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify({
+        amount,
+        currency,
+        description: `Abonnement Baobab Loyalty - Plan ${planName || planSlug}`,
+        return_url: successUrl,
+        cancel_url: cancelUrl,
+        customer: {
+          email,
+          first_name: firstName,
+          last_name: lastName,
+        },
+        metadata: {
+          user_id: user.id,
+          plan: planSlug,
+        },
+      }),
     });
 
-    // Build checkout params
-    const extraParams: Record<string, unknown> = {};
-
-    if (profile?.customer_id) {
-      extraParams.customer = profile.customer_id;
-    } else {
-      if (mode === "payment") {
-        extraParams.customer_creation = "always";
-        extraParams.payment_intent_data = { setup_future_usage: "on_session" };
-      }
-      if (profile?.email || user.email) {
-        extraParams.customer_email = profile?.email || user.email;
-      }
-      extraParams.tax_id_collection = { enabled: true };
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Moneroo API error:", errorText);
+      return errors.internal(`Moneroo error ${response.status}: ${errorText}`);
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode,
-      allow_promotion_codes: true,
-      client_reference_id: user.id,
-      line_items: [{ price: priceId, quantity: 1 }],
-      discounts: couponId ? [{ coupon: couponId }] : [],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      ...extraParams,
-    });
+    const data = await response.json();
+    const checkoutUrl = data?.data?.checkout_url;
 
-    return success({ url: session.url });
+    if (!checkoutUrl) {
+      console.error("No checkout_url in Moneroo response:", data);
+      return errors.internal("Payment initialization failed");
+    }
+
+    return success({ url: checkoutUrl, paymentId: data?.data?.id });
   } catch (err) {
     console.error("billing-create-checkout error:", err);
     return errors.internal(err instanceof Error ? err.message : "Checkout failed");

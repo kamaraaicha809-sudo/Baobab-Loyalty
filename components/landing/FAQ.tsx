@@ -9,63 +9,64 @@ interface FAQItem {
 
 const faqList: FAQItem[] = [
   {
-    question: "Qu'est-ce qui est inclus dans Kodefast ?",
+    question: "Comment fonctionne Baobab Loyalty ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Kodefast inclut tout ce dont vous avez besoin pour lancer un Micro SaaS : authentification 
-        Supabase (email, OAuth), paiements Stripe (checkout, abonnements, webhooks), 
-        emails transactionnels via Resend, dashboard admin, Edge Functions prêtes à l&apos;emploi, 
-        et une documentation complète.
+        Baobab Loyalty analyse votre base de données clients grâce à l&apos;IA pour identifier 
+        les segments les plus pertinents (clients inactifs depuis 3, 6 ou 9 mois). Vous choisissez 
+        un template d&apos;offre, personnalisez le message, et l&apos;envoi se fait automatiquement 
+        via WhatsApp en moins de 2 minutes.
       </div>
     ),
   },
   {
-    question: "Ai-je besoin de configurer Supabase moi-même ?",
+    question: "Ai-je besoin de compétences techniques ?",
     answer: (
       <p>
-        Non, tout est préconfiguré ! Il vous suffit de créer un projet Supabase, copier vos clés 
-        API dans les variables d&apos;environnement, et appliquer les migrations SQL fournies. 
-        Le guide de déploiement vous accompagne étape par étape.
+        Non, Baobab Loyalty est conçu pour les hôteliers, pas pour les développeurs. 
+        L&apos;interface est simple et intuitive : quelques clics suffisent pour lancer 
+        une campagne de relance. Aucune connaissance technique n&apos;est requise.
       </p>
     ),
   },
   {
-    question: "Le template est-il compatible TypeScript ?",
+    question: "Pourquoi WhatsApp plutôt que l'email ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Oui ! Le SDK et les Edge Functions sont écrits en TypeScript pour un typage robuste. 
-        Les composants React sont également en TypeScript pour une meilleure maintenabilité. 
-        Le projet est entièrement configuré pour TypeScript.
+        WhatsApp affiche un taux d&apos;ouverture de 98%, contre 20% pour l&apos;email. 
+        Vos clients lisent et répondent beaucoup plus rapidement sur WhatsApp, ce qui 
+        augmente considérablement vos chances de convertir une relance en réservation.
       </div>
     ),
   },
   {
-    question: "Comment personnaliser le design ?",
+    question: "Quels types d'offres puis-je envoyer ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Le design utilise TailwindCSS 4 avec une palette de couleurs centralisée dans 
-        <code className="bg-slate-100 px-1 rounded mx-1 text-xs sm:text-sm">config.js</code>. 
-        Changez simplement les couleurs dans ce fichier et elles seront automatiquement appliquées 
-        dans toute l&apos;application. Tous les composants sont modulaires et faciles à modifier.
+        Baobab Loyalty propose 5 templates d&apos;offres prêts à l&apos;emploi : remise 
+        exceptionnelle, surclassement offert, cocktail de bienvenue, offre famille, et 
+        événements spéciaux (Ramadan, Pâques, Saint-Valentin, etc.). Chaque offre est 
+        personnalisable selon vos besoins.
       </div>
     ),
   },
   {
-    question: "Puis-je utiliser Kodefast pour des projets commerciaux ?",
+    question: "Comment importer ma base de clients ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Absolument ! La licence vous permet d&apos;utiliser Kodefast pour vos projets personnels 
-        et commerciaux. Vous pouvez créer autant de Micro SaaS que vous voulez avec le template.
+        Depuis la page Configuration de votre dashboard, vous pouvez importer votre 
+        base clients facilement. L&apos;IA se charge ensuite de segmenter automatiquement 
+        vos clients pour des campagnes ciblées et efficaces.
       </div>
     ),
   },
   {
-    question: "Quel est le support disponible ?",
+    question: "Puis-je essayer avant de m'abonner ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        La documentation couvre tous les aspects du template. Pour les questions techniques, 
-        vous avez accès au support par email. Les mises à jour et corrections de bugs sont 
-        incluses avec votre licence.
+        Oui ! Vous pouvez accéder à une démo complète de la plateforme pour découvrir 
+        toutes les fonctionnalités avant de vous engager. Cliquez sur &quot;Voir la démo&quot; 
+        sur la page d&apos;accueil pour commencer.
       </div>
     ),
   },

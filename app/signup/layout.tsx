@@ -4,7 +4,7 @@ import { ReactNode, Suspense } from "react";
 
 export const metadata = getSEOTags({
   title: `Inscription | ${config.appName}`,
-  description: `Créez votre compte ${config.appName} pour gérer vos campagnes.`,
+  description: `Créez votre compte ${config.appName}.`,
   canonicalUrlRelative: "/signup",
 });
 

@@ -6,7 +6,7 @@ import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients } from "@/src/sdk/clients";
-import { isDemoMode } from "@/src/lib/demo";
+import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
 
 // Segments basés sur la dernière visite — connectés à la base clients
 const SEGMENT_DEFINITIONS = [
@@ -40,15 +40,13 @@ const SEGMENT_DEFINITIONS = [
   },
 ];
 
-const DEMO_COUNTS = { "3mois": 124, "6mois": 89, "9mois": 56, tous: 450 };
-
 export default function SegmentsPage() {
-  const [counts, setCounts] = useState<Record<string, number>>(DEMO_COUNTS);
+  const [counts, setCounts] = useState<Record<string, number>>(demoSegmentCounts);
 
   useEffect(() => {
     const load = async () => {
       if (isDemoMode) {
-        setCounts(DEMO_COUNTS);
+        setCounts(demoSegmentCounts);
         return;
       }
       const supabase = createClient();
@@ -58,7 +56,7 @@ export default function SegmentsPage() {
         const seg = await clients.getSegmentCounts(user.id);
         setCounts(seg);
       } catch {
-        setCounts(DEMO_COUNTS);
+        setCounts(demoSegmentCounts);
       }
     };
     load();

@@ -14,6 +14,15 @@ const Footer = () => {
         <p className="text-slate-500 text-sm">
           © {new Date().getFullYear()} {config.appName}. Tous droits réservés.
         </p>
+        <div className="flex items-center justify-center gap-4 mt-3">
+          <Link href="/tos" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Conditions d&apos;utilisation
+          </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/privacy-policy" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Politique de confidentialité
+          </Link>
+        </div>
       </div>
     </footer>
   );

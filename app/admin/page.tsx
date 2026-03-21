@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { prompts as promptsApi } from "@/src/sdk";
-import { isDemoMode } from "@/src/lib/demo";
+import { isDemoMode, demoAdminStats } from "@/src/lib/demo";
+import { callEdgeFunction } from "@/src/sdk/_core";
 
 /**
  * Admin Dashboard - Vue d'ensemble
@@ -19,10 +20,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadStats = async () => {
       if (isDemoMode) {
-        setStats({
-          promptsCount: 1,
-          model: "openai/gpt-4o-mini",
-        });
+        setStats(demoAdminStats);
         setLoading(false);
         return;
       }
@@ -34,17 +32,9 @@ export default function AdminDashboard() {
         // Load model from config
         let model = "openai/gpt-4o-mini";
         try {
-          const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-          
-          if (url && anonKey) {
-            const response = await fetch(`${url}/functions/v1/config-get?key=default_model`, {
-              headers: { apikey: anonKey },
-            });
-            const data = await response.json();
-            if (data.ok && data.data?.value) {
-              model = data.data.value.replace(/"/g, "");
-            }
+          const result = await callEdgeFunction<{ value: string }>("config-get?key=default_model", { method: "GET", requireAuth: false });
+          if (result?.value) {
+            model = result.value.replace(/"/g, "");
           }
         } catch (err) {
           console.error("Failed to load model:", err);
