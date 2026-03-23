@@ -43,7 +43,6 @@ Deno.serve(async (req) => {
 
   const isValid = await verifySignature(body, signature, webhookSecret);
   if (!isValid) {
-    console.error("Webhook signature verification failed");
     return errors.badRequest("Invalid signature");
   }
 
@@ -64,7 +63,6 @@ Deno.serve(async (req) => {
     const now = Date.now();
     const fiveMinutes = 5 * 60 * 1000;
     if (isNaN(eventTime) || now - eventTime > fiveMinutes) {
-      console.error("Webhook rejected: event too old or invalid timestamp");
       return errors.badRequest("Event timestamp expired");
     }
   }
@@ -79,7 +77,6 @@ Deno.serve(async (req) => {
         const plan = metadata?.plan;
 
         if (!userId) {
-          console.error("No user_id in payment metadata");
           break;
         }
 
@@ -89,23 +86,19 @@ Deno.serve(async (req) => {
           .eq("id", userId);
 
         if (error) throw error;
-        console.log(`Payment success: user=${userId} plan=${plan}`);
         break;
       }
 
       case "payment.failed": {
-        const metadata = event.data.metadata as Record<string, string> | undefined;
-        console.log(`Payment failed: user=${metadata?.user_id}`);
         break;
       }
 
       default:
-        console.log(`Unhandled event: ${event.event}`);
+        break;
     }
 
     return success({ received: true });
   } catch (err) {
-    console.error("Webhook handler error:", err);
     return errors.internal("Webhook processing failed");
   }
 });

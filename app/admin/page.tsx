@@ -36,16 +36,16 @@ export default function AdminDashboard() {
           if (result?.value) {
             model = result.value.replace(/"/g, "");
           }
-        } catch (err) {
-          console.error("Failed to load model:", err);
+        } catch {
+          // Model config not available, use default
         }
 
         setStats({
           promptsCount: promptsList.length,
           model,
         });
-      } catch (err) {
-        console.error("Failed to load stats:", err);
+      } catch {
+        // Stats not available
       } finally {
         setLoading(false);
       }

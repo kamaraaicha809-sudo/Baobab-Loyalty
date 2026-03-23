@@ -98,7 +98,6 @@ export default function SignUp() {
       toast.success("Un code de vérification a été envoyé à votre email");
       router.push("/auth/verify?type=signup");
     } catch (error) {
-      console.error("Sign up error:", error);
       toast.error("Une erreur est survenue");
     } finally {
       setIsLoading(false);

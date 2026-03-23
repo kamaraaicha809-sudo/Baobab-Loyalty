@@ -48,13 +48,11 @@ Deno.serve(async (req) => {
       .eq("key", key);
 
     if (error) {
-      console.error("config-update db error:", error);
       return errors.internal("Failed to update configuration");
     }
 
     return success({ key, updated: true });
   } catch (err) {
-    console.error("config-update error:", err);
     return errors.internal(err instanceof Error ? err.message : "Config update failed");
   }
 });

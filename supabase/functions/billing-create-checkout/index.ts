@@ -75,7 +75,6 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Moneroo API error:", errorText);
       return errors.internal(`Moneroo error ${response.status}: ${errorText}`);
     }
 
@@ -83,13 +82,11 @@ Deno.serve(async (req) => {
     const checkoutUrl = data?.data?.checkout_url;
 
     if (!checkoutUrl) {
-      console.error("No checkout_url in Moneroo response:", data);
       return errors.internal("Payment initialization failed");
     }
 
     return success({ url: checkoutUrl, paymentId: data?.data?.id });
   } catch (err) {
-    console.error("billing-create-checkout error:", err);
     return errors.internal(err instanceof Error ? err.message : "Checkout failed");
   }
 });

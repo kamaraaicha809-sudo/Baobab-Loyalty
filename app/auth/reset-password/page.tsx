@@ -58,7 +58,6 @@ export default function ResetPassword() {
         router.push("/auth/verify?type=recovery");
       }, 2000);
     } catch (error) {
-      console.error("Reset password error:", error);
       toast.error("Une erreur est survenue");
     } finally {
       setIsLoading(false);

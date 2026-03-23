@@ -48,13 +48,11 @@ Deno.serve(async (req) => {
       .remove([path]);
 
     if (deleteError) {
-      console.error("storage-delete error:", deleteError);
       return errors.internal(`Delete failed: ${deleteError.message}`);
     }
 
     return success({ deleted: true, path });
   } catch (err) {
-    console.error("storage-delete error:", err);
     return errors.internal(err instanceof Error ? err.message : "Delete failed");
   }
 });

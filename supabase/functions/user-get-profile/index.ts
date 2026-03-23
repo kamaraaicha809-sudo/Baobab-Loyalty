@@ -56,13 +56,11 @@ Deno.serve(async (req) => {
         });
       }
       
-      console.error("Database error:", dbError);
       return errors.internal("Failed to fetch profile");
     }
 
     return success(profile);
   } catch (err) {
-    console.error("user-get-profile error:", err);
     return errors.internal(err instanceof Error ? err.message : "Profile fetch failed");
   }
 });

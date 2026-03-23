@@ -61,7 +61,6 @@ Deno.serve(async (req) => {
       if (dbError.code === "PGRST116") {
         return success(null, 200, { "Cache-Control": "public, max-age=300" });
       }
-      console.error("config-get db error:", dbError);
       return errors.internal("Failed to fetch configuration");
     }
 
@@ -80,7 +79,6 @@ Deno.serve(async (req) => {
 
     return success(configMap, 200, { "Cache-Control": "public, max-age=300" });
   } catch (err) {
-    console.error("config-get error:", err);
     return errors.internal(err instanceof Error ? err.message : "Config fetch failed");
   }
 });

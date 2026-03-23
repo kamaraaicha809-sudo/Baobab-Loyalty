@@ -77,14 +77,12 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Resend API error:", errorData);
       return errors.internal(`Email sending failed: ${errorData.message || "Unknown error"}`);
     }
 
     const data = await response.json();
     return success({ id: data.id, sent: true });
   } catch (err) {
-    console.error("email-send error:", err);
     return errors.internal(err instanceof Error ? err.message : "Email sending failed");
   }
 });

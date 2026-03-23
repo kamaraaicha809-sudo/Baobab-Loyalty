@@ -81,8 +81,7 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error("OpenRouter API error:", errorData);
-      return errors.internal("AI generation failed");
+      return errors.internal(`AI generation failed: ${errorData}`);
     }
 
     const data = await response.json();
@@ -90,7 +89,6 @@ Deno.serve(async (req) => {
 
     return success({ content, model: data.model, usage: data.usage });
   } catch (err) {
-    console.error("ai-generate error:", err);
     return errors.internal(err instanceof Error ? err.message : "Generation failed");
   }
 });
