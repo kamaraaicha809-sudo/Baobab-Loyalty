@@ -56,7 +56,7 @@ export const getSEOTags = ({
     metadataBase: new URL(
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000/"
-        : `https://${config.domainName}/`
+        : process.env.NEXT_PUBLIC_SITE_URL || `https://${config.domainName}/`
     ),
 
     // Robots meta
