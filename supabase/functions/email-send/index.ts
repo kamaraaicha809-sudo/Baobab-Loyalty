@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) return errors.internal("Email service not configured");
 
-    const defaultFrom = from || Deno.env.get("EMAIL_FROM") || "Kodefast <noreply@kodefast.com>";
+    const defaultFrom = from || Deno.env.get("EMAIL_FROM") || "Baobab Loyalty <noreply@baobabloyalty.com>";
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",

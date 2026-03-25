@@ -1,5 +1,6 @@
 const nextConfig = {
   reactStrictMode: true,
+  turbopack: {},
   poweredByHeader: false, // Security: hide X-Powered-By header
   images: {
     remotePatterns: [

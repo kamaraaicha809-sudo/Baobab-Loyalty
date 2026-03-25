@@ -3,7 +3,7 @@
  * Used by all functions to handle cross-origin requests
  */
 
-const allowedOrigin = Deno.env.get("SITE_URL") || "https://baobab-loyalty.com";
+const allowedOrigin = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": allowedOrigin,
