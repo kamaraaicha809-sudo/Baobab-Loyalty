@@ -7,7 +7,7 @@ const benefits = [
   },
   {
     title: "Fidélisez sans effort",
-    desc: "Quand vous sentez le besoin de faire une promotion, l'IA s'occupe de sélectionner la liste des clients selon le segment que vous avez choisi et vous aide à compléter le message que vous allez envoyer via WhatsApp. Le tout en moins de 5 minutes chrono.",
+    desc: "Quand vous sentez le besoin de faire une promotion, l'IA s'occupe de sélectionner la liste des clients selon le segment que vous avez choisi et vous aide à compléter le message que vous allez envoyer via WhatsApp. Le tout en moins de 2 minutes chrono.",
   },
   {
     title: "Simplicité absolue",
