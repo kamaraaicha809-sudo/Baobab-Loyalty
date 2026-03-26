@@ -3,7 +3,7 @@ import Image from "next/image";
 const benefits = [
   {
     title: "Augmentez vos revenus directs",
-    desc: "Réduisez votre dépendance aux OTAs et reprenez le contrôle de votre relation client.",
+    desc: "Réduisez votre dépendance aux OTAs (Online Travel Agency) et reprenez le contrôle de votre relation client.",
   },
   {
     title: "Fidélisez sans effort",
