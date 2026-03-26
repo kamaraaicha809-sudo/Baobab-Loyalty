@@ -16,20 +16,50 @@ const SEGMENT_LABELS: Record<string, string> = {
   tous: "Tous les clients",
 };
 
+interface ProfileForm {
+  hotel_name: string;
+  adresse_physique: string;
+  adresse_postale: string;
+  email_principal: string;
+  telephone_officiel: string;
+  nom_responsable: string;
+  telephone_responsable: string;
+  email_responsable: string;
+  latitude: string;
+  longitude: string;
+}
+
+const emptyForm: ProfileForm = {
+  hotel_name: "",
+  adresse_physique: "",
+  adresse_postale: "",
+  email_principal: "",
+  telephone_officiel: "",
+  nom_responsable: "",
+  telephone_responsable: "",
+  email_responsable: "",
+  latitude: "",
+  longitude: "",
+};
+
 export default function ConfigurationPage() {
-  const [hotelName, setHotelName] = useState("");
+  const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [configComplete, setConfigComplete] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [geoLoading, setGeoLoading] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
 
+  const set = (field: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+
   const loadProfile = useCallback(async () => {
     if (isDemoMode) {
       setProfileId(demoUser.id);
-      setHotelName(demoProfile.hotel_name);
+      setForm({ ...emptyForm, hotel_name: demoProfile.hotel_name });
       setConfigComplete(demoProfile.config_complete);
       setCounts(demoSegmentCounts);
       setLoading(false);
@@ -38,21 +68,29 @@ export default function ConfigurationPage() {
 
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) { setLoading(false); return; }
 
     setProfileId(user.id);
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude")
       .eq("id", user.id)
       .single();
 
     if (profile) {
-      setHotelName(profile.hotel_name || "");
+      setForm({
+        hotel_name: profile.hotel_name || "",
+        adresse_physique: profile.adresse_physique || "",
+        adresse_postale: profile.adresse_postale || "",
+        email_principal: profile.email_principal || "",
+        telephone_officiel: profile.telephone_officiel || "",
+        nom_responsable: profile.nom_responsable || "",
+        telephone_responsable: profile.telephone_responsable || "",
+        email_responsable: profile.email_responsable || "",
+        latitude: profile.latitude?.toString() || "",
+        longitude: profile.longitude?.toString() || "",
+      });
       setConfigComplete(profile.config_complete ?? false);
     }
 
@@ -65,9 +103,30 @@ export default function ConfigurationPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    loadProfile();
-  }, [loadProfile]);
+  useEffect(() => { loadProfile(); }, [loadProfile]);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Géolocalisation non supportée par votre navigateur");
+      return;
+    }
+    setGeoLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((f) => ({
+          ...f,
+          latitude: pos.coords.latitude.toFixed(6),
+          longitude: pos.coords.longitude.toFixed(6),
+        }));
+        setGeoLoading(false);
+        toast.success("Position détectée");
+      },
+      () => {
+        setGeoLoading(false);
+        toast.error("Impossible de détecter la position");
+      }
+    );
+  };
 
   const handleSaveConfig = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +143,16 @@ export default function ConfigurationPage() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          hotel_name: hotelName.trim() || null,
+          hotel_name: form.hotel_name.trim() || null,
+          adresse_physique: form.adresse_physique.trim() || null,
+          adresse_postale: form.adresse_postale.trim() || null,
+          email_principal: form.email_principal.trim() || null,
+          telephone_officiel: form.telephone_officiel.trim() || null,
+          nom_responsable: form.nom_responsable.trim() || null,
+          telephone_responsable: form.telephone_responsable.trim() || null,
+          email_responsable: form.email_responsable.trim() || null,
+          latitude: form.latitude ? parseFloat(form.latitude) : null,
+          longitude: form.longitude ? parseFloat(form.longitude) : null,
           config_complete: true,
           updated_at: new Date().toISOString(),
         })
@@ -147,13 +215,13 @@ export default function ConfigurationPage() {
     );
   }
 
+  const inputClass = "w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm";
+  const labelClass = "block text-sm font-medium text-slate-700 mb-1";
+
   return (
     <div className="space-y-8">
       <header>
-        <Link
-          href="/dashboard"
-          className="text-sm text-slate-500 hover:text-slate-700 mb-2 inline-block"
-        >
+        <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-700 mb-2 inline-block">
           ← Retour au dashboard
         </Link>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
@@ -166,24 +234,83 @@ export default function ConfigurationPage() {
 
       {/* Informations de l'établissement */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
           <Icons.Settings />
           Informations de l&apos;établissement
         </h2>
-        <form onSubmit={handleSaveConfig} className="space-y-4 max-w-md">
+        <form onSubmit={handleSaveConfig} className="space-y-6">
+
+          {/* Infos hôtel */}
           <div>
-            <label htmlFor="hotel" className="block text-sm font-medium text-slate-700 mb-1">
-              Nom de l&apos;hôtel ou établissement
-            </label>
-            <input
-              id="hotel"
-              type="text"
-              value={hotelName}
-              onChange={(e) => setHotelName(e.target.value)}
-              placeholder="Ex. Hôtel Le Baobab"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary/30 focus:border-primary"
-            />
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Hôtel</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label htmlFor="hotel" className={labelClass}>Nom de l&apos;hôtel ou établissement</label>
+                <input id="hotel" type="text" value={form.hotel_name} onChange={set("hotel_name")} placeholder="Ex. Hôtel Le Baobab" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="adresse_physique" className={labelClass}>Adresse physique</label>
+                <input id="adresse_physique" type="text" value={form.adresse_physique} onChange={set("adresse_physique")} placeholder="Ex. 12 Avenue de la Paix, Dakar" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="adresse_postale" className={labelClass}>Adresse postale</label>
+                <input id="adresse_postale" type="text" value={form.adresse_postale} onChange={set("adresse_postale")} placeholder="Ex. BP 1234, Dakar" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="email_principal" className={labelClass}>Email principal de l&apos;hôtel</label>
+                <input id="email_principal" type="email" value={form.email_principal} onChange={set("email_principal")} placeholder="contact@monhotel.com" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="telephone_officiel" className={labelClass}>Numéro officiel de l&apos;hôtel</label>
+                <input id="telephone_officiel" type="tel" value={form.telephone_officiel} onChange={set("telephone_officiel")} placeholder="+221 33 000 00 00" className={inputClass} />
+              </div>
+            </div>
           </div>
+
+          {/* Responsable */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Responsable du compte</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label htmlFor="nom_responsable" className={labelClass}>Nom du propriétaire ou responsable</label>
+                <input id="nom_responsable" type="text" value={form.nom_responsable} onChange={set("nom_responsable")} placeholder="Ex. Amadou Diallo" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="telephone_responsable" className={labelClass}>Téléphone personnel</label>
+                <input id="telephone_responsable" type="tel" value={form.telephone_responsable} onChange={set("telephone_responsable")} placeholder="+221 77 000 00 00" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="email_responsable" className={labelClass}>Email personnel</label>
+                <input id="email_responsable" type="email" value={form.email_responsable} onChange={set("email_responsable")} placeholder="responsable@email.com" className={inputClass} />
+              </div>
+            </div>
+          </div>
+
+          {/* Géolocalisation */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Géolocalisation</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="latitude" className={labelClass}>Latitude</label>
+                <input id="latitude" type="text" value={form.latitude} onChange={set("latitude")} placeholder="Ex. 14.693425" className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="longitude" className={labelClass}>Longitude</label>
+                <input id="longitude" type="text" value={form.longitude} onChange={set("longitude")} placeholder="Ex. -17.447938" className={inputClass} />
+              </div>
+              <div className="sm:col-span-2">
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  disabled={geoLoading}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                >
+                  {geoLoading ? "Détection en cours…" : "Détecter ma position automatiquement"}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={saving}
@@ -222,15 +349,11 @@ export default function ConfigurationPage() {
           </button>
         </form>
 
-        {/* Comptage par segment */}
         <div className="mt-6 pt-6 border-t border-slate-200">
           <p className="text-sm font-medium text-slate-700 mb-3">Répartition par segment</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {(["3mois", "6mois", "9mois", "tous"] as const).map((id) => (
-              <div
-                key={id}
-                className="p-3 rounded-lg bg-slate-50 border border-slate-200"
-              >
+              <div key={id} className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <p className="text-2xl font-bold text-slate-900">{counts[id] ?? 0}</p>
                 <p className="text-xs text-slate-500">{SEGMENT_LABELS[id]}</p>
               </div>
