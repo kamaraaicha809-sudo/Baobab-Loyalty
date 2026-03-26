@@ -35,7 +35,7 @@ const WhyChoose = () => {
                   </span>
                   <div>
                     <h3 className="font-semibold text-[#2C2C2C] mb-1">{b.title}</h3>
-                    <p className="text-slate-600 text-sm sm:text-base">{b.desc}</p>
+                    <p className="text-slate-600 text-sm sm:text-base text-pretty">{b.desc}</p>
                     {b.highlight && (
                       <p className="text-slate-800 text-sm sm:text-base font-bold mt-1">{b.highlight}</p>
                     )}
