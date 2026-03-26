@@ -22,7 +22,7 @@ const WhyChoose = () => {
   return (
     <section id="benefices" className="py-16 sm:py-24 bg-[#FDFDF9]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-[3fr_2fr] gap-8 lg:gap-12 items-center">
+        <div className="grid lg:grid-cols-[11fr_9fr] gap-10 lg:gap-14 items-center">
           <div>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#2C2C2C] mb-10">
               Pourquoi choisir Baobab Loyalty?
