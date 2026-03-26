@@ -4,14 +4,17 @@ const benefits = [
   {
     title: "Augmentez vos revenus directs",
     desc: "Réduisez votre dépendance aux OTAs (Online Travel Agency) et reprenez le contrôle de votre relation client.",
+    highlight: "",
   },
   {
     title: "Fidélisez sans effort",
-    desc: "Quand vous sentez le besoin de faire une promotion, l'IA s'occupe de sélectionner la liste des clients selon le segment que vous avez choisi et vous aide à compléter le message que vous allez envoyer via WhatsApp. Le tout en moins de 2 minutes chrono.",
+    desc: "Quand vous sentez le besoin de faire une promotion, l'IA s'occupe de sélectionner la liste des clients selon le segment que vous avez choisi et vous aide à compléter le message que vous allez envoyer via WhatsApp.",
+    highlight: "Le tout en moins de 2 minutes chrono.",
   },
   {
     title: "Simplicité absolue",
     desc: "Pas besoin d'être un expert en marketing. L'interface est conçue pour les hôteliers pressés.",
+    highlight: "",
   },
 ];
 
@@ -19,7 +22,7 @@ const WhyChoose = () => {
   return (
     <section id="benefices" className="py-16 sm:py-24 bg-[#FDFDF9]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[3fr_2fr] gap-8 lg:gap-12 items-center">
           <div>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#2C2C2C] mb-10">
               Pourquoi choisir Baobab Loyalty?
@@ -33,6 +36,9 @@ const WhyChoose = () => {
                   <div>
                     <h3 className="font-semibold text-[#2C2C2C] mb-1">{b.title}</h3>
                     <p className="text-slate-600 text-sm sm:text-base">{b.desc}</p>
+                    {b.highlight && (
+                      <p className="text-slate-800 text-sm sm:text-base font-bold mt-1">{b.highlight}</p>
+                    )}
                   </div>
                 </li>
               ))}
