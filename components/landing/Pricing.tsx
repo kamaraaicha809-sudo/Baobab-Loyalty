@@ -44,11 +44,7 @@ const Pricing = () => {
             return (
               <div
                 key={i}
-                className={`relative rounded-2xl p-6 sm:p-8 ${
-                  plan.isFeatured
-                    ? "bg-[#252525] border-2 border-primary"
-                    : "bg-[#252525] border border-[#333]"
-                }`}
+                className="relative rounded-2xl p-6 sm:p-8 bg-[#252525] border border-[#333]"
               >
                 <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
                 <div className="mb-6">
@@ -65,9 +61,7 @@ const Pricing = () => {
                 <div>
                   {loading ? (
                     <div
-                      className={`block w-full py-3 rounded-lg text-center font-medium animate-pulse ${
-                        plan.isFeatured ? "bg-primary/50" : "bg-slate-700"
-                      }`}
+                      className="block w-full py-3 rounded-lg text-center font-medium animate-pulse bg-slate-700"
                     >
                       Chargement...
                     </div>
@@ -76,22 +70,14 @@ const Pricing = () => {
                       planSlug={slug}
                       amount={plan.price}
                       planName={plan.name}
-                      extraStyle={`block w-full py-3 rounded-lg text-center font-medium transition-colors ${
-                        plan.isFeatured
-                          ? "bg-primary text-[#1a1a1a] hover:bg-[#c9a84d]"
-                          : "bg-white text-[#1a1a1a] hover:bg-slate-100"
-                      }`}
+                      extraStyle="block w-full py-3 rounded-lg text-center font-medium transition-colors bg-white text-[#1a1a1a] hover:bg-slate-100"
                     >
                       Choisir ce plan
                     </ButtonCheckout>
                   ) : (
                     <Link
                       href={`/signup?plan=${slug}`}
-                      className={`block w-full py-3 rounded-lg text-center font-medium transition-colors ${
-                        plan.isFeatured
-                          ? "bg-primary text-[#1a1a1a] hover:bg-[#c9a84d]"
-                          : "bg-white text-[#1a1a1a] hover:bg-slate-100"
-                      }`}
+                      className="block w-full py-3 rounded-lg text-center font-medium transition-colors bg-white text-[#1a1a1a] hover:bg-slate-100"
                     >
                       Choisir ce plan
                     </Link>
