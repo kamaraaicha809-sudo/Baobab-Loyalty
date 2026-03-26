@@ -50,13 +50,6 @@ const Pricing = () => {
                     : "bg-[#252525] border border-[#333]"
                 }`}
               >
-                {plan.isFeatured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-1 rounded-full bg-primary text-white text-xs font-medium uppercase">
-                      POPULAIRE
-                    </span>
-                  </div>
-                )}
                 <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
                 <div className="mb-6">
                   <span className="text-3xl sm:text-4xl font-bold text-white">
