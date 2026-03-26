@@ -1,19 +1,5 @@
 import Image from "next/image";
 
-const benefits = [
-  {
-    title: "Augmentez vos revenus directs",
-    desc: "Réduisez votre dépendance aux OTAs (Online Travel Agency) et reprenez le contrôle de votre relation client.",
-  },
-  {
-    title: "Fidélisez sans effort",
-    desc: "L'IA s'occupe de trouver le bon moment et le bon message pour chaque client.",
-  },
-  {
-    title: "Simplicité absolue",
-    desc: "Pas besoin d'être un expert en marketing. L'interface est conçue pour les hôteliers pressés.",
-  },
-];
 
 const WhyChoose = () => {
   return (
@@ -24,19 +10,9 @@ const WhyChoose = () => {
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#2C2C2C] mb-10">
               Pourquoi choisir Baobab Loyalty?
             </h2>
-            <ul className="space-y-8">
-              {benefits.map((b, i) => (
-                <li key={i} className="flex gap-4">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
-                    ✓
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-[#2C2C2C] mb-1">{b.title}</h3>
-                    <p className="text-slate-600 text-sm sm:text-base">{b.desc}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+              Quand vous sentez le besoin de faire une promotion, l&apos;IA s&apos;occupe de sélectionner la liste des clients selon le segment que vous avez choisi et vous aide à compléter le message que vous allez envoyer via WhatsApp. Le tout en moins de 5 minutes chrono.
+            </p>
           </div>
           <div className="relative">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 relative">
