@@ -23,7 +23,7 @@ const WhyChoose = () => {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
-              <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-xs bg-white/95 rounded-xl p-4 shadow-lg">
+              <div className="absolute top-4 left-4 right-4 sm:right-auto sm:max-w-xs bg-white/95 rounded-xl p-4 shadow-lg">
                 <p className="font-display text-[#2C2C2C] italic text-sm sm:text-base mb-2">
                   &ldquo;Baobab a changé notre façon de gérer les périodes creuses. C&apos;est magique.&rdquo;
                 </p>
