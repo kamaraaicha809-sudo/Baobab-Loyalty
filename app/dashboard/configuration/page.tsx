@@ -16,6 +16,24 @@ const SEGMENT_LABELS: Record<string, string> = {
   tous: "Tous les clients",
 };
 
+const ROOM_TYPE_LIST = [
+  { key: "Standard", label: "Chambre Standard" },
+  { key: "Twins", label: "Chambre Twins (2 lits simples)" },
+  { key: "Deluxe", label: "Chambre Deluxe" },
+  { key: "Familiale", label: "Chambre Familiale" },
+  { key: "Suite Junior", label: "Suite Junior" },
+  { key: "Suite", label: "Suite" },
+  { key: "Suite Présidentielle", label: "Suite Présidentielle" },
+  { key: "Appartement", label: "Appartement" },
+];
+
+interface RoomTypeRow {
+  id?: string;
+  name: string;
+  nombre_chambres: string;
+  base_price_fcfa: string;
+}
+
 interface ProfileForm {
   hotel_name: string;
   adresse_physique: string;
@@ -48,6 +66,10 @@ export default function ConfigurationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
+  const [roomTypes, setRoomTypes] = useState<RoomTypeRow[]>(
+    ROOM_TYPE_LIST.map((r) => ({ name: r.key, nombre_chambres: "", base_price_fcfa: "" }))
+  );
+  const [savingRooms, setSavingRooms] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
@@ -92,6 +114,25 @@ export default function ConfigurationPage() {
         longitude: profile.longitude?.toString() || "",
       });
       setConfigComplete(profile.config_complete ?? false);
+    }
+
+    const { data: existingRooms } = await supabase
+      .from("room_types")
+      .select("id, name, nombre_chambres, base_price_fcfa")
+      .eq("profile_id", user.id);
+
+    if (existingRooms && existingRooms.length > 0) {
+      setRoomTypes(
+        ROOM_TYPE_LIST.map((r) => {
+          const found = existingRooms.find((e) => e.name === r.key);
+          return {
+            id: found?.id,
+            name: r.key,
+            nombre_chambres: found?.nombre_chambres?.toString() || "",
+            base_price_fcfa: found?.base_price_fcfa?.toString() || "",
+          };
+        })
+      );
     }
 
     try {
@@ -168,6 +209,44 @@ export default function ConfigurationPage() {
     }
   };
 
+  const handleSaveRooms = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isDemoMode) { toast.success("Chambres enregistrées (démo)"); return; }
+    if (!profileId) return;
+
+    setSavingRooms(true);
+    try {
+      const supabase = createClient();
+      const toSave = roomTypes.filter((r) => r.nombre_chambres || r.base_price_fcfa);
+
+      for (const room of toSave) {
+        const payload = {
+          profile_id: profileId,
+          name: room.name,
+          nombre_chambres: room.nombre_chambres ? parseInt(room.nombre_chambres) : 0,
+          base_price_fcfa: room.base_price_fcfa ? parseInt(room.base_price_fcfa) : 0,
+          updated_at: new Date().toISOString(),
+        };
+
+        if (room.id) {
+          await supabase.from("room_types").update(payload).eq("id", room.id);
+        } else {
+          const { data } = await supabase.from("room_types").insert(payload).select("id").single();
+          if (data) {
+            setRoomTypes((prev) =>
+              prev.map((r) => (r.name === room.name ? { ...r, id: data.id } : r))
+            );
+          }
+        }
+      }
+      toast.success("Types de chambres enregistrés");
+    } catch {
+      toast.error("Erreur lors de l'enregistrement des chambres");
+    } finally {
+      setSavingRooms(false);
+    }
+  };
+
   const handleImportCSV = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!csvFile || !profileId) return;
@@ -183,17 +262,14 @@ export default function ConfigurationPage() {
       const text = await csvFile.text();
       const rows = clients.parseClientsCSV(text);
       if (rows.length === 0) {
-        toast.error("Aucune ligne valide trouvée. Vérifiez le format CSV (nom, email, téléphone, dernière visite).");
+        toast.error("Aucune ligne valide trouvée. Vérifiez le format CSV.");
         setImporting(false);
         return;
       }
-
       const { inserted, errors } = await clients.importClients(profileId, rows);
       if (inserted > 0) {
         toast.success(`${inserted} client(s) importé(s)`);
-        if (errors.length > 0) {
-          toast.error(`${errors.length} erreur(s) : ${errors.slice(0, 2).join(" ; ")}`);
-        }
+        if (errors.length > 0) toast.error(`${errors.length} erreur(s)`);
         const seg = await clients.getSegmentCounts(profileId);
         setCounts(seg);
       } else if (errors.length > 0) {
@@ -240,7 +316,6 @@ export default function ConfigurationPage() {
         </h2>
         <form onSubmit={handleSaveConfig} className="space-y-6">
 
-          {/* Infos hôtel */}
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Hôtel</p>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -267,7 +342,6 @@ export default function ConfigurationPage() {
             </div>
           </div>
 
-          {/* Responsable */}
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Responsable du compte</p>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -286,7 +360,6 @@ export default function ConfigurationPage() {
             </div>
           </div>
 
-          {/* Géolocalisation */}
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Géolocalisation</p>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -321,6 +394,77 @@ export default function ConfigurationPage() {
         </form>
       </section>
 
+      {/* Types de chambres */}
+      <section className="bg-white rounded-xl border border-slate-200 p-6">
+        <h2 className="text-lg font-semibold text-slate-900 mb-2 flex items-center gap-2">
+          <Icons.Settings />
+          Types de chambres
+        </h2>
+        <p className="text-slate-600 text-sm mb-6">
+          Renseignez le nombre de chambres et le prix normal par nuit (en FCFA) pour chaque type.
+        </p>
+        <form onSubmit={handleSaveRooms}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left py-2 pr-4 font-medium text-slate-700">Type de chambre</th>
+                  <th className="text-left py-2 pr-4 font-medium text-slate-700">Nombre de chambres</th>
+                  <th className="text-left py-2 font-medium text-slate-700">Prix / nuit (FCFA)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {ROOM_TYPE_LIST.map((r, i) => (
+                  <tr key={r.key}>
+                    <td className="py-3 pr-4 font-medium text-slate-800">{r.label}</td>
+                    <td className="py-3 pr-4">
+                      <input
+                        type="number"
+                        min="0"
+                        value={roomTypes[i]?.nombre_chambres || ""}
+                        onChange={(e) =>
+                          setRoomTypes((prev) =>
+                            prev.map((rt, idx) => idx === i ? { ...rt, nombre_chambres: e.target.value } : rt)
+                          )
+                        }
+                        placeholder="0"
+                        className="w-28 px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm"
+                      />
+                    </td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          value={roomTypes[i]?.base_price_fcfa || ""}
+                          onChange={(e) =>
+                            setRoomTypes((prev) =>
+                              prev.map((rt, idx) => idx === i ? { ...rt, base_price_fcfa: e.target.value } : rt)
+                            )
+                          }
+                          placeholder="Ex. 45000"
+                          className="w-36 px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm"
+                        />
+                        <span className="text-slate-500 text-xs">FCFA</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-6">
+            <button
+              type="submit"
+              disabled={savingRooms}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-slate-900 font-semibold hover:opacity-90 disabled:opacity-70"
+            >
+              {savingRooms ? "Enregistrement…" : "Enregistrer les chambres"}
+            </button>
+          </div>
+        </form>
+      </section>
+
       {/* Import base clients */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
         <h2 className="text-lg font-semibold text-slate-900 mb-2 flex items-center gap-2">
@@ -330,7 +474,6 @@ export default function ConfigurationPage() {
         <p className="text-slate-600 text-sm mb-4">
           Importez votre liste clients (CSV) avec les colonnes : <strong>nom</strong>, <strong>email</strong>, <strong>téléphone</strong>, <strong>dernière visite</strong> (format JJ/MM/AAAA ou AAAA-MM-JJ).
         </p>
-
         <form onSubmit={handleImportCSV} className="flex flex-wrap items-end gap-4">
           <div className="flex-1 min-w-[200px]">
             <input
