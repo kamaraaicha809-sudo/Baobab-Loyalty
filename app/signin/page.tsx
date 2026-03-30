@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
 import Logo from "@/components/common/Logo";
 import { isDemoMode } from "@/src/lib/demo";
 
-export default function SignIn() {
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -203,5 +203,13 @@ export default function SignIn() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white" />}>
+      <SignInContent />
+    </Suspense>
   );
 }
