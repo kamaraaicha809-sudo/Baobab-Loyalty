@@ -32,8 +32,8 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
   const mainNavItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <Icons.Home />, href: '/dashboard' },
     { id: 'configuration', label: 'Configuration', icon: <Icons.Settings />, href: '/dashboard/configuration' },
-    { id: 'templates', label: 'Templates', icon: <Icons.Template />, href: '/dashboard/templates' },
     { id: 'segments', label: 'Segments', icon: <Icons.Users />, href: '/dashboard/segments' },
+    { id: 'templates', label: 'Templates', icon: <Icons.Template />, href: '/dashboard/templates' },
     {
       id: 'linkedin',
       label: 'Posts LinkedIn',
