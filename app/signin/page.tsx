@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, Suspense } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
@@ -68,6 +68,19 @@ export default function SignIn() {
       } else if (plan) {
         router.push(`/checkout?plan=${plan}`);
       } else {
+        // Vérifier si la configuration est complète pour éviter le double redirect
+        const setupUrl = (config.auth as { setupUrl?: string }).setupUrl;
+        if (setupUrl && data.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("config_complete")
+            .eq("id", data.user.id)
+            .single();
+          if (profile && !profile.config_complete) {
+            router.push(setupUrl);
+            return;
+          }
+        }
         router.push(config.auth.callbackUrl);
       }
     } catch (error) {
