@@ -80,6 +80,19 @@ function VerifyContent() {
           toast.success("Code vérifié ! Définissez votre nouveau mot de passe.");
           router.push("/auth/update-password");
         } else {
+          // Si l'utilisateur vient de /beta, marquer comme bêta testeur
+          const signupRef = sessionStorage.getItem("signup_ref");
+          if (signupRef === "beta") {
+            sessionStorage.removeItem("signup_ref");
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            if (authUser) {
+              await supabase
+                .from("profiles")
+                .update({ is_beta_tester: true })
+                .eq("id", authUser.id);
+            }
+          }
+
           const pendingPlan = sessionStorage.getItem("pending_checkout_plan");
           sessionStorage.removeItem("pending_checkout_plan");
           toast.success("Email vérifié avec succès !");
@@ -105,7 +118,9 @@ function VerifyContent() {
       const supabase = createClient();
 
       if (type === "recovery") {
-        const { error } = await supabase.auth.resetPasswordForEmail(email);
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/update-password`,
+        });
         if (error) throw error;
       } else {
         const { error } = await supabase.auth.resend({

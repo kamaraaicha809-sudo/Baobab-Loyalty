@@ -22,6 +22,8 @@ function SignUpContent() {
   useEffect(() => {
     const plan = searchParams.get("plan");
     if (plan) sessionStorage.setItem("pending_checkout_plan", plan);
+    const ref = searchParams.get("ref");
+    if (ref === "beta") sessionStorage.setItem("signup_ref", "beta");
   }, [searchParams]);
 
   // En mode démo, on laisse le formulaire s'afficher normalement

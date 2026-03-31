@@ -123,9 +123,16 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
               {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 truncate">
-                {user?.name || user?.email?.split('@')[0] || 'Utilisateur'}
-              </p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm font-semibold text-slate-900 truncate">
+                  {user?.name || user?.email?.split('@')[0] || 'Utilisateur'}
+                </p>
+                {user?.is_beta_tester && (
+                  <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 leading-none">
+                    BÊTA
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-slate-500 truncate">
                 {isAdmin ? 'Administrateur' : 'Utilisateur'}
               </p>
@@ -246,9 +253,16 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
                   {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-900 truncate">
-                    {user?.name || user?.email?.split('@')[0] || 'Utilisateur'}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-semibold text-slate-900 truncate">
+                      {user?.name || user?.email?.split('@')[0] || 'Utilisateur'}
+                    </p>
+                    {user?.is_beta_tester && (
+                      <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 leading-none">
+                        BÊTA
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-500 truncate">
                     {isAdmin ? 'Administrateur' : 'Utilisateur'}
                   </p>

@@ -104,11 +104,17 @@ export default function BaseLayout({
               role: profile?.role || "user",
             });
           } else {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("is_beta_tester")
+              .eq("id", session.user.id)
+              .single();
             setUser({
               id: session.user.id,
               email: session.user.email,
               name: session.user.user_metadata?.full_name,
               role: undefined,
+              is_beta_tester: profile?.is_beta_tester ?? false,
             });
           }
         }
