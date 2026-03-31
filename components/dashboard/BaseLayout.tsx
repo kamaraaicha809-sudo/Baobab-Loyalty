@@ -3,6 +3,7 @@
 import { useState, ReactNode, useCallback, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/dashboard/Sidebar";
+import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
 import { isDemoMode, demoUser, demoProfile } from "@/src/lib/demo";
 import { User } from "@/types";
 
@@ -171,6 +172,9 @@ export default function BaseLayout({
           {children}
         </div>
       </main>
+
+      {/* Feedback Widget */}
+      <FeedbackWidget user={user} />
     </div>
     </DemoAuthGuard>
     </Suspense>
