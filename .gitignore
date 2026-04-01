@@ -44,6 +44,7 @@ next-env.d.ts
 .vscode/
 .idea/
 .cursor/mcp.json
+.mcp.json
 *.swp
 *.swo
 *~
