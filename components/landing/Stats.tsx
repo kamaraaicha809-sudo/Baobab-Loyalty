@@ -2,7 +2,7 @@ const stats = [
   { value: "+35%", label: "RÉSERVATIONS DIRECTES" },
   { value: "< 2 min", label: "TEMPS DE CAMPAGNE" },
   { value: "98%", label: "TAUX D'OUVERTURE" },
-  { value: "300+", label: "HÔTELS PARTENAIRES" },
+  { value: "50+", label: "HÔTELS PARTENAIRES" },
 ];
 
 const Stats = () => {
