@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import config from "@/config";
+import { PostHogProvider } from "@/components/common/PostHogProvider";
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -15,7 +16,7 @@ interface ClientLayoutProps {
  */
 const ClientLayout = ({ children }: ClientLayoutProps) => {
   return (
-    <>
+    <PostHogProvider>
       {/* Progress bar */}
       <NextTopLoader color={config.colors.main} showSpinner={false} />
 
@@ -28,7 +29,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
           duration: 3000,
         }}
       />
-    </>
+    </PostHogProvider>
   );
 };
 
