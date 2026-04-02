@@ -30,9 +30,10 @@ export default async function Layout({ children }: { children: ReactNode }) {
       redirect(config.auth.loginUrl);
     }
     const headersList = await headers();
-    const pathname = headersList.get("x-pathname") || "";
+    const pathname = headersList.get("x-pathname") ?? "";
     const setupUrl = (config.auth as { setupUrl?: string }).setupUrl;
-    if (setupUrl && !pathname.includes("/configuration")) {
+    const isOnConfigPage = pathname.includes("/configuration") || pathname === "";
+    if (setupUrl && !isOnConfigPage) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("config_complete")
