@@ -68,19 +68,6 @@ function SignInContent() {
       } else if (plan) {
         router.push(`/checkout?plan=${plan}`);
       } else {
-        // Vérifier si la configuration est complète pour éviter le double redirect
-        const setupUrl = (config.auth as { setupUrl?: string }).setupUrl;
-        if (setupUrl && data.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("config_complete")
-            .eq("id", data.user.id)
-            .single();
-          if (profile && !profile.config_complete) {
-            router.push(setupUrl);
-            return;
-          }
-        }
         router.push(config.auth.callbackUrl);
       }
     } catch (error) {

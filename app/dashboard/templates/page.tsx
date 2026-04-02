@@ -6,10 +6,11 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Icons } from "@/components/common/Icons";
 import toast from "react-hot-toast";
 import config from "@/config";
-import { linkedin } from "@/src/sdk";
+import { linkedin, ai } from "@/src/sdk";
 import {
   demoGeneratedTemplate,
   demoLinkedinPost,
+  demoLinkedInPostGenerated,
   demoMessageTemplates,
   demoProfile,
 } from "@/src/lib/demo";
@@ -618,13 +619,197 @@ function LinkedInTab() {
 }
 
 // ============================================================
+// ONGLET 3 : Générer un post LinkedIn
+// ============================================================
+type LinkedInTone = "professionnel" | "chaleureux" | "inspirant";
+
+const TONES: { id: LinkedInTone; label: string; description: string }[] = [
+  { id: "professionnel", label: "Professionnel", description: "Factuel, structuré, axé sur les résultats" },
+  { id: "chaleureux", label: "Chaleureux", description: "Humain, proche, émotionnel" },
+  { id: "inspirant", label: "Inspirant", description: "Vision, valeurs, impact positif" },
+];
+
+function LinkedInPostTab() {
+  const [subject, setSubject] = useState("");
+  const [tone, setTone] = useState<LinkedInTone>("professionnel");
+  const [loading, setLoading] = useState(false);
+  const [generatedPost, setGeneratedPost] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const hotelName = demoProfile.hotel_name || "";
+  const charCount = generatedPost?.length ?? 0;
+
+  const handleGenerate = async () => {
+    if (!subject.trim()) {
+      toast.error("Entrez un sujet pour votre post LinkedIn.");
+      return;
+    }
+
+    setLoading(true);
+    setGeneratedPost(null);
+
+    try {
+      if (config.isDemoMode) {
+        await new Promise((r) => setTimeout(r, 1400));
+        setGeneratedPost(demoLinkedInPostGenerated.content);
+        toast.success("Post généré avec succès !");
+      } else {
+        const result = await ai.generateLinkedInPost({
+          subject: subject.trim(),
+          hotelName: hotelName || undefined,
+          tone,
+        });
+        setGeneratedPost(result.content);
+        toast.success("Post généré avec succès !");
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la génération.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (!generatedPost) return;
+    navigator.clipboard.writeText(generatedPost);
+    setCopied(true);
+    toast.success("Copié dans le presse-papiers !");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="space-y-6">
+      {config.isDemoMode && (
+        <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          Mode démo — la génération est simulée sans appel à l&apos;IA.
+        </div>
+      )}
+
+      {/* Formulaire */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
+        <div>
+          <h3 className="font-semibold text-slate-900 mb-1">Générer un post LinkedIn</h3>
+          <p className="text-sm text-slate-500">
+            Décrivez votre sujet et choisissez un ton. L&apos;IA rédige un post prêt à publier.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            Sujet du post *
+          </label>
+          <textarea
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Ex : Comment nous avons augmenté notre taux de retour client de 30% en 3 mois"
+            rows={3}
+            className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            Ton du post
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {TONES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTone(t.id)}
+                title={t.description}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  tone === t.id
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1.5 text-xs text-slate-400">
+            {TONES.find((t) => t.id === tone)?.description}
+          </p>
+        </div>
+
+        <button
+          onClick={handleGenerate}
+          disabled={loading || !subject.trim()}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {loading ? (
+            <>
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Génération en cours...
+            </>
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Générer le post
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Résultat */}
+      {generatedPost && (
+        <div className="bg-white rounded-xl border border-primary/30 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="font-semibold text-slate-900">Post LinkedIn généré</h4>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {charCount} caractères
+                {charCount > 1500 && (
+                  <span className="text-amber-600 ml-1">(LinkedIn recommande moins de 1 500 caractères)</span>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors"
+            >
+              {copied ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Copié !
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copier
+                </>
+              )}
+            </button>
+          </div>
+          <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
+            <pre className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed font-sans">
+              {generatedPost}
+            </pre>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // COMPOSANT PRINCIPAL
 // ============================================================
 function TemplatesContent() {
   const searchParams = useSearchParams();
   const segmentId = searchParams.get("segment") || "";
   const segmentName = SEGMENT_NAMES[segmentId] || "un segment";
-  const [activeTab, setActiveTab] = useState<"offres" | "linkedin">("offres");
+  const [activeTab, setActiveTab] = useState<"offres" | "linkedin" | "linkedin-post">("offres");
 
   return (
     <div className="space-y-6">
@@ -661,7 +846,7 @@ function TemplatesContent() {
       </header>
 
       {/* Onglets */}
-      <div className="flex gap-1 p-1 bg-slate-100 rounded-xl w-fit">
+      <div className="flex flex-wrap gap-1 p-1 bg-slate-100 rounded-xl w-fit">
         <button
           onClick={() => setActiveTab("offres")}
           className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
@@ -683,16 +868,29 @@ function TemplatesContent() {
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
           </svg>
-          Générer depuis LinkedIn
+          Depuis LinkedIn
+        </button>
+        <button
+          onClick={() => setActiveTab("linkedin-post")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+            activeTab === "linkedin-post"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Post LinkedIn IA
         </button>
       </div>
 
       {/* Contenu des onglets */}
-      {activeTab === "offres" ? (
+      {activeTab === "offres" && (
         <OffresTab segmentId={segmentId} segmentName={segmentName} />
-      ) : (
-        <LinkedInTab />
       )}
+      {activeTab === "linkedin" && <LinkedInTab />}
+      {activeTab === "linkedin-post" && <LinkedInPostTab />}
     </div>
   );
 }
