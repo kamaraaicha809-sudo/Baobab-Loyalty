@@ -243,6 +243,22 @@ export const demoMessageTemplates = [
   },
 ];
 
+export const demoLinkedInPostGenerated = {
+  content: `Saviez-vous que 68% des clients d'un hôtel ne reviennent pas simplement parce qu'ils ont été oubliés ?
+
+Chez Hôtel Le Baobab, nous avons décidé de changer cela.
+
+Chaque mois, nous identifions nos clients inactifs et leur envoyons un message personnalisé sur WhatsApp — pas un message générique, mais un vrai message qui reconnaît leur dernière visite et leur propose quelque chose de concret.
+
+En 3 mois, notre taux de retour a progressé de 31%. Pas grâce à une grande campagne publicitaire. Juste grâce à une attention sincère et un bon outil.
+
+La fidélisation, c'est d'abord une question de relation. La technologie vient ensuite.
+
+Et vous, comment gardez-vous le lien avec vos anciens clients ?
+
+#Hotellerie #Fidelisation #MarketingHotelier #AfriqueOccidentale #CustomerExperience`,
+};
+
 // ============================================
 // DONNÉES FICTIVES — PROMPTS IA
 // ============================================
