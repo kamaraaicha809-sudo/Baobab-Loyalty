@@ -61,14 +61,15 @@ function SignInContent() {
       }
 
       toast.success("Connexion réussie !");
-      const redirect = searchParams.get("redirect");
+      const redirectTo = searchParams.get("redirect");
       const plan = searchParams.get("plan");
-      if (redirect) {
-        router.push(redirect);
+      // Use full page reload to ensure auth cookies are sent with the next request
+      if (redirectTo) {
+        window.location.href = redirectTo;
       } else if (plan) {
-        router.push(`/checkout?plan=${plan}`);
+        window.location.href = `/checkout?plan=${plan}`;
       } else {
-        router.push(config.auth.callbackUrl);
+        window.location.href = config.auth.callbackUrl;
       }
     } catch (error) {
       toast.error("Une erreur est survenue");
