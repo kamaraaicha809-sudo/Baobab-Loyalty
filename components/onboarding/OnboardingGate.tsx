@@ -38,12 +38,23 @@ export default function OnboardingGate() {
     check();
   }, []);
 
+  const handleSkip = async () => {
+    if (!profileId) return;
+    const supabase = createClient();
+    await supabase
+      .from("profiles")
+      .update({ onboarding_completed: true, updated_at: new Date().toISOString() })
+      .eq("id", profileId);
+    setShowOnboarding(false);
+  };
+
   if (!showOnboarding || !profileId) return null;
 
   return (
     <OnboardingModal
       profileId={profileId}
       onComplete={() => setShowOnboarding(false)}
+      onSkip={handleSkip}
     />
   );
 }
