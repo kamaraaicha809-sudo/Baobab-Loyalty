@@ -29,8 +29,10 @@ function ConfirmContent() {
   const templateId = searchParams.get("template") || "surclassement";
   const feteName = searchParams.get("fete") || "";
   const avantage = searchParams.get("avantage") || "";
+  const aiMessage = searchParams.get("message") || "";
 
   const [counts, setCounts] = useState<Record<string, number>>(demoSegmentCounts);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -58,11 +60,13 @@ function ConfirmContent() {
   const templatesUrl = `/dashboard/templates?segment=${segmentId}`;
 
   const handleConfirmerEnvoi = () => {
+    setSending(true);
     const params = new URLSearchParams();
     if (segmentId) params.set("segment", segmentId);
     params.set("template", templateId);
     if (avantage) params.set("avantage", avantage);
     if (feteName) params.set("fete", feteName);
+    if (aiMessage) params.set("message", aiMessage);
     router.push(`/dashboard/campaign/sending?${params.toString()}`);
   };
 
@@ -123,6 +127,15 @@ function ConfirmContent() {
             )}
           </div>
 
+          {aiMessage && (
+            <div className="border-t border-slate-200 pt-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Message WhatsApp</p>
+              <div className="p-4 rounded-2xl rounded-tl-sm bg-white border border-slate-200">
+                <p className="text-sm text-slate-700 whitespace-pre-wrap">{aiMessage}</p>
+              </div>
+            </div>
+          )}
+
           <div className="border-t border-slate-200 pt-4">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Coût estimé</p>
             <p className="text-slate-900 font-medium text-green-600">Inclus dans votre forfait</p>
@@ -133,12 +146,22 @@ function ConfirmContent() {
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button
             onClick={handleConfirmerEnvoi}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
+            disabled={sending}
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors disabled:opacity-70"
           >
-            Confirmer l&apos;envoi
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+            {sending ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Lancement en cours…
+              </>
+            ) : (
+              <>
+                Confirmer l&apos;envoi
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </>
+            )}
           </button>
           <Link
             href={templatesUrl}

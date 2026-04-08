@@ -24,12 +24,26 @@ export interface GenerateResponse {
   };
 }
 
+export interface GenerateCampaignMessageParams {
+  typeOffre: string;
+  avantage: string;
+  segment: "3mois" | "6mois" | "9mois" | "tous";
+  hotelName?: string;
+}
+
 export interface GenerateLinkedInPostParams {
   subject: string;
   hotelName?: string;
   tone?: "professionnel" | "chaleureux" | "inspirant";
   offer?: string;
 }
+
+const SEGMENT_LABELS: Record<string, string> = {
+  "3mois": "clients absents depuis 3 mois",
+  "6mois": "clients absents depuis 6 mois",
+  "9mois": "clients absents depuis 9 mois",
+  "tous": "tous les clients",
+};
 
 const LINKEDIN_SYSTEM_PROMPT = `Tu es un expert en contenu LinkedIn pour directeurs d'hotels en Afrique francophone.
 
@@ -64,6 +78,38 @@ export async function generate(
 }
 
 /**
+ * Generate a WhatsApp campaign message using the campaign_whatsapp prompt
+ * Uses claude-haiku for speed and cost efficiency on short texts
+ */
+export async function generateCampaignMessage(
+  params: GenerateCampaignMessageParams
+): Promise<GenerateResponse> {
+  const { typeOffre, avantage, segment, hotelName } = params;
+
+  const segmentLabel = SEGMENT_LABELS[segment] || segment;
+
+  const userPrompt = [
+    `Type d'offre : ${typeOffre}`,
+    `Avantage concret : ${avantage}`,
+    `Segment cible : ${segmentLabel}`,
+    hotelName ? `Nom de l'hotel : ${hotelName}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return callEdgeFunction<GenerateResponse>("ai-generate", {
+    method: "POST",
+    body: {
+      prompt: userPrompt,
+      promptName: "campaign_whatsapp",
+      model: "anthropic/claude-haiku-4-5",
+      maxTokens: 300,
+      temperature: 0.6,
+    },
+  });
+}
+
+/**
  * Generate a LinkedIn post from a subject
  * System prompt is hardcoded to guarantee consistent B2B output
  */
@@ -92,5 +138,6 @@ export async function generateLinkedInPost(
 // Export as namespace
 export const ai = {
   generate,
+  generateCampaignMessage,
   generateLinkedInPost,
 };
