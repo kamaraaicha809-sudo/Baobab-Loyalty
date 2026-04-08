@@ -1,11 +1,11 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import OnboardingGate from "@/components/onboarding/OnboardingGate";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 import { ReactNode } from "react";
 import { createClient } from "@/libs/supabase/server";
 import { redirect } from "next/navigation";
 import { isDemoMode } from "@/src/lib/demo";
-import { headers } from "next/headers";
 
 // Metadata noindex pour les pages privées du dashboard
 export const metadata = getSEOTags({
@@ -29,21 +29,13 @@ export default async function Layout({ children }: { children: ReactNode }) {
     if (!user) {
       redirect(config.auth.loginUrl);
     }
-    const headersList = await headers();
-    const pathname = headersList.get("x-pathname") ?? "";
-    const setupUrl = (config.auth as { setupUrl?: string }).setupUrl;
-    const isOnConfigPage = pathname.includes("/configuration") || pathname === "";
-    if (setupUrl && !isOnConfigPage) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("config_complete")
-        .eq("id", user.id)
-        .single();
-      if (profile && (profile.config_complete === false || profile.config_complete === null)) {
-        redirect(setupUrl);
-      }
-    }
   }
 
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <DashboardLayout>
+      {/* Onboarding : s'affiche automatiquement si onboarding_completed = false */}
+      <OnboardingGate />
+      {children}
+    </DashboardLayout>
+  );
 }

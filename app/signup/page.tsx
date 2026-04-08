@@ -87,18 +87,31 @@ function SignUpContent() {
 
       if (error) {
         if (error.message.includes("already registered")) {
-          toast.error("Cet email est déjà utilisé");
+          toast.error("Cet email est déjà utilisé. Connectez-vous !");
+          router.push(`/signin?email=${encodeURIComponent(email)}`);
         } else {
           toast.error(error.message);
         }
         return;
       }
 
-      // Stocker l'email pour la page de vérification
-      sessionStorage.setItem("verify_email", email);
-      
-      toast.success("Un code de vérification a été envoyé à votre email");
-      router.push("/auth/verify?type=signup");
+      // Supabase retourne identities=[] si l'email existe déjà (sans erreur)
+      if (data.user?.identities?.length === 0) {
+        toast.error("Cet email est déjà associé à un compte. Connectez-vous !");
+        router.push(`/signin?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
+      if (data.session) {
+        // mailer_autoconfirm activé : l'utilisateur est directement connecté
+        toast.success("Compte créé avec succès !");
+        window.location.href = config.auth.callbackUrl;
+      } else {
+        // Vérification email requise
+        sessionStorage.setItem("verify_email", email);
+        toast.success("Un code de vérification a été envoyé à votre email");
+        router.push("/auth/verify?type=signup");
+      }
     } catch (error) {
       toast.error("Une erreur est survenue");
     } finally {
