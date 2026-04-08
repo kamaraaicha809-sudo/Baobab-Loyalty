@@ -87,12 +87,37 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedFete, setSelectedFete] = useState<Fete | null>(null);
   const [avantage, setAvantage] = useState("");
+  const [generatedMessage, setGeneratedMessage] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
 
   const selected = TEMPLATES.find((t) => t.id === selectedId);
   const SelectedIcon = selected ? ICON_MAP[selected.icon as keyof typeof ICON_MAP] : null;
   const fetes = selected?.id === "evenements" && "fetes" in selected ? (selected.fetes as Fete[]) : null;
 
   useEffect(() => {
+    if (config.isDemoMode) return;
+    const loadProfile = async () => {
+      try {
+        const { createClient } = await import("@/libs/supabase/client");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("hotel_name")
+          .eq("id", user.id)
+          .single();
+        if (profile?.hotel_name) setHotelName(profile.hotel_name);
+      } catch {
+        // silent
+      }
+    };
+    loadProfile();
+  }, []);
+
+  useEffect(() => {
+    setGeneratedMessage(null);
     if (selected?.id === "evenements" && selectedFete) {
       setAvantage(selectedFete.avantage);
     } else if (selected) {
@@ -105,17 +130,46 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
   const handleSelectTemplate = (id: string) => {
     setSelectedId(id);
     setSelectedFete(null);
+    setGeneratedMessage(null);
   };
 
-  const getPreviewMessage = () => {
-    if (selected?.id === "evenements") {
-      const evt = selected as { defaultIntro?: string; fetes?: Fete[] };
-      if (selectedFete) return selectedFete.intro;
-      return evt.defaultIntro ?? "Célébrons ensemble cet événement spécial ! Profitez de notre offre exclusive :";
+  const handleGenerateAI = async () => {
+    if (!selected || !avantage.trim()) {
+      toast.error("Sélectionnez une offre et renseignez l'avantage d'abord.");
+      return;
     }
-    return "Cher {nom}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : ";
+
+    setGenerating(true);
+    setGeneratedMessage(null);
+
+    try {
+      if (config.isDemoMode) {
+        await new Promise((r) => setTimeout(r, 1300));
+        const demoMessages: Record<string, string> = {
+          "3mois": `Bonjour {{nom}}, cela fait un moment que vous n'êtes pas venus nous voir ! Pour votre prochain séjour, nous vous réservons : ${avantage}. Réservez avant la fin du mois pour en profiter.`,
+          "6mois": `{{nom}}, vous nous manquez vraiment ! Pour fêter votre retour à ${hotelName || "l'hôtel"}, nous vous offrons : ${avantage}. Cette offre vous est réservée jusqu'à la fin du mois — profitez-en.`,
+          "9mois": `Cher {{nom}}, cela fait longtemps et on pense à vous ! Nous avons une surprise : ${avantage}, rien que pour vous. Répondez simplement OUI et on s'occupe du reste.`,
+          "tous": `Bonjour {{nom}}, l'équipe de ${hotelName || "notre hôtel"} pense à vous ! Pour votre prochaine visite, profitez de : ${avantage}. Réservez dès maintenant.`,
+        };
+        setGeneratedMessage(demoMessages[segmentId] || demoMessages["tous"]);
+        toast.success("Message généré avec succès !");
+      } else {
+        const result = await ai.generateCampaignMessage({
+          typeOffre: selected.name,
+          avantage: avantage.trim(),
+          segment: segmentId as "3mois" | "6mois" | "9mois" | "tous",
+          hotelName: hotelName || undefined,
+        });
+        setGeneratedMessage(result.content);
+        toast.success("Message généré avec succès !");
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la génération.";
+      toast.error(message);
+    } finally {
+      setGenerating(false);
+    }
   };
-  const previewMessage = getPreviewMessage();
 
   const handleValiderEnvoyer = () => {
     if (!selected || !avantage.trim()) {
@@ -127,6 +181,7 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
     params.set("template", selected.id);
     params.set("avantage", avantage.trim());
     if (selectedFete) params.set("fete", selectedFete.name);
+    if (generatedMessage) params.set("message", generatedMessage);
     router.push(`/dashboard/campaign/confirm?${params.toString()}`);
   };
 
@@ -212,32 +267,42 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                  Aperçu du message
-                </label>
-                <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
-                  <p className="text-sm text-slate-700">
-                    {previewMessage}
-                    <span className="text-primary font-medium italic">&quot;{avantage || "…"}&quot;</span>
+              <button
+                onClick={handleGenerateAI}
+                disabled={generating || !avantage.trim()}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-primary/40 bg-primary/5 text-primary font-semibold hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {generating ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Génération en cours...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Générer avec l&apos;IA
+                  </>
+                )}
+              </button>
+
+              {generatedMessage !== null && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    Message généré
+                  </label>
+                  <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{generatedMessage}</p>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1.5">
+                    Vous pouvez modifier l&apos;avantage et regénérer si besoin.
                   </p>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                  Bouton interactif
-                </label>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-200/80 border border-slate-200 text-slate-700 text-sm font-medium">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Réserver
-                </div>
-              </div>
+              )}
 
               <button
                 onClick={handleValiderEnvoyer}

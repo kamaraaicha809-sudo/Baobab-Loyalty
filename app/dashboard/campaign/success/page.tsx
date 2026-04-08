@@ -4,12 +4,15 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, demoUser, demoProfile } from "@/src/lib/demo";
+import toast from "react-hot-toast";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const avantageRaw = searchParams.get("avantage") || "";
   const avantage = avantageRaw || "Un surclassement gratuit en Suite Junior";
+  const aiMessage = searchParams.get("message") || "";
   const [profileId, setProfileId] = useState<string | null>(isDemoMode ? demoUser.id : null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isDemoMode) return;
@@ -28,7 +31,18 @@ function SuccessContent() {
   offreParams.set("hotel", hotelName);
   if (profileId) offreParams.set("pid", profileId);
 
-  const messageText = `Cher {nom}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : "${avantage}"`;
+  const messageText = aiMessage || `Cher {{nom}}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : "${avantage}"`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(messageText);
+      setCopied(true);
+      toast.success("Message copié !");
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error("Impossible de copier le message.");
+    }
+  };
 
   return (
     <div className="min-h-[70vh] bg-[#FDFDF9] py-8 px-4">
@@ -49,15 +63,46 @@ function SuccessContent() {
           <p className="text-slate-600 text-base max-w-md">
             Vos clients reçoivent actuellement leur offre personnalisée. Voici à quoi ressemble le message sur leur téléphone.
           </p>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
+            >
+              Retour au tableau de bord
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </Link>
+            <Link
+              href="/dashboard/segments"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+              </svg>
+              Lancer une autre campagne
+            </Link>
+          </div>
+          <button
+            onClick={handleCopy}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
           >
-            Retour au tableau de bord
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          </Link>
+            {copied ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Copié !
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copier le message
+              </>
+            )}
+          </button>
         </div>
 
         {/* Partie droite - Mockup téléphone WhatsApp */}
