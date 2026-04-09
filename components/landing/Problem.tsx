@@ -1,64 +1,54 @@
-interface StepProps {
-  emoji: string;
-  text: string;
-}
+const consequences = [
+  {
+    stat: "20–25M FCFA",
+    label: "perdus chaque mois",
+    detail: "en chambres vides que tu n'arrives pas à remplir",
+  },
+  {
+    stat: "15 à 25%",
+    label: "de commission reversés",
+    detail: "à Booking.com sur chaque réservation que tu aurais pu avoir en direct",
+  },
+  {
+    stat: "2 à 3h",
+    label: "perdues chaque jour",
+    detail: "à appeler manuellement, envoyer des WhatsApp un par un, gérer Excel",
+  },
+  {
+    stat: "0 retour",
+    label: "de tes anciens clients",
+    detail: "parce qu'ils ne reçoivent jamais de signe de toi entre deux séjours",
+  },
+];
 
-const Step = ({ emoji, text }: StepProps) => {
-  return (
-    <div className="w-full sm:w-40 md:w-48 flex flex-col gap-2 sm:gap-3 items-center justify-center">
-      <span className="text-3xl sm:text-4xl">{emoji}</span>
-      <h3 className="font-bold text-white text-center text-sm sm:text-base">{text}</h3>
-    </div>
-  );
-};
-
-/**
- * Problem Section
- * Shows the pain points of building a SaaS from scratch
- */
 const Problem = () => {
   return (
-    <section className="gradient-primary text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-16 md:py-20 lg:py-28 text-center">
-        <h2 className="max-w-3xl mx-auto font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight mb-4 sm:mb-6 text-white">
-          Sans Baobab Loyalty
-        </h2>
-        <p className="max-w-xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed mb-10 sm:mb-12 md:mb-16 text-white/80 px-2">
-          Relances manuelles, tableaux Excel, oublis de clients... Du temps perdu pour remplir les chambres.
-        </p>
-
-        {/* Mobile: Vertical layout */}
-        <div className="flex flex-col sm:hidden gap-6 items-center mb-12">
-          <Step emoji="⏰" text="Heures de relance manuelle" />
-          <Step emoji="📋" text="Excel et listes dispersées" />
-          <Step emoji="😔" text="Clients oubliés" />
+    <section className="py-16 sm:py-24 bg-[#2C2C2C]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
+            Chaque nuit vide, c&apos;est de l&apos;argent que tu ne récupèreras jamais
+          </h2>
+          <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto">
+            Tu as des clients qui ont déjà séjourné dans ton hôtel. Ils ont aimé. Mais ils ne reviennent pas — parce que personne ne les relance.
+          </p>
         </div>
 
-        {/* Desktop: Horizontal */}
-        <div className="hidden sm:flex flex-row justify-center items-center md:items-start gap-8 md:gap-12">
-          <Step emoji="⏰" text="Heures de relance manuelle" />
-          <Step emoji="📋" text="Excel et listes dispersées" />
-          <Step emoji="😔" text="Clients oubliés" />
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-12">
+          {consequences.map((c, i) => (
+            <div key={i} className="bg-[#383838] rounded-2xl p-6 border border-[#444]">
+              <div className="text-[#EBC161] font-display text-3xl font-bold mb-1">{c.stat}</div>
+              <div className="text-white font-semibold mb-2">{c.label}</div>
+              <div className="text-slate-400 text-sm">{c.detail}</div>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-12 sm:mt-14 md:mt-16 pt-10 sm:pt-12 md:pt-16 border-t border-white/10">
-          <h3 className="max-w-3xl mx-auto font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight mb-6 sm:mb-8 text-white">
-            Avec Baobab Loyalty
-          </h3>
-
-          {/* Mobile: Vertical layout */}
-          <div className="flex flex-col sm:hidden gap-6 items-center">
-            <Step emoji="⚡" text="Relances en 2 minutes" />
-            <Step emoji="🤖" text="IA + WhatsApp automatique" />
-            <Step emoji="📈" text="Chambres remplies" />
-          </div>
-
-          {/* Desktop: Horizontal */}
-          <div className="hidden sm:flex flex-row justify-center items-center md:items-start gap-8 md:gap-12">
-            <Step emoji="⚡" text="Relances en 2 minutes" />
-            <Step emoji="🤖" text="IA + WhatsApp automatique" />
-            <Step emoji="📈" text="Chambres remplies" />
-          </div>
+        <div className="text-center">
+          <p className="text-white text-lg sm:text-xl font-semibold">
+            Tu n&apos;as pas un problème de clients.{" "}
+            <span className="text-[#EBC161]">Tu as un problème de suivi.</span>
+          </p>
         </div>
       </div>
     </section>

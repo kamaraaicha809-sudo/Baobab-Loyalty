@@ -102,13 +102,13 @@ const config = {
       {
         isFeatured: true,
         name: "Pro",
-        description: "Le plan recommandé",
+        description: "Le meilleur rapport qualité/prix",
         price: 59000,
         features: [
           { name: "Jusqu'à 100 chambres" },
-          { name: "Tous les segments IA" },
-          { name: "Génération IA de messages" },
-          { name: "Multi-campagnes" },
+          { name: "Segmentation avancée" },
+          { name: "Campagnes illimitées" },
+          { name: "IA génération de messages" },
           { name: "Support prioritaire" },
         ],
       },
