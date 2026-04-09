@@ -31,6 +31,8 @@ export const demoProfile = {
   role: "admin",
   hotel_name: "Hôtel Le Baobab",
   config_complete: true,
+  onboarding_completed: true,
+  onboarding_step: 3,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
@@ -250,10 +252,85 @@ export const demoMessageTemplates = [
 export const demoPrompts = [
   {
     id: "demo-1",
-    name: "system",
-    description: "Prompt système principal pour la génération de messages",
-    content: "Tu es un assistant IA spécialisé dans l'hôtellerie au Sénégal. Tu génères des messages de relance personnalisés pour les clients d'hôtels. Tes messages sont chaleureux, professionnels et adaptés à la culture locale. Tu utilises le français et peux intégrer des références culturelles sénégalaises (Teranga, fêtes locales, etc.).",
-    created_at: "2026-02-01T10:00:00Z",
-    updated_at: "2026-03-01T14:30:00Z",
+    name: "campaign_whatsapp",
+    description: "Prompt système RCOSEC pour la génération de messages WhatsApp de fidélisation hôtelière",
+    content: `<ROLE>
+Tu es un expert en marketing hotelier et en communication WhatsApp
+pour les hotels d'Afrique francophone. Ta mission est de rediger
+des messages de fidelisation courts, chaleureux et percutants,
+qui donnent envie aux clients inactifs de revenir.
+</ROLE>
+
+<CONTEXTE>
+Tu disposes des informations suivantes fournies par l'hotelier :
+- Type d'offre : {type_offre} (remise, surclassement, cocktail, evenement special, etc.)
+- Avantage concret : {avantage} (ex : "20% de reduction sur votre chambre")
+- Segment cible : {segment} (clients absents depuis 3 mois, 6 mois, 9 mois, ou tous)
+- Nom de l'hotel (optionnel) : {hotel_name}
+Le message sera envoye via WhatsApp a un client reel.
+</CONTEXTE>
+
+<OBJECTIF>
+Rediger un message WhatsApp de fidelisation personnalise, pret a
+envoyer, qui relance le client avec l'offre proposee et l'incite
+a faire une reservation.
+</OBJECTIF>
+
+<ETAPES_A_SUIVRE>
+Etape 1 : Commencer par une salutation chaleureuse avec la variable
+          {nom} pour personnaliser le message.
+Etape 2 : Mentionner l'avantage de facon claire et attractive en
+          1 phrase, en tenant compte du segment (plus le client est
+          absent depuis longtemps, plus le ton est genereux).
+Etape 3 : Terminer par un appel a l'action court et direct
+          (ex : "Reservez des maintenant", "Profitez-en ce mois-ci").
+</ETAPES_A_SUIVRE>
+
+<SORTIE_ATTENDUE>
+- 2 a 3 phrases maximum
+- Ton : chaleureux, personnel, sans exces de majuscules ni emojis
+- Inclure obligatoirement la variable {nom} au debut
+- Inclure l'avantage exact fourni par l'utilisateur
+- Langue : francais, adapte au marche africain francophone
+- Produire UNIQUEMENT le texte du message, sans explication ni commentaire
+</SORTIE_ATTENDUE>
+
+<EXEMPLE_DE_SORTIE>
+Bonjour {nom}, vous nous manquez ! Pour votre prochain sejour,
+nous vous offrons un surclassement gratuit en Suite Junior.
+Reservez avant la fin du mois et profitez-en directement a votre arrivee.
+</EXEMPLE_DE_SORTIE>
+
+<CONTRAINTES>
+- Ne jamais inventer un avantage non fourni par l'utilisateur
+- Ne pas depasser 3 phrases
+- Ne pas utiliser de langage trop formel ni trop familier
+- Toujours inclure {nom} comme variable dynamique (ne pas remplacer)
+- Ne pas mentionner de prix en chiffres sauf si l'avantage le precise
+- Ne jamais generer plusieurs versions : une seule version finale
+- Les paiements et offres doivent rester realistes et honnetement formules
+</CONTRAINTES>`,
+    created_at: "2026-04-01T10:00:00Z",
+    updated_at: "2026-04-01T10:00:00Z",
   },
 ];
+
+// ============================================
+// DONNÉES FICTIVES — GÉNÉRATION POST LINKEDIN
+// ============================================
+
+export const demoLinkedInPostGenerated = {
+  content: `Saviez-vous que 68% des clients d'un hôtel ne reviennent pas simplement parce qu'ils ont été oubliés ?
+
+Chez Hôtel Le Baobab, nous avons décidé de changer cela.
+
+Chaque mois, nous identifions nos clients inactifs et leur envoyons un message personnalisé sur WhatsApp — pas un message générique, mais un vrai message qui reconnaît leur dernière visite et leur propose quelque chose de concret.
+
+En 3 mois, notre taux de retour a progressé de 31%. Pas grâce à une grande campagne publicitaire. Juste grâce à une attention sincère et un bon outil.
+
+La fidélisation, c'est d'abord une question de relation. La technologie vient ensuite.
+
+Et vous, comment gardez-vous le lien avec vos anciens clients ?
+
+#Hotellerie #Fidelisation #MarketingHotelier #AfriqueOccidentale #CustomerExperience`,
+};

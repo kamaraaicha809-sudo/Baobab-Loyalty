@@ -145,23 +145,25 @@ export default function Dashboard() {
         </Link>
       </header>
 
-      {/* Deux cartes métriques (image 2) */}
+      {/* Deux cartes métriques — M3: hiérarchie visuelle KPI principal en premier */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-start justify-between mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#3b82f6" className="w-8 h-8">
+        {/* KPI principal */}
+        <div className="bg-[var(--color-main)] p-5 rounded-xl shadow-sm">
+          <div className="flex items-start justify-between mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-slate-800">
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
             </svg>
-            <span className="text-sm font-medium text-green-600">+20% vs mois dernier</span>
+            <span className="text-xs font-semibold text-slate-700 bg-slate-900/10 px-2 py-1 rounded-full">+20% vs mois dernier</span>
           </div>
-          <p className="text-3xl font-bold text-slate-900">{loading ? "—" : totalFromApp}</p>
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mt-0.5">
+          <p className="text-5xl font-bold text-slate-900">{loading ? "—" : totalFromApp}</p>
+          <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider mt-1.5">
             Réservations via {config.appName}
           </p>
         </div>
+        {/* KPI secondaire */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-end justify-end mb-2">
-            <span className="text-xs text-slate-500">Derniers 3 jours</span>
+          <div className="flex items-end justify-end mb-3">
+            <span className="text-xs text-slate-400">Derniers 3 jours</span>
           </div>
           <p className="text-3xl font-bold text-slate-900">{isDemoMode ? demoMetrics.revenueFormatted : "120 000"} FCFA</p>
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mt-0.5">
@@ -169,6 +171,27 @@ export default function Dashboard() {
           </p>
         </div>
       </div>
+
+      {/* H1 — État vide: guide l'utilisateur vers la configuration */}
+      {!loading && !isDemoMode && totalFromApp === 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="font-semibold text-amber-900 mb-1">Aucune réservation encore générée</p>
+            <p className="text-sm text-amber-700">
+              Importez votre base clients et configurez votre hôtel pour commencer à relancer vos clients via {config.appName}.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/configuration"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-amber-900 text-white text-sm font-semibold rounded-lg hover:bg-amber-800 transition-colors"
+          >
+            Configurer mon hôtel
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
+        </div>
+      )}
 
       {/* Layout 2 colonnes: gauche (Performance + Campagnes), droite (Flux + Impact global) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

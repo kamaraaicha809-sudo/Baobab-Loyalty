@@ -1,8 +1,7 @@
 "use client";
 
 import posthog from "posthog-js";
-import { PostHogProvider as PHProvider } from "posthog-js/react";
-import { useEffect, Suspense, ReactNode } from "react";
+import { useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 function PostHogPageView() {
@@ -22,7 +21,9 @@ function PostHogPageView() {
   return null;
 }
 
-export function PostHogProvider({ children }: { children: ReactNode }) {
+// Standalone init component — does NOT wrap children.
+// Loaded lazily via dynamic import so posthog-js is NOT in the main bundle.
+export default function PostHogInit() {
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
 
@@ -35,7 +36,7 @@ export function PostHogProvider({ children }: { children: ReactNode }) {
         maskAllInputs: false,
       },
       loaded: (ph) => {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_POSTHOG_DEBUG === "true") {
           ph.debug();
         }
       },
@@ -43,11 +44,8 @@ export function PostHogProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <PHProvider client={posthog}>
-      <Suspense fallback={null}>
-        <PostHogPageView />
-      </Suspense>
-      {children}
-    </PHProvider>
+    <Suspense fallback={null}>
+      <PostHogPageView />
+    </Suspense>
   );
 }

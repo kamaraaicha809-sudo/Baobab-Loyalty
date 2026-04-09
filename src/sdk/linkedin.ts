@@ -88,7 +88,8 @@ export async function getTemplates(
     .from("message_templates")
     .select("*")
     .eq("profile_id", profileId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) {
     throw new Error(error.message);

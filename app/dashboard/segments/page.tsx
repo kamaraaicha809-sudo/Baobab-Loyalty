@@ -79,6 +79,27 @@ export default function SegmentsPage() {
         </p>
       </header>
 
+      {/* H2 — État vide: aucun client importé */}
+      {!isDemoMode && (counts["tous"] ?? 0) === 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="font-semibold text-amber-900 mb-1">Aucun client dans votre base</p>
+            <p className="text-sm text-amber-700">
+              Importez votre fichier CSV depuis la page de configuration pour pouvoir lancer vos premières campagnes.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/configuration"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-amber-900 text-white text-sm font-semibold rounded-lg hover:bg-amber-800 transition-colors"
+          >
+            Importer mes clients
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2">
         {SEGMENT_DEFINITIONS.map((segment) => (
           <Link

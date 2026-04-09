@@ -46,7 +46,7 @@ export async function getClients(profileId: string, limit = 1000): Promise<Clien
 
   const { data, error } = await supabase
     .from("clients")
-    .select("*")
+    .select("id, profile_id, nom, email, telephone, whatsapp, derniere_visite, notes, created_at, updated_at")
     .eq("profile_id", profileId)
     .order("derniere_visite", { ascending: false })
     .limit(limit);

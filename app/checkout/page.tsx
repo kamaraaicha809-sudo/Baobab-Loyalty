@@ -6,7 +6,7 @@ import config from "@/config";
 import { billing } from "@/src/sdk";
 import toast from "react-hot-toast";
 
-const PLAN_SLUGS = ["essentiel", "croissance", "premium"] as const;
+const PLAN_SLUGS = ["starter", "pro", "premium"] as const;
 
 function CheckoutContent() {
   const searchParams = useSearchParams();

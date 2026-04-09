@@ -1,13 +1,16 @@
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import Header from "@/components/landing/Header";
 import Hero from "@/components/landing/Hero";
 import Stats from "@/components/landing/Stats";
 import Solution from "@/components/landing/Solution";
 import Features from "@/components/landing/Features";
 import WhyChoose from "@/components/landing/WhyChoose";
-import Pricing from "@/components/landing/Pricing";
 import Footer from "@/components/landing/Footer";
 import { renderSchemaTags } from "@/libs/seo";
+
+// Below the fold — code split to reduce initial JS
+const Pricing = dynamic(() => import("@/components/landing/Pricing"));
 
 export default function Home() {
   return (

@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ai, prompts } from "@/src/sdk";
-import { isDemoMode } from "@/src/lib/demo";
-
-const DEMO_SYSTEM_PROMPT = `Tu es un expert en création de contenu LinkedIn pour l'hôtellerie haut de gamme en Afrique de l'Ouest. Génère UNIQUEMENT le texte du post LinkedIn, prêt à copier-coller. Commence directement par le hook.`;
+import { ai } from "@/src/sdk";
 
 const TONES = [
   { value: "professionnel", label: "Professionnel", desc: "Sobre, orienté résultats" },
@@ -13,7 +10,6 @@ const TONES = [
 ];
 
 export default function LinkedInPage() {
-  const [systemPrompt, setSystemPrompt] = useState<string>("");
   const [hotelName, setHotelName] = useState("");
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("professionnel");
@@ -23,20 +19,6 @@ export default function LinkedInPage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [charCount, setCharCount] = useState(0);
-
-  // Charger le system prompt depuis la DB
-  useEffect(() => {
-    if (isDemoMode) {
-      setSystemPrompt(DEMO_SYSTEM_PROMPT);
-      return;
-    }
-    prompts.list().then((list) => {
-      const p = list.find((p) => p.name === "linkedin-post");
-      if (p) setSystemPrompt(p.content);
-    }).catch(() => {
-      setSystemPrompt(DEMO_SYSTEM_PROMPT);
-    });
-  }, []);
 
   useEffect(() => {
     setCharCount(generatedPost.length);
@@ -51,21 +33,12 @@ export default function LinkedInPage() {
     setLoading(true);
     setGeneratedPost("");
 
-    const userPrompt = [
-      hotelName ? `Hôtel : ${hotelName}` : null,
-      `Sujet : ${topic}`,
-      `Ton : ${tone}`,
-      offer ? `Offre à mettre en avant : ${offer}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n");
-
     try {
-      const result = await ai.generate({
-        system: systemPrompt,
-        prompt: userPrompt,
-        temperature: 0.8,
-        maxTokens: 600,
+      const result = await ai.generateLinkedInPost({
+        subject: topic,
+        hotelName: hotelName || undefined,
+        tone: tone as "professionnel" | "chaleureux" | "inspirant",
+        offer: offer || undefined,
       });
       setGeneratedPost(result.content);
     } catch (err: unknown) {
@@ -287,8 +260,11 @@ export default function LinkedInPage() {
       </div>
 
       {/* Conseil */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-800">
-        <strong>Conseil :</strong> Les posts LinkedIn avec 150-300 mots et une question en fin génèrent en moyenne 3x plus de commentaires. Personnalise le post avec des chiffres réels de ton hôtel avant de publier.
+      <div className="bg-[var(--color-light)] border border-[var(--color-main)]/30 rounded-xl p-4 text-sm text-slate-700 flex gap-3 items-start">
+        <svg className="w-4 h-4 text-[var(--color-main)] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+        </svg>
+        <p><strong className="text-slate-900">Conseil :</strong> Les posts LinkedIn avec 150-300 mots et une question en fin génèrent en moyenne 3x plus de commentaires. Personnalise le post avec des chiffres réels de ton hôtel avant de publier.</p>
       </div>
     </div>
   );

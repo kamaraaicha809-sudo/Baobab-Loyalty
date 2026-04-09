@@ -6,8 +6,8 @@ import config from "@/config";
 import ButtonCheckout from "@/components/ui/ButtonCheckout";
 
 const planSlugs: Record<string, string> = {
-  Essentiel: "essentiel",
-  Croissance: "croissance",
+  Starter: "starter",
+  Pro: "pro",
   Premium: "premium",
 };
 
