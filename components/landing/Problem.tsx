@@ -1,6 +1,6 @@
 const consequences = [
   {
-    stat: "20–25M FCFA",
+    stat: "10–35M FCFA",
     label: "perdus chaque mois",
     detail: "en chambres vides que tu n'arrives pas à remplir",
   },
@@ -10,7 +10,7 @@ const consequences = [
     detail: "à Booking.com sur chaque réservation que tu aurais pu avoir en direct",
   },
   {
-    stat: "2 à 3h",
+    stat: "3 à 5h",
     label: "perdues chaque jour",
     detail: "à appeler manuellement, envoyer des WhatsApp un par un, gérer Excel",
   },
