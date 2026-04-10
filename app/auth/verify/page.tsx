@@ -96,7 +96,11 @@ function VerifyContent() {
           const pendingPlan = sessionStorage.getItem("pending_checkout_plan");
           sessionStorage.removeItem("pending_checkout_plan");
           toast.success("Email vérifié avec succès !");
-          router.push(pendingPlan ? `/checkout?plan=${pendingPlan}` : config.auth.callbackUrl);
+          if (signupRef === "beta") {
+            router.push("/");
+          } else {
+            router.push(pendingPlan ? `/checkout?plan=${pendingPlan}` : config.auth.callbackUrl);
+          }
         }
       } catch (err) {
         setError("Une erreur est survenue. Veuillez réessayer.");
