@@ -20,7 +20,7 @@ const Hero = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/signin"
+            href="/beta"
             className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
           >
             Commencer maintenant
