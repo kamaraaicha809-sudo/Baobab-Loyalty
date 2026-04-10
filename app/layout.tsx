@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
   display: "swap",
   variable: "--font-playfair",
 });
@@ -46,6 +46,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 		>
 			<head>
 				<style dangerouslySetInnerHTML={{ __html: dynamicStyles }} />
+				{/* Preconnect to speed up font + analytics + image loading */}
+				<link rel="preconnect" href="https://fonts.googleapis.com" />
+				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+				<link rel="dns-prefetch" href="https://us.i.posthog.com" />
+				<link rel="dns-prefetch" href="https://images.unsplash.com" />
 			</head>
 			<body>
 				<ClientLayout>{children}</ClientLayout>

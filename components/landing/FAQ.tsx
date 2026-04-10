@@ -9,64 +9,42 @@ interface FAQItem {
 
 const faqList: FAQItem[] = [
   {
-    question: "Comment fonctionne Baobab Loyalty ?",
+    question: "Est-ce que ça vaut vraiment le coût ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Baobab Loyalty analyse votre base de données clients grâce à l&apos;IA pour identifier 
-        les segments les plus pertinents (clients inactifs depuis 3, 6 ou 9 mois). Vous choisissez 
-        un template d&apos;offre, personnalisez le message, et l&apos;envoi se fait automatiquement 
-        via WhatsApp en moins de 2 minutes.
+        Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Nos hôteliers récupèrent en moyenne 120 000 à 600 000 FCFA supplémentaires par mois. Et si ça ne marche pas, nous t&apos;offrons le mois suivant.
       </div>
     ),
   },
   {
-    question: "Ai-je besoin de compétences techniques ?",
-    answer: (
-      <p>
-        Non, Baobab Loyalty est conçu pour les hôteliers, pas pour les développeurs. 
-        L&apos;interface est simple et intuitive : quelques clics suffisent pour lancer 
-        une campagne de relance. Aucune connaissance technique n&apos;est requise.
-      </p>
-    ),
-  },
-  {
-    question: "Pourquoi WhatsApp plutôt que l'email ?",
+    question: "Est-ce que mes clients vont vraiment répondre et réserver ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        WhatsApp affiche un taux d&apos;ouverture de 98%, contre 20% pour l&apos;email. 
-        Vos clients lisent et répondent beaucoup plus rapidement sur WhatsApp, ce qui 
-        augmente considérablement vos chances de convertir une relance en réservation.
+        WhatsApp affiche un taux d&apos;ouverture de 98%. Tes anciens clients ont déjà séjourné chez toi — ils te connaissent et te font confiance. Une offre personnalisée au bon moment suffit à déclencher la réservation. Nos beta testeurs voient en moyenne 2 à 5 nuits supplémentaires dès la première campagne.
       </div>
     ),
   },
   {
-    question: "Quels types d'offres puis-je envoyer ?",
+    question: "Mes données clients sont-elles en sécurité ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Baobab Loyalty propose 5 templates d&apos;offres prêts à l&apos;emploi : remise 
-        exceptionnelle, surclassement offert, cocktail de bienvenue, offre famille, et 
-        événements spéciaux (Ramadan, Pâques, Saint-Valentin, etc.). Chaque offre est 
-        personnalisable selon vos besoins.
+        Oui. Tes données sont hébergées sur des serveurs sécurisés (chiffrement SSL, accès protégé). Tu restes propriétaire de ta base clients — nous n&apos;y accédons pas et ne la partageons jamais avec des tiers. Tu peux exporter ou supprimer tes données à tout moment.
       </div>
     ),
   },
   {
-    question: "Comment importer ma base de clients ?",
+    question: "Est-ce facile à utiliser ? Je ne suis pas technique.",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Depuis la page Configuration de votre dashboard, vous pouvez importer votre 
-        base clients facilement. L&apos;IA se charge ensuite de segmenter automatiquement 
-        vos clients pour des campagnes ciblées et efficaces.
+        Très facile. À l&apos;inscription, tu saisis les informations de ton hôtel et tu importes ta base de données clients — une seule fois. Une fois cette étape faite, chaque nouvelle promotion se lance en moins de 2 minutes. Pas de formation nécessaire. Et si tu bloques quelque part, notre équipe t&apos;accompagne personnellement les 30 premiers jours.
       </div>
     ),
   },
   {
-    question: "Puis-je essayer avant de m'abonner ?",
+    question: "Est-ce que je m'engage sur la durée ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Oui ! Vous pouvez accéder à une démo complète de la plateforme pour découvrir 
-        toutes les fonctionnalités avant de vous engager. Cliquez sur &quot;Voir la démo&quot; 
-        sur la page d&apos;accueil pour commencer.
+        Non, aucun engagement. Tu peux résilier à tout moment depuis ton dashboard, sans frais ni justification. Et pour être honnêtes : si tu ne récupères pas au moins 2 nuits le premier mois, on t&apos;offre le mois suivant. On préfère te prouver que ça marche plutôt que de te retenir par contrat.
       </div>
     ),
   },

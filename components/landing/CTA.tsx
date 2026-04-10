@@ -22,11 +22,13 @@ const CTA = () => {
           </div>
 
           <h2 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight mb-4 sm:mb-6 text-white">
-            Prêt à booster vos réservations ?
+            Tes chambres vides ne t&apos;attendent pas.<br />Tes anciens clients, si.
           </h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-8 sm:mb-10 leading-relaxed px-2">
-            Rejoignez les hôteliers qui utilisent {config.appName} pour 
-            relancer leurs clients et remplir leurs chambres automatiquement.
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-4 sm:mb-6 leading-relaxed px-2">
+            120 000 à 600 000 FCFA supplémentaires chaque mois — sans Booking, sans commission, sans effort.
+          </p>
+          <p className="text-white/70 text-sm sm:text-base mb-8 sm:mb-10 px-2 italic">
+            Garantie : si on ne te génère pas au moins 2 nuits dans le mois, on t&apos;offre le mois suivant.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
@@ -45,8 +47,8 @@ const CTA = () => {
           </div>
 
           <p className="text-white/60 text-xs sm:text-sm mt-6 sm:mt-8 px-2">
-            <span className="hidden sm:inline">Campagne en 2 minutes • IA + WhatsApp • Support dédié</span>
-            <span className="sm:hidden">2 min • IA + WhatsApp • Support</span>
+            <span className="hidden sm:inline">Sans engagement • Résultats dès la première campagne • Support 30 jours offert</span>
+            <span className="sm:hidden">Sans engagement • Support inclus</span>
           </p>
         </div>
       </div>

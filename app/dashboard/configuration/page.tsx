@@ -72,6 +72,7 @@ export default function ConfigurationPage() {
   const [savingRooms, setSavingRooms] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
+  const [importStatus, setImportStatus] = useState<string>("");
   const [counts, setCounts] = useState<Record<string, number>>({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
 
@@ -258,26 +259,32 @@ export default function ConfigurationPage() {
     }
 
     setImporting(true);
+    setImportStatus("Lecture du fichier CSV...");
     try {
       const text = await csvFile.text();
       const rows = clients.parseClientsCSV(text);
       if (rows.length === 0) {
         toast.error("Aucune ligne valide trouvée. Vérifiez le format CSV.");
         setImporting(false);
+        setImportStatus("");
         return;
       }
+      setImportStatus(`Importation de ${rows.length} client(s) détecté(s)...`);
       const { inserted, errors } = await clients.importClients(profileId, rows);
       if (inserted > 0) {
         toast.success(`${inserted} client(s) importé(s)`);
         if (errors.length > 0) toast.error(`${errors.length} erreur(s)`);
+        setImportStatus(`${inserted} client(s) importé(s) avec succès`);
         const seg = await clients.getSegmentCounts(profileId);
         setCounts(seg);
       } else if (errors.length > 0) {
         toast.error(errors[0] || "Erreur d'import");
+        setImportStatus("");
       }
       setCsvFile(null);
     } catch {
       toast.error("Erreur lors de l'import");
+      setImportStatus("");
     } finally {
       setImporting(false);
     }
@@ -306,22 +313,49 @@ export default function ConfigurationPage() {
         <p className="text-slate-600">
           Configurez votre établissement et importez votre base clients pour utiliser {config.appName}.
         </p>
+
+        {/* Avertissement ordinateur requis */}
+        <div className="mt-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Cette étape nécessite un ordinateur</p>
+            <p className="text-sm text-amber-700 mt-0.5">
+              L&apos;import de votre base clients (fichier CSV) et la configuration complète de votre hôtel doivent être effectués depuis un ordinateur, là où se trouve votre fichier clients.
+            </p>
+          </div>
+        </div>
       </header>
 
       {/* Informations de l'établissement */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
-          <Icons.Settings />
-          Informations de l&apos;établissement
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <Icons.Settings />
+            Informations de l&apos;établissement
+          </h2>
+          {/* H4 — Badge configuration complète */}
+          {configComplete && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Configuration complète
+            </span>
+          )}
+        </div>
         <form onSubmit={handleSaveConfig} className="space-y-6">
 
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Hôtel</p>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label htmlFor="hotel" className={labelClass}>Nom de l&apos;hôtel ou établissement</label>
-                <input id="hotel" type="text" value={form.hotel_name} onChange={set("hotel_name")} placeholder="Ex. Hôtel Le Baobab" className={inputClass} />
+                <label htmlFor="hotel" className={labelClass}>
+                  Nom de l&apos;hôtel ou établissement
+                  <span className="text-red-500 ml-0.5">*</span>
+                </label>
+                <input id="hotel" type="text" required value={form.hotel_name} onChange={set("hotel_name")} placeholder="Ex. Hôtel Le Baobab" className={inputClass} />
               </div>
               <div>
                 <label htmlFor="adresse_physique" className={labelClass}>Adresse physique</label>
@@ -346,8 +380,11 @@ export default function ConfigurationPage() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Responsable du compte</p>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label htmlFor="nom_responsable" className={labelClass}>Nom du propriétaire ou responsable</label>
-                <input id="nom_responsable" type="text" value={form.nom_responsable} onChange={set("nom_responsable")} placeholder="Ex. Amadou Diallo" className={inputClass} />
+                <label htmlFor="nom_responsable" className={labelClass}>
+                  Nom du propriétaire ou responsable
+                  <span className="text-red-500 ml-0.5">*</span>
+                </label>
+                <input id="nom_responsable" type="text" required value={form.nom_responsable} onChange={set("nom_responsable")} placeholder="Ex. Amadou Diallo" className={inputClass} />
               </div>
               <div>
                 <label htmlFor="telephone_responsable" className={labelClass}>Téléphone personnel</label>
@@ -378,7 +415,20 @@ export default function ConfigurationPage() {
                   disabled={geoLoading}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
                 >
-                  {geoLoading ? "Détection en cours…" : "Détecter ma position automatiquement"}
+                  {geoLoading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                      Détection en cours…
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                      </svg>
+                      Détecter ma position automatiquement
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -486,11 +536,28 @@ export default function ConfigurationPage() {
           <button
             type="submit"
             disabled={!csvFile || importing}
-            className="px-5 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {importing ? "Import en cours…" : "Importer"}
+            {importing ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Import en cours…
+              </>
+            ) : "Importer"}
           </button>
         </form>
+        {/* M2 — Feedback progression import */}
+        {importStatus && (
+          <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+            {importing && <span className="w-3.5 h-3.5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin shrink-0" />}
+            {!importing && (
+              <svg className="w-3.5 h-3.5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            )}
+            <span className={importing ? "" : "text-green-700 font-medium"}>{importStatus}</span>
+          </div>
+        )}
 
         <div className="mt-6 pt-6 border-t border-slate-200">
           <p className="text-sm font-medium text-slate-700 mb-3">Répartition par segment</p>

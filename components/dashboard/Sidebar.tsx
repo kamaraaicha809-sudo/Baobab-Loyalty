@@ -3,6 +3,7 @@
 import { useState, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { Icons } from '@/components/common/Icons';
 import config from '@/config';
 import Logo from '@/components/common/Logo';
@@ -139,7 +140,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
             </div>
           </div>
           <button
-            onClick={onLogout}
+            onClick={() => { toast.success('À bientôt !'); onLogout(); }}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
             <Icons.Logout />
@@ -271,6 +272,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
+                  toast.success('À bientôt !');
                   onLogout();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-base text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"

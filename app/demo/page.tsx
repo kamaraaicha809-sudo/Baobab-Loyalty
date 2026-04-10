@@ -36,7 +36,7 @@ const SEGMENTS = [
   {
     id: "tous",
     label: "Tous les clients",
-    count: 450,
+    count: 269,
     description: "Base complète",
     badge: "Grande portée",
     badgeColor: "bg-green-100 text-green-700",
@@ -121,6 +121,11 @@ export default function DemoPage() {
   const [generating, setGenerating] = useState(false);
   const [sendProgress, setSendProgress] = useState(0);
   const [notifVisible, setNotifVisible] = useState(false);
+  const [linkedinTab, setLinkedinTab] = useState<"wa-to-li" | "li-to-wa">("wa-to-li");
+  const [linkedinGenerating, setLinkedinGenerating] = useState(false);
+  const [linkedinPost, setLinkedinPost] = useState<string | null>(null);
+  const [linkedinInput, setLinkedinInput] = useState("");
+  const [liToWaMessage, setLiToWaMessage] = useState<string | null>(null);
 
   // Envoi : progression automatique
   useEffect(() => {
@@ -189,6 +194,27 @@ export default function DemoPage() {
     setNotifVisible(false);
   };
 
+  const handleGenerateLinkedinPost = async () => {
+    setLinkedinGenerating(true);
+    setLinkedinPost(null);
+    await new Promise((r) => setTimeout(r, 1600));
+    setLinkedinPost(
+      `Chez l'Hôtel Le Baobab, nous croyons que chaque client mérite de se sentir chez lui.\n\nC'est pourquoi nous offrons en ce moment une remise exceptionnelle de 20% sur vos réservations de chambre — une façon de vous dire merci pour votre fidélité.\n\nNous vous attendons avec le sourire.\n\n#HotelLeBaobab #Hospitalité #OffreSpéciale #Sénégal`
+    );
+    setLinkedinGenerating(false);
+  };
+
+  const handleGenerateWaFromLinkedin = async () => {
+    if (!linkedinInput.trim()) return;
+    setLinkedinGenerating(true);
+    setLiToWaMessage(null);
+    await new Promise((r) => setTimeout(r, 1600));
+    setLiToWaMessage(
+      `Bonjour {{nom}}, l'équipe de l'Hôtel Le Baobab vous réserve une surprise spéciale !\n\nComme annoncé récemment, nous lançons une offre exclusive réservée à nos clients fidèles : 20% de réduction sur votre prochaine chambre.\n\nRépondez OUI pour réserver, et nous nous occupons du reste.`
+    );
+    setLinkedinGenerating(false);
+  };
+
   const displayMessage =
     generatedMessage ??
     (selectedSegment && selectedTemplate
@@ -211,10 +237,10 @@ export default function DemoPage() {
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Démo interactive</span>
           </div>
           <Link
-            href="/signin"
+            href="/#tarifs"
             className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
           >
-            Créer mon compte
+            Je m&apos;abonner
           </Link>
         </div>
       </div>
@@ -301,7 +327,7 @@ export default function DemoPage() {
                   <div className="mt-3 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all group-hover:opacity-80"
-                      style={{ width: `${Math.round((seg.count / 450) * 100)}%` }}
+                      style={{ width: `${Math.round((seg.count / 269) * 100)}%` }}
                     />
                   </div>
                 </button>
@@ -554,6 +580,69 @@ export default function DemoPage() {
                 </div>
               </div>
 
+              {/* Dashboard clients */}
+              <div className="bg-white rounded-2xl border border-slate-200 mt-4 overflow-hidden">
+                {/* Header dashboard */}
+                <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-sm font-semibold text-slate-800">Dashboard campagne en direct</span>
+                  </div>
+                  <span className="text-xs text-slate-400 font-medium">
+                    {selectedSegment?.count} messages · il y a 2 min
+                  </span>
+                </div>
+
+                {/* Funnel */}
+                <div className="grid grid-cols-4 divide-x divide-slate-100 border-b border-slate-100">
+                  {[
+                    { label: "Envoyés", value: selectedSegment?.count ?? 0, color: "text-slate-900", pct: null },
+                    { label: "Ouverts", value: Math.round((selectedSegment?.count ?? 0) * 0.78), color: "text-blue-600", pct: "78%" },
+                    { label: "Clics", value: Math.round((selectedSegment?.count ?? 0) * 0.34), color: "text-amber-600", pct: "34%" },
+                    { label: "Réservations", value: 1, color: "text-green-600", pct: null },
+                  ].map((item) => (
+                    <div key={item.label} className="p-3 text-center">
+                      <p className={`text-xl font-bold ${item.color}`}>{item.value}</p>
+                      <p className="text-slate-500 text-[10px] mt-0.5 leading-tight">{item.label}</p>
+                      {item.pct && (
+                        <span className="text-[10px] font-semibold text-slate-400">{item.pct}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Liste clients */}
+                <div className="divide-y divide-slate-50">
+                  {[
+                    { initials: "MD", name: "Moussa Diop", info: "Suite Junior · 3 nuits", status: "Réservé", statusColor: "bg-green-100 text-green-700", dot: "bg-green-500" },
+                    { initials: "FS", name: "Fatou Sow", info: "Lien ouvert · il y a 4 min", status: "Lien cliqué", statusColor: "bg-blue-100 text-blue-700", dot: "bg-blue-400" },
+                    { initials: "IN", name: "Ibrahima Ndiaye", info: "Message lu · il y a 6 min", status: "Lu", statusColor: "bg-slate-100 text-slate-600", dot: "bg-slate-300" },
+                    { initials: "MB", name: "Mariama Baldé", info: "Message lu · il y a 8 min", status: "Lu", statusColor: "bg-slate-100 text-slate-600", dot: "bg-slate-300" },
+                    { initials: "KA", name: "Kofi Asante", info: "Envoyé · il y a 2 min", status: "En attente", statusColor: "bg-amber-100 text-amber-700", dot: "bg-amber-400" },
+                  ].map((client) => (
+                    <div key={client.name} className="flex items-center gap-3 px-5 py-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-slate-600">{client.initials}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-800 truncate">{client.name}</p>
+                        <p className="text-xs text-slate-400 truncate">{client.info}</p>
+                      </div>
+                      <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${client.statusColor}`}>
+                        {client.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 text-center">
+                  <p className="text-xs text-slate-400">
+                    <span className="font-semibold text-slate-600">{Math.round((selectedSegment?.count ?? 0) - 5)} autres clients</span> — statut en cours de mise à jour
+                  </p>
+                </div>
+              </div>
+
               {/* Message final */}
               <div className="bg-slate-900 rounded-2xl p-6 text-center mt-4">
                 <p className="text-white font-bold text-lg mb-1">
@@ -564,10 +653,10 @@ export default function DemoPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
-                    href="/signin"
+                    href="/#tarifs"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors"
                   >
-                    Créer mon compte gratuit
+                    Je veux m&apos;abonner
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
@@ -583,6 +672,270 @@ export default function DemoPage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* ─── Section LinkedIn ─────────────────────────────────────────────────── */}
+      <div className="border-t border-slate-200 bg-white">
+        <div className="max-w-3xl mx-auto px-4 py-14">
+          {/* En-tête section */}
+          <div className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A66C2]/10 text-[#0A66C2] text-xs font-semibold uppercase tracking-wider mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              Nouvelle fonctionnalité
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+              Baobab Loyalty et LinkedIn : les deux ensemble
+            </h2>
+            <p className="text-slate-500 text-base max-w-xl mx-auto">
+              Grâce à l&apos;IA, vos campagnes voyagent dans les deux sens — depuis Baobab Loyalty vers votre page LinkedIn, ou depuis un post LinkedIn directement vers vos clients ciblés dans Baobab.
+            </p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 justify-center mb-8">
+            <button
+              onClick={() => { setLinkedinTab("wa-to-li"); setLinkedinPost(null); }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                linkedinTab === "wa-to-li"
+                  ? "bg-slate-900 text-white shadow"
+                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+              }`}
+            >
+              <span className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-[10px] font-black">B</span>
+              Baobab
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              LinkedIn
+            </button>
+            <button
+              onClick={() => { setLinkedinTab("li-to-wa"); setLiToWaMessage(null); }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                linkedinTab === "li-to-wa"
+                  ? "bg-slate-900 text-white shadow"
+                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              LinkedIn
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-[10px] font-black">B</span>
+              Baobab
+            </button>
+          </div>
+
+          {/* ── Mode Baobab → LinkedIn ── */}
+          {linkedinTab === "wa-to-li" && (
+            <div className="space-y-4">
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-5">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                  Votre message Baobab Loyalty
+                </p>
+                <div className="rounded-xl bg-[#ECE5DD] p-3">
+                  <div className="flex justify-end">
+                    <div className="max-w-[85%] rounded-lg rounded-tr-none bg-white shadow-sm px-3 py-2.5">
+                      <p className="text-slate-800 text-sm leading-relaxed">
+                        Bonjour Moussa, cela fait un moment que vous n&apos;êtes pas venus nous voir à l&apos;Hôtel Le Baobab ! Pour votre prochain séjour, nous avons une surprise : 20% de réduction sur votre prochaine chambre. Réservez avant la fin du mois pour en profiter.
+                      </p>
+                      <p className="text-slate-400 text-[10px] text-right mt-1">22:22 ✓✓</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Flèche IA */}
+              <div className="flex items-center justify-center gap-3">
+                <div className="flex-1 h-px bg-slate-200" />
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Baobab IA reformule pour LinkedIn
+                </div>
+                <div className="flex-1 h-px bg-slate-200" />
+              </div>
+
+              {/* Bouton générer */}
+              {!linkedinPost && (
+                <button
+                  onClick={handleGenerateLinkedinPost}
+                  disabled={linkedinGenerating}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0A66C2] text-white font-semibold hover:bg-[#004182] disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                >
+                  {linkedinGenerating ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      Génération du post LinkedIn...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                      </svg>
+                      Générer le post LinkedIn
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Post LinkedIn généré */}
+              {linkedinPost && (
+                <div className="rounded-xl border border-[#0A66C2]/30 bg-white overflow-hidden shadow-sm">
+                  {/* Header profil LinkedIn */}
+                  <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-lg font-bold text-amber-700 shrink-0">
+                      B
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">Hôtel Le Baobab</p>
+                      <p className="text-slate-400 text-xs">Hôtellerie · Sénégal · 1 234 abonnés</p>
+                      <p className="text-slate-400 text-xs">À l&apos;instant</p>
+                    </div>
+                    <div className="ml-auto">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-[#0A66C2]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                      </svg>
+                    </div>
+                  </div>
+                  {/* Corps du post */}
+                  <div className="px-5 py-4">
+                    <p className="text-slate-800 text-sm leading-relaxed whitespace-pre-wrap">{linkedinPost}</p>
+                  </div>
+                  {/* Actions LinkedIn */}
+                  <div className="px-5 py-3 border-t border-slate-100 flex items-center gap-6">
+                    {[
+                      { label: "J'aime", icon: "M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" },
+                      { label: "Commenter", icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
+                      { label: "Partager", icon: "M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" },
+                    ].map((action) => (
+                      <button key={action.label} className="flex items-center gap-1.5 text-slate-500 hover:text-[#0A66C2] text-xs font-semibold transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={action.icon} />
+                        </svg>
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {linkedinPost && (
+                <p className="text-xs text-primary font-medium flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Post prêt — copiez-le et publiez-le directement sur votre page LinkedIn.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Mode LinkedIn → WA ── */}
+          {linkedinTab === "li-to-wa" && (
+            <div className="space-y-4">
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-5">
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                  Collez votre post LinkedIn ici
+                </label>
+                <textarea
+                  value={linkedinInput}
+                  onChange={(e) => { setLinkedinInput(e.target.value); setLiToWaMessage(null); }}
+                  rows={5}
+                  placeholder={`Exemple :\n\nNous lançons une offre spéciale pour nos clients fidèles : -20% sur toutes les chambres ce week-end. Réservez maintenant !\n\n#HotelLeBaobab #OffreSpéciale`}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2] transition-all resize-none placeholder:text-slate-300"
+                />
+              </div>
+
+              {/* Flèche IA */}
+              <div className="flex items-center justify-center gap-3">
+                <div className="flex-1 h-px bg-slate-200" />
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Baobab IA adapte pour vos clients ciblés
+                </div>
+                <div className="flex-1 h-px bg-slate-200" />
+              </div>
+
+              <button
+                onClick={handleGenerateWaFromLinkedin}
+                disabled={linkedinGenerating || !linkedinInput.trim()}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#25D366] text-white font-semibold hover:bg-[#1da851] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {linkedinGenerating ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Adaptation en cours...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Importer ce post dans Baobab
+                  </>
+                )}
+              </button>
+
+              {liToWaMessage && (
+                <>
+                  <div className="rounded-xl bg-[#ECE5DD] p-3">
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-1">Message WhatsApp généré par l&apos;IA</p>
+                    <div className="flex justify-end">
+                      <div className="max-w-[85%] rounded-lg rounded-tr-none bg-white shadow-sm px-3 py-2.5">
+                        <p className="text-slate-800 text-sm leading-relaxed whitespace-pre-wrap">{liToWaMessage}</p>
+                        <p className="text-slate-400 text-[10px] text-right mt-1">22:22 ✓✓</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">Prêt à envoyer à vos clients ciblés</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Choisissez votre segment (3 mois, 6 mois, tous...) et lancez la campagne en un clic.
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Call to action */}
+          <div className="mt-10 text-center">
+            <Link
+              href="/#tarifs"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors"
+            >
+              Découvrir les plans
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

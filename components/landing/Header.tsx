@@ -66,7 +66,7 @@ const Header = () => {
           ))}
         </div>
 
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center justify-end" style={{ minWidth: 120 }}>
           {!isLoading && (
             isLoggedIn ? (
               <Link

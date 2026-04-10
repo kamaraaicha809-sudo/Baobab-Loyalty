@@ -232,6 +232,15 @@ return <AuthenticatedFeature />;
 
 ---
 
+## Commandes disponibles
+
+- `/landing` — Optimise le copywriting de la landing page (skill : `.claude/skills/landing.md`)
+  - Pose d'abord 8 questions sur le problème, la cible et les résultats
+  - Propose le copywriting complet en mode plan avant de modifier le code
+  - Règle clé : toujours parler du résultat, jamais des fonctionnalités techniques
+
+---
+
 ## Métaphore du Restaurant (architecture)
 
 | Dossier | Restaurant | Rôle |
