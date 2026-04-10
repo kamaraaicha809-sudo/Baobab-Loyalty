@@ -36,7 +36,7 @@ const SEGMENTS = [
   {
     id: "tous",
     label: "Tous les clients",
-    count: 450,
+    count: 269,
     description: "Base complète",
     badge: "Grande portée",
     badgeColor: "bg-green-100 text-green-700",
@@ -211,10 +211,10 @@ export default function DemoPage() {
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Démo interactive</span>
           </div>
           <Link
-            href="/signin"
+            href="/#tarifs"
             className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
           >
-            Créer mon compte
+            Je m&apos;abonner
           </Link>
         </div>
       </div>
@@ -301,7 +301,7 @@ export default function DemoPage() {
                   <div className="mt-3 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all group-hover:opacity-80"
-                      style={{ width: `${Math.round((seg.count / 450) * 100)}%` }}
+                      style={{ width: `${Math.round((seg.count / 269) * 100)}%` }}
                     />
                   </div>
                 </button>
@@ -554,6 +554,69 @@ export default function DemoPage() {
                 </div>
               </div>
 
+              {/* Dashboard clients */}
+              <div className="bg-white rounded-2xl border border-slate-200 mt-4 overflow-hidden">
+                {/* Header dashboard */}
+                <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-sm font-semibold text-slate-800">Dashboard campagne en direct</span>
+                  </div>
+                  <span className="text-xs text-slate-400 font-medium">
+                    {selectedSegment?.count} messages · il y a 2 min
+                  </span>
+                </div>
+
+                {/* Funnel */}
+                <div className="grid grid-cols-4 divide-x divide-slate-100 border-b border-slate-100">
+                  {[
+                    { label: "Envoyés", value: selectedSegment?.count ?? 0, color: "text-slate-900", pct: null },
+                    { label: "Ouverts", value: Math.round((selectedSegment?.count ?? 0) * 0.78), color: "text-blue-600", pct: "78%" },
+                    { label: "Clics", value: Math.round((selectedSegment?.count ?? 0) * 0.34), color: "text-amber-600", pct: "34%" },
+                    { label: "Réservations", value: 1, color: "text-green-600", pct: null },
+                  ].map((item) => (
+                    <div key={item.label} className="p-3 text-center">
+                      <p className={`text-xl font-bold ${item.color}`}>{item.value}</p>
+                      <p className="text-slate-500 text-[10px] mt-0.5 leading-tight">{item.label}</p>
+                      {item.pct && (
+                        <span className="text-[10px] font-semibold text-slate-400">{item.pct}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Liste clients */}
+                <div className="divide-y divide-slate-50">
+                  {[
+                    { initials: "MD", name: "Moussa Diop", info: "Suite Junior · 3 nuits", status: "Réservé", statusColor: "bg-green-100 text-green-700", dot: "bg-green-500" },
+                    { initials: "FS", name: "Fatou Sow", info: "Lien ouvert · il y a 4 min", status: "Lien cliqué", statusColor: "bg-blue-100 text-blue-700", dot: "bg-blue-400" },
+                    { initials: "IN", name: "Ibrahima Ndiaye", info: "Message lu · il y a 6 min", status: "Lu", statusColor: "bg-slate-100 text-slate-600", dot: "bg-slate-300" },
+                    { initials: "MB", name: "Mariama Baldé", info: "Message lu · il y a 8 min", status: "Lu", statusColor: "bg-slate-100 text-slate-600", dot: "bg-slate-300" },
+                    { initials: "KA", name: "Kofi Asante", info: "Envoyé · il y a 2 min", status: "En attente", statusColor: "bg-amber-100 text-amber-700", dot: "bg-amber-400" },
+                  ].map((client) => (
+                    <div key={client.name} className="flex items-center gap-3 px-5 py-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-slate-600">{client.initials}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-800 truncate">{client.name}</p>
+                        <p className="text-xs text-slate-400 truncate">{client.info}</p>
+                      </div>
+                      <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${client.statusColor}`}>
+                        {client.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 text-center">
+                  <p className="text-xs text-slate-400">
+                    <span className="font-semibold text-slate-600">{Math.round((selectedSegment?.count ?? 0) - 5)} autres clients</span> — statut en cours de mise à jour
+                  </p>
+                </div>
+              </div>
+
               {/* Message final */}
               <div className="bg-slate-900 rounded-2xl p-6 text-center mt-4">
                 <p className="text-white font-bold text-lg mb-1">
@@ -564,10 +627,10 @@ export default function DemoPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
-                    href="/signin"
+                    href="/#tarifs"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors"
                   >
-                    Créer mon compte gratuit
+                    Je veux m&apos;abonner
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
