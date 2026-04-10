@@ -25,7 +25,7 @@ const CTA = () => {
             Tes chambres vides ne t&apos;attendent pas.<br />Tes anciens clients, si.
           </h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-4 sm:mb-6 leading-relaxed px-2">
-            120 000 à 315 000 FCFA supplémentaires chaque mois — sans Booking, sans commission, sans effort.
+            120 000 à 600 000 FCFA supplémentaires chaque mois — sans Booking, sans commission, sans effort.
           </p>
           <p className="text-white/70 text-sm sm:text-base mb-8 sm:mb-10 px-2 italic">
             Garantie : si on ne te génère pas au moins 2 nuits dans le mois, on t&apos;offre le mois suivant.
