@@ -36,7 +36,7 @@ const faqList: FAQItem[] = [
     question: "Est-ce facile à utiliser ? Je ne suis pas technique.",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Très facile. En 15 minutes, tu importes ta base clients, tu choisis un segment, l&apos;IA rédige le message, et tu envoies. Pas de formation nécessaire. Et si tu bloques quelque part, notre équipe t&apos;accompagne personnellement les 30 premiers jours.
+        Très facile. À l&apos;inscription, tu saisis les informations de ton hôtel et tu importes ta base de données clients — une seule fois. Une fois cette étape faite, chaque nouvelle promotion se lance en moins de 2 minutes. Pas de formation nécessaire. Et si tu bloques quelque part, notre équipe t&apos;accompagne personnellement les 30 premiers jours.
       </div>
     ),
   },
