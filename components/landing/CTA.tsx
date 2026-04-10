@@ -1,7 +1,34 @@
+"use client";
+
 import Link from "next/link";
-import config from "@/config";
+import { useState, useEffect } from "react";
+import { isDemoMode } from "@/src/lib/demo";
 
 const CTA = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (isDemoMode) {
+      const demoLoggedIn = typeof window !== "undefined" && sessionStorage.getItem("demo_logged_in") === "1";
+      setIsLoggedIn(demoLoggedIn);
+      return;
+    }
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseKey) return;
+    const checkAuth = async () => {
+      try {
+        const { createClient } = await import("@/libs/supabase/client");
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsLoggedIn(!!session);
+      } catch {
+        // silent
+      }
+    };
+    checkAuth();
+  }, []);
+
   return (
     <section className="relative gradient-primary py-16 sm:py-20 md:py-24 overflow-hidden">
       {/* Background decoration - smaller on mobile */}
@@ -33,10 +60,10 @@ const CTA = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <Link
-              href="/beta"
+              href={isLoggedIn ? "/dashboard" : "/beta"}
               className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-white text-slate-900 font-bold text-base sm:text-lg hover:bg-slate-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
             >
-              Commencer maintenant
+              {isLoggedIn ? "Accéder au dashboard" : "Commencer maintenant"}
             </Link>
             <Link
               href="/#tarifs"
