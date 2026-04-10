@@ -6,16 +6,21 @@ import { isDemoMode } from "@/src/lib/demo";
 
 const Hero = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isDemoMode) {
       const demoLoggedIn = typeof window !== "undefined" && sessionStorage.getItem("demo_logged_in") === "1";
       setIsLoggedIn(demoLoggedIn);
+      setIsLoading(false);
       return;
     }
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseKey) return;
+    if (!supabaseUrl || !supabaseKey) {
+      setIsLoading(false);
+      return;
+    }
     const checkAuth = async () => {
       try {
         const { createClient } = await import("@/libs/supabase/client");
@@ -24,6 +29,8 @@ const Hero = () => {
         setIsLoggedIn(!!session);
       } catch {
         // silent
+      } finally {
+        setIsLoading(false);
       }
     };
     checkAuth();
@@ -47,15 +54,22 @@ const Hero = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href={isLoggedIn ? "/dashboard" : "/beta"}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
-          >
-            {isLoggedIn ? "Accéder au dashboard" : "Commencer maintenant"}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </Link>
+          {isLoading ? (
+            <div className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary/60 text-white font-semibold flex items-center justify-center gap-2 cursor-wait">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Chargement...
+            </div>
+          ) : (
+            <Link
+              href={isLoggedIn ? "/dashboard" : "/beta"}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
+            >
+              {isLoggedIn ? "Accéder au dashboard" : "Commencer maintenant"}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          )}
           <Link
             href="/demo"
             className="w-full sm:w-auto px-8 py-3.5 rounded-lg border border-[#2C2C2C] text-[#2C2C2C] font-medium hover:bg-slate-50 transition-colors"

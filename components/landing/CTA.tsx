@@ -6,16 +6,21 @@ import { isDemoMode } from "@/src/lib/demo";
 
 const CTA = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isDemoMode) {
       const demoLoggedIn = typeof window !== "undefined" && sessionStorage.getItem("demo_logged_in") === "1";
       setIsLoggedIn(demoLoggedIn);
+      setIsLoading(false);
       return;
     }
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseKey) return;
+    if (!supabaseUrl || !supabaseKey) {
+      setIsLoading(false);
+      return;
+    }
     const checkAuth = async () => {
       try {
         const { createClient } = await import("@/libs/supabase/client");
@@ -24,6 +29,8 @@ const CTA = () => {
         setIsLoggedIn(!!session);
       } catch {
         // silent
+      } finally {
+        setIsLoading(false);
       }
     };
     checkAuth();
@@ -59,12 +66,19 @@ const CTA = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <Link
-              href={isLoggedIn ? "/dashboard" : "/beta"}
-              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-white text-slate-900 font-bold text-base sm:text-lg hover:bg-slate-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
-            >
-              {isLoggedIn ? "Accéder au dashboard" : "Commencer maintenant"}
-            </Link>
+            {isLoading ? (
+              <div className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-white/60 text-slate-500 font-bold text-base sm:text-lg flex items-center justify-center gap-2 cursor-wait">
+                <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                Chargement...
+              </div>
+            ) : (
+              <Link
+                href={isLoggedIn ? "/dashboard" : "/beta"}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-white text-slate-900 font-bold text-base sm:text-lg hover:bg-slate-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
+              >
+                {isLoggedIn ? "Accéder au dashboard" : "Commencer maintenant"}
+              </Link>
+            )}
             <Link
               href="/#tarifs"
               className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-white/10 text-white border border-white/20 font-bold text-base sm:text-lg hover:bg-white/20 transition-all"
