@@ -359,22 +359,12 @@ export default function Dashboard() {
                 </span>
               </p>
             </div>
-            {isDemoMode ? (
-              <Link
-                href="/dashboard"
-                className="inline-block px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
-              >
-                Gérer mon abonnement
-              </Link>
-            ) : (
-              <button
-                onClick={handleManageSubscription}
-                disabled={portalLoading}
-                className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
-              >
-                {portalLoading ? "Chargement..." : "Gérer mon abonnement"}
-              </button>
-            )}
+            <Link
+              href="/dashboard/abonnement"
+              className="inline-block px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Gérer mon abonnement
+            </Link>
           </div>
         )}
       </div>
