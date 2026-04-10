@@ -65,7 +65,7 @@ const Pricing = () => {
                 <p className="text-slate-400 text-sm mb-4">{plan.description}</p>
                 <div className="mb-6">
                   <span className={`text-3xl sm:text-4xl font-bold ${isFeatured ? "text-[#EBC161]" : "text-white"}`}>
-                    {plan.price.toLocaleString("fr-FR")} {config.stripe.currency}
+                    {String(plan.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} {config.stripe.currency}
                   </span>
                   <span className="text-slate-400 text-sm ml-1">/mois</span>
                 </div>
