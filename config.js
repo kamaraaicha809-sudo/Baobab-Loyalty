@@ -91,7 +91,7 @@ const config = {
       {
         name: "Starter",
         description: "Pour tester et démarrer",
-        price: 29000,
+        price: 39000,
         features: [
           { name: "Jusqu'à 30 chambres" },
           { name: "Segmentation clients de base" },
@@ -103,7 +103,7 @@ const config = {
         isFeatured: true,
         name: "Pro",
         description: "Le meilleur rapport qualité/prix",
-        price: 59000,
+        price: 79000,
         features: [
           { name: "Jusqu'à 100 chambres" },
           { name: "Segmentation avancée" },
@@ -115,7 +115,7 @@ const config = {
       {
         name: "Premium",
         description: "Pour les grands établissements",
-        price: 149000,
+        price: 249000,
         features: [
           { name: "Chambres illimitées" },
           { name: "Automatisation avancée" },
