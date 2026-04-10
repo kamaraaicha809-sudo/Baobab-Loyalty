@@ -313,6 +313,19 @@ export default function ConfigurationPage() {
         <p className="text-slate-600">
           Configurez votre établissement et importez votre base clients pour utiliser {config.appName}.
         </p>
+
+        {/* Avertissement ordinateur requis */}
+        <div className="mt-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Cette étape nécessite un ordinateur</p>
+            <p className="text-sm text-amber-700 mt-0.5">
+              L&apos;import de votre base clients (fichier CSV) et la configuration complète de votre hôtel doivent être effectués depuis un ordinateur, là où se trouve votre fichier clients.
+            </p>
+          </div>
+        </div>
       </header>
 
       {/* Informations de l'établissement */}
