@@ -57,7 +57,7 @@ const Features = () => {
               className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-100"
             >
               <div className="text-[#2C2C2C] mb-4">{f.icon}</div>
-              <h3 className="font-display text-xl font-bold text-[#2C2C2C] mb-3">{f.title}</h3>
+              <h3 className="text-xl font-bold text-[#2C2C2C] mb-3 tracking-tight">{f.title}</h3>
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed">{f.desc}</p>
             </div>
           ))}
