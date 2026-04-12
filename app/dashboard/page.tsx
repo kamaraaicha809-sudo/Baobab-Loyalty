@@ -328,7 +328,7 @@ export default function Dashboard() {
             </p>
             <p className="text-center text-4xl font-bold">{impactCount}</p>
             <p className="text-center text-sm text-white/80 mt-0.5">
-              Réservations via {config.appName} aujourd&apos;hui
+              Réservations via {config.appName} — aujourd&apos;hui
             </p>
           </div>
         </div>
