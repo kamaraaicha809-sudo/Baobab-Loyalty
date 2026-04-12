@@ -239,6 +239,13 @@ return <AuthenticatedFeature />;
   - Propose le copywriting complet en mode plan avant de modifier le code
   - Règle clé : toujours parler du résultat, jamais des fonctionnalités techniques
 
+- `/legal` — Génère les pages légales complètes (skill : `.claude/skills/legal.md`)
+  - Pose 7 questions obligatoires (nom légal, pays, adresse, email, numéro RCCM, données collectées, services tiers)
+  - Propose un plan de contenu avant de créer les fichiers
+  - Génère 5 pages : Mentions légales, CGU, Confidentialité, Cookies, CGV
+  - Met à jour le footer et crée la bannière cookies
+  - Adapté au droit africain francophone (OHADA, FCFA)
+
 ---
 
 ## Métaphore du Restaurant (architecture)
