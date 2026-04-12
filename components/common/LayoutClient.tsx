@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import NextTopLoader from "nextjs-toploader";
 import config from "@/config";
+import CookieBanner from "@/components/common/CookieBanner";
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -40,6 +41,9 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
           duration: 3000,
         }}
       />
+
+      {/* Cookie consent banner */}
+      <CookieBanner />
     </>
   );
 };

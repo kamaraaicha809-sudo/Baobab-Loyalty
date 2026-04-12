@@ -1,3 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(vercel ls:*)",
+      "Bash(find 'c:\\\\Users\\\\HP\\\\Desktop\\\\Micro-SaaS Baobab Loyalty\\\\Baobab Loyalty Kodefast' -type f -name *linkedin*)",
+      "Bash(xargs grep:*)"
+    ]
+  },
   "defaultMode": "bypassPermissions"
 }
