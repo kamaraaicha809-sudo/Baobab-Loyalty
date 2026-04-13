@@ -39,7 +39,7 @@ export default function ConfidentialitePage() {
             <div className="bg-slate-50 rounded-lg p-4">
               <p className="font-medium text-slate-700 mb-2">Données de paiement</p>
               <ul className="text-slate-600 text-sm space-y-1 list-disc list-inside">
-                <li>Informations de carte bancaire (traitées et stockées par Stripe — non accessibles par Baobab Loyalty)</li>
+                <li>Informations de paiement (traitées et stockées par Moneroo — non accessibles par Baobab Loyalty)</li>
                 <li>Historique des transactions</li>
               </ul>
             </div>
@@ -105,9 +105,9 @@ export default function ConfidentialitePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="p-3 border border-slate-200">Stripe</td>
-                  <td className="p-3 border border-slate-200">Paiements en ligne</td>
-                  <td className="p-3 border border-slate-200">États-Unis</td>
+                  <td className="p-3 border border-slate-200">Moneroo</td>
+                  <td className="p-3 border border-slate-200">Paiements en ligne (Mobile Money)</td>
+                  <td className="p-3 border border-slate-200">Afrique</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Supabase</td>

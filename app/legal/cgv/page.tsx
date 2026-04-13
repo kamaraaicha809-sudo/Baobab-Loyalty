@@ -62,7 +62,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">3. Modalités de paiement</h2>
           <p className="text-slate-600 leading-relaxed">
-            Les paiements sont traités de manière sécurisée via <strong>Stripe</strong>. Les modes de paiement acceptés sont : carte bancaire (Visa, Mastercard, American Express).
+            Les paiements sont traités de manière sécurisée via <strong>Moneroo</strong>. Les modes de paiement acceptés sont : Mobile Money (Orange Money, MTN Money, Wave) et carte bancaire.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
             L&apos;abonnement est renouvelé automatiquement chaque mois à la date anniversaire de souscription. Une facture est envoyée par email à chaque renouvellement.
