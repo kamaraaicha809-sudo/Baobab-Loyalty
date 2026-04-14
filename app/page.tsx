@@ -5,6 +5,7 @@ import Hero from "@/components/landing/Hero";
 import Problem from "@/components/landing/Problem";
 import Solution from "@/components/landing/Solution";
 import Features from "@/components/landing/Features";
+import LinkedInFeature from "@/components/landing/LinkedInFeature";
 import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
 import CTA from "@/components/landing/CTA";
@@ -26,6 +27,7 @@ export default function Home() {
         <Problem />
         <Solution />
         <Features />
+        <LinkedInFeature />
         <Testimonials />
         <Pricing />
         <FAQ />
