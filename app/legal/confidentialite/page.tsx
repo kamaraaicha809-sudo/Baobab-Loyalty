@@ -112,7 +112,7 @@ export default function ConfidentialitePage() {
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Supabase</td>
                   <td className="p-3 border border-slate-200">Base de données & authentification</td>
-                  <td className="p-3 border border-slate-200">Singapour</td>
+                  <td className="p-3 border border-slate-200">États-Unis</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">Resend</td>
