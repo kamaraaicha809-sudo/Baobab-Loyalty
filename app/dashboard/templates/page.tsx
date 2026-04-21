@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useEffect } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Icons } from "@/components/common/Icons";
@@ -67,7 +67,20 @@ const TEMPLATES = [
       { id: "saint-sylvestre", name: "Saint-Sylvestre", intro: "Terminez l'année en beauté ! Pour le réveillon de la Saint Sylvestre, nous vous proposons :", avantage: "Soirée de gala, champagne et brunch du nouvel an" },
     ],
   },
+  {
+    id: "vide",
+    name: "Template Vide",
+    description: "Rédigez votre propre message personnalisé",
+    icon: "file",
+    message: "",
+  },
 ];
+
+const FileIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  </svg>
+);
 
 const ICON_MAP = {
   tag: Icons.Tag,
@@ -75,6 +88,7 @@ const ICON_MAP = {
   cocktail: Icons.Cocktail,
   users: Icons.Users,
   calendar: Icons.Calendar,
+  file: FileIcon,
 };
 
 type Fete = { id: string; name: string; intro: string; avantage: string };
@@ -90,6 +104,8 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
   const [generatedMessage, setGeneratedMessage] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selected = TEMPLATES.find((t) => t.id === selectedId);
   const SelectedIcon = selected ? ICON_MAP[selected.icon as keyof typeof ICON_MAP] : null;
@@ -233,76 +249,143 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
 
           {selected ? (
             <div className="space-y-5">
-              {fetes ? (
-                <>
-                  <p className="text-sm font-medium text-slate-700">Choisissez une fête :</p>
-                  <div className="flex flex-wrap gap-2">
-                    {fetes.map((fete) => (
-                      <button
-                        key={fete.id}
-                        onClick={() => setSelectedFete(fete)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          selectedFete?.id === fete.id
-                            ? "bg-primary text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        {fete.name}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                  Modifier l&apos;avantage (1-2 lignes)
-                </label>
-                <textarea
-                  value={avantage}
-                  onChange={(e) => setAvantage(e.target.value)}
-                  placeholder="Ex : Un surclassement gratuit en Suite Junior"
-                  rows={2}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
-                />
-              </div>
-
-              <button
-                onClick={handleGenerateAI}
-                disabled={generating || !avantage.trim()}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-primary/40 bg-primary/5 text-primary font-semibold hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {generating ? (
-                  <>
-                    <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                    </svg>
-                    Génération en cours...
-                  </>
-                ) : (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Générer avec l&apos;IA
-                  </>
-                )}
-              </button>
-
-              {generatedMessage !== null && (
+              {selected.id === "vide" ? (
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Message généré
+                    Votre message personnalisé
                   </label>
-                  <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{generatedMessage}</p>
-                  </div>
+                  <textarea
+                    value={avantage}
+                    onChange={(e) => setAvantage(e.target.value)}
+                    placeholder="Rédigez votre message WhatsApp ici... Ex : Bonjour {{nom}}, nous avons une offre spéciale pour vous !"
+                    rows={6}
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-sm"
+                  />
                   <p className="text-xs text-slate-400 mt-1.5">
-                    Vous pouvez modifier l&apos;avantage et regénérer si besoin.
+                    Utilisez <span className="font-mono bg-slate-100 px-1 rounded">{"{{nom}}"}</span> pour personnaliser avec le prénom du client.
                   </p>
                 </div>
+              ) : (
+                <>
+                  {fetes ? (
+                    <>
+                      <p className="text-sm font-medium text-slate-700">Choisissez une fête :</p>
+                      <div className="flex flex-wrap gap-2">
+                        {fetes.map((fete) => (
+                          <button
+                            key={fete.id}
+                            onClick={() => setSelectedFete(fete)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              selectedFete?.id === fete.id
+                                ? "bg-primary text-white"
+                                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                            }`}
+                          >
+                            {fete.name}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : null}
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                      Modifier l&apos;avantage (1-2 lignes)
+                    </label>
+                    <textarea
+                      value={avantage}
+                      onChange={(e) => setAvantage(e.target.value)}
+                      placeholder="Ex : Un surclassement gratuit en Suite Junior"
+                      rows={2}
+                      className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleGenerateAI}
+                    disabled={generating || !avantage.trim()}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-primary/40 bg-primary/5 text-primary font-semibold hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {generating ? (
+                      <>
+                        <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        Génération en cours...
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Générer avec l&apos;IA
+                      </>
+                    )}
+                  </button>
+
+                  {generatedMessage !== null && (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        Message généré
+                      </label>
+                      <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{generatedMessage}</p>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-1.5">
+                        Vous pouvez modifier l&apos;avantage et regénérer si besoin.
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
+
+              {/* Ajouter un fichier */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Pièce jointe (optionnel)
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    setAttachedFile(file);
+                  }}
+                />
+                {attachedFile ? (
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-slate-200 bg-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span className="text-sm text-slate-700 truncate flex-1">{attachedFile.name}</span>
+                    <button
+                      onClick={() => {
+                        setAttachedFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="text-slate-400 hover:text-red-500 transition-colors shrink-0"
+                      title="Supprimer le fichier"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-slate-500 text-sm font-medium hover:bg-slate-100 hover:border-slate-400 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    Ajouter un fichier
+                  </button>
+                )}
+              </div>
 
               <button
                 onClick={handleValiderEnvoyer}
