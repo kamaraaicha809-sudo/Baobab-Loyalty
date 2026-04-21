@@ -187,18 +187,33 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
     }
   };
 
-  const handleValiderEnvoyer = () => {
+  const handleValiderEnvoyer = async () => {
     if (!selected || !avantage.trim()) {
       toast.error("Renseignez l'avantage et sélectionnez une offre.");
       return;
     }
-    const params = new URLSearchParams();
-    if (segmentId) params.set("segment", segmentId);
-    params.set("template", selected.id);
-    params.set("avantage", avantage.trim());
-    if (selectedFete) params.set("fete", selectedFete.name);
-    if (generatedMessage) params.set("message", generatedMessage);
-    router.push(`/dashboard/campaign/confirm?${params.toString()}`);
+
+    if (attachedFile && attachedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        sessionStorage.setItem("campaign_image", reader.result as string);
+        navigateToConfirm();
+      };
+      reader.readAsDataURL(attachedFile);
+    } else {
+      sessionStorage.removeItem("campaign_image");
+      navigateToConfirm();
+    }
+
+    function navigateToConfirm() {
+      const params = new URLSearchParams();
+      if (segmentId) params.set("segment", segmentId);
+      params.set("template", selected!.id);
+      params.set("avantage", avantage.trim());
+      if (selectedFete) params.set("fete", selectedFete.name);
+      if (generatedMessage) params.set("message", generatedMessage);
+      router.push(`/dashboard/campaign/confirm?${params.toString()}`);
+    }
   };
 
   return (

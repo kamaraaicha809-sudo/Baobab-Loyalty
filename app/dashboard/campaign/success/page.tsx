@@ -13,6 +13,12 @@ function SuccessContent() {
   const aiMessage = searchParams.get("message") || "";
   const [profileId, setProfileId] = useState<string | null>(isDemoMode ? demoUser.id : null);
   const [copied, setCopied] = useState(false);
+  const [campaignImage, setCampaignImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const img = sessionStorage.getItem("campaign_image");
+    if (img) setCampaignImage(img);
+  }, []);
 
   useEffect(() => {
     if (isDemoMode) return;
@@ -135,6 +141,13 @@ function SuccessContent() {
             <div className="bg-[#ECE5DD] p-3 min-h-[280px]">
               <div className="flex justify-end">
                 <div className="max-w-[85%] rounded-lg rounded-tr-none bg-white shadow-sm px-3 py-2.5 relative">
+                  {campaignImage && (
+                    <img
+                      src={campaignImage}
+                      alt="Pièce jointe"
+                      className="w-full rounded-md mb-2 object-cover max-h-40"
+                    />
+                  )}
                   <p className="text-slate-800 text-sm leading-snug whitespace-pre-wrap">{messageText}</p>
                   <Link
                     href={`/offre?${offreParams.toString()}`}
