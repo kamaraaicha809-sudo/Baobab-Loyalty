@@ -33,6 +33,12 @@ function ConfirmContent() {
 
   const [counts, setCounts] = useState<Record<string, number>>(demoSegmentCounts);
   const [sending, setSending] = useState(false);
+  const [campaignImage, setCampaignImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const img = sessionStorage.getItem("campaign_image");
+    if (img) setCampaignImage(img);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -140,6 +146,17 @@ function ConfirmContent() {
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Coût estimé</p>
             <p className="text-slate-900 font-medium text-green-600">Inclus dans votre forfait</p>
           </div>
+
+          {campaignImage && (
+            <div className="border-t border-slate-200 pt-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Pièce jointe</p>
+              <img
+                src={campaignImage}
+                alt="Pièce jointe"
+                className="w-full max-h-48 object-cover rounded-lg border border-slate-200"
+              />
+            </div>
+          )}
         </div>
 
         {/* Boutons */}
