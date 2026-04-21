@@ -20,6 +20,7 @@ const TEMPLATE_NAMES: Record<string, string> = {
   cocktail: "Cocktail de Bienvenue",
   famille: "Offre Famille",
   evenements: "Événements Spéciaux",
+  vide: "Message Personnalisé",
 };
 
 function ConfirmContent() {

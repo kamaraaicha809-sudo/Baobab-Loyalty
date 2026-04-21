@@ -211,7 +211,11 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
       params.set("template", selected!.id);
       params.set("avantage", avantage.trim());
       if (selectedFete) params.set("fete", selectedFete.name);
-      if (generatedMessage) params.set("message", generatedMessage);
+      if (selected!.id === "vide") {
+        params.set("message", avantage.trim());
+      } else if (generatedMessage) {
+        params.set("message", generatedMessage);
+      }
       router.push(`/dashboard/campaign/confirm?${params.toString()}`);
     }
   };
