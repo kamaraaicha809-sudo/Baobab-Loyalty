@@ -68,6 +68,14 @@ const TEMPLATES = [
     ],
   },
   {
+    id: "sondage",
+    name: "Sondage Satisfaction",
+    description: "Réduction offerte en échange du questionnaire complété",
+    icon: "clipboard",
+    message: "",
+    defaultDiscount: 50,
+  },
+  {
     id: "vide",
     name: "Template Vide",
     description: "Rédigez votre propre message personnalisé",
@@ -82,6 +90,12 @@ const FileIcon = () => (
   </svg>
 );
 
+const ClipboardIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+  </svg>
+);
+
 const ICON_MAP = {
   tag: Icons.Tag,
   star: Icons.Star,
@@ -89,7 +103,20 @@ const ICON_MAP = {
   users: Icons.Users,
   calendar: Icons.Calendar,
   file: FileIcon,
+  clipboard: ClipboardIcon,
 };
+
+const QUESTIONNAIRE_SUMMARY = [
+  { category: "Accueil & Check-in", count: 3 },
+  { category: "Chambre & Hébergement", count: 3 },
+  { category: "Salle de bain", count: 2 },
+  { category: "Restauration", count: 3 },
+  { category: "Service en chambre", count: 2 },
+  { category: "Espace Bien-être", count: 2 },
+  { category: "Personnel & Service", count: 2 },
+  { category: "Rapport qualité-prix", count: 1 },
+  { category: "Recommandation générale", count: 2 },
+];
 
 type Fete = { id: string; name: string; intro: string; avantage: string };
 
@@ -128,6 +155,7 @@ function OffresTab({
   const [generating, setGenerating] = useState(false);
   const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [discountPct, setDiscountPct] = useState(50);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selected = TEMPLATES.find((t) => t.id === selectedId);
@@ -187,8 +215,19 @@ function OffresTab({
     setSelectedId(id);
     setSelectedFete(null);
     setGeneratedMessage(null);
-    setAvantage(template?.description || "");
+    if (id === "sondage") {
+      setDiscountPct(50);
+      setAvantage(`${50}% de réduction sur votre prochain séjour`);
+    } else {
+      setAvantage(template?.description || "");
+    }
   };
+
+  useEffect(() => {
+    if (selectedId === "sondage") {
+      setAvantage(`${discountPct}% de réduction sur votre prochain séjour`);
+    }
+  }, [discountPct, selectedId]);
 
   const handleSelectFete = (fete: Fete) => {
     setSelectedFete(fete);
@@ -208,7 +247,13 @@ function OffresTab({
     try {
       if (config.isDemoMode) {
         await new Promise((r) => setTimeout(r, 1300));
-        const demoMessages: Record<string, string> = {
+        const hotel = hotelName || "notre hôtel";
+        const demoMessages: Record<string, string> = selected.id === "sondage" ? {
+          "3mois": `Bonjour {{nom}}, cela fait quelques mois et votre avis nous est précieux !\n\nPartagez votre expérience à ${hotel} en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour.\n\n👉 [Lien questionnaire]\n\nMerci pour votre fidélité !`,
+          "6mois": `{{nom}}, vous nous manquez ! Pour votre retour à ${hotel}, nous avons une offre spéciale :\n\nComplétez notre questionnaire de satisfaction et obtenez ${discountPct}% de réduction sur votre prochaine chambre.\n\n👉 [Lien questionnaire]\n\nOffre valable 30 jours.`,
+          "9mois": `Cher {{nom}}, cela fait longtemps et nous aimerions avoir votre avis !\n\nRépondez à quelques questions sur votre dernier séjour à ${hotel} et bénéficiez de ${discountPct}% de réduction pour votre retour.\n\n👉 [Lien questionnaire]`,
+          "tous": `Bonjour {{nom}}, l'équipe de ${hotel} tient à votre satisfaction !\n\nPartagez votre avis en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour en remerciement.\n\n👉 [Lien questionnaire]`,
+        } : {
           "3mois": `Bonjour {{nom}}, cela fait un moment que vous n'êtes pas venus nous voir ! Pour votre prochain séjour, nous vous réservons : ${avantage}. Réservez avant la fin du mois pour en profiter.`,
           "6mois": `{{nom}}, vous nous manquez vraiment ! Pour fêter votre retour à ${hotelName || "l'hôtel"}, nous vous offrons : ${avantage}. Cette offre vous est réservée jusqu'à la fin du mois — profitez-en.`,
           "9mois": `Cher {{nom}}, cela fait longtemps et on pense à vous ! Nous avons une surprise : ${avantage}, rien que pour vous. Répondez simplement OUI et on s'occupe du reste.`,
@@ -219,7 +264,9 @@ function OffresTab({
       } else {
         const result = await ai.generateCampaignMessage({
           typeOffre: selected.name,
-          avantage: avantage.trim(),
+          avantage: selected.id === "sondage"
+            ? `${discountPct}% de réduction conditionnelle au renvoi du questionnaire de satisfaction complété`
+            : avantage.trim(),
           segment: segmentId as "3mois" | "6mois" | "9mois" | "tous",
           hotelName: hotelName || undefined,
         });
@@ -245,6 +292,7 @@ function OffresTab({
       avantage: avantage.trim(),
       message: selected.id === "vide" ? avantage.trim() : (generatedMessage ?? null),
       feteName: selectedFete?.name ?? "",
+      discountPct: selected.id === "sondage" ? discountPct : undefined,
     }));
 
     if (attachedFile && attachedFile.type.startsWith("image/")) {
@@ -265,7 +313,10 @@ function OffresTab({
       params.set("template", selected!.id);
       params.set("avantage", avantage.trim());
       if (selectedFete) params.set("fete", selectedFete.name);
-      if (selected!.id === "vide") {
+      if (selected!.id === "sondage") {
+        params.set("discountPct", String(discountPct));
+        if (generatedMessage) params.set("message", generatedMessage);
+      } else if (selected!.id === "vide") {
         params.set("message", avantage.trim());
       } else if (generatedMessage) {
         params.set("message", generatedMessage);
@@ -322,7 +373,100 @@ function OffresTab({
 
           {selected ? (
             <div className="space-y-5">
-              {selected.id === "vide" ? (
+              {selected.id === "sondage" ? (
+                <>
+                  {/* Réduction conditionnelle */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                      Réduction conditionnelle
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        min={5}
+                        max={100}
+                        step={5}
+                        value={discountPct}
+                        onChange={(e) => setDiscountPct(Math.min(100, Math.max(5, Number(e.target.value))))}
+                        className="w-20 px-3 py-2.5 rounded-lg border border-slate-200 text-center text-xl font-bold text-slate-900 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      />
+                      <span className="text-slate-700 font-medium text-sm">% de réduction sur le prochain séjour</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1.5">
+                      Offerte uniquement après soumission du questionnaire complet.
+                    </p>
+                  </div>
+
+                  {/* Aperçu du questionnaire */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                      Questionnaire inclus — {QUESTIONNAIRE_SUMMARY.length} catégories · {QUESTIONNAIRE_SUMMARY.reduce((s, c) => s + c.count, 0)} questions
+                    </label>
+                    <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
+                      {QUESTIONNAIRE_SUMMARY.map((cat) => (
+                        <div key={cat.category} className="px-4 py-2.5 bg-slate-50 flex items-center justify-between">
+                          <span className="text-sm text-slate-700">{cat.category}</span>
+                          <span className="text-xs text-slate-400 font-medium">{cat.count} question{cat.count > 1 ? "s" : ""}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1.5">
+                      Les clients accèdent au questionnaire via un lien dans le message WhatsApp.
+                    </p>
+                  </div>
+
+                  {/* Génération IA */}
+                  <button
+                    onClick={handleGenerateAI}
+                    disabled={generating}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-primary/40 bg-primary/5 text-primary font-semibold hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {generating ? (
+                      <>
+                        <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        Génération en cours...
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Générer le message WhatsApp avec l&apos;IA
+                      </>
+                    )}
+                  </button>
+
+                  {generatedMessage !== null && (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        Message WhatsApp généré
+                      </label>
+                      <textarea
+                        value={generatedMessage}
+                        onChange={(e) => setGeneratedMessage(e.target.value)}
+                        rows={7}
+                        className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-sm"
+                      />
+                      <p className="text-xs text-slate-400 mt-1.5">
+                        Le lien du questionnaire sera automatiquement inséré à l&apos;envoi.
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleValiderEnvoyer}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
+                  >
+                    Valider et envoyer
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
+                </>
+              ) : selected.id === "vide" ? (
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
                     Votre message personnalisé
@@ -416,16 +560,18 @@ function OffresTab({
                 </>
               )}
 
-              <button
-                onClick={handleValiderEnvoyer}
-                disabled={!avantage.trim()}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Valider et envoyer
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
+              {selected.id !== "sondage" && (
+                <button
+                  onClick={handleValiderEnvoyer}
+                  disabled={!avantage.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Valider et envoyer
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
