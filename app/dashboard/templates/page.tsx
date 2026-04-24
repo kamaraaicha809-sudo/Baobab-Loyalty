@@ -249,10 +249,10 @@ function OffresTab({
         await new Promise((r) => setTimeout(r, 1300));
         const hotel = hotelName || "notre hôtel";
         const demoMessages: Record<string, string> = selected.id === "sondage" ? {
-          "3mois": `Bonjour {{nom}}, cela fait quelques mois et votre avis nous est précieux !\n\nPartagez votre expérience à ${hotel} en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour.\n\n👉 [Lien questionnaire]\n\nMerci pour votre fidélité !`,
-          "6mois": `{{nom}}, vous nous manquez ! Pour votre retour à ${hotel}, nous avons une offre spéciale :\n\nComplétez notre questionnaire de satisfaction et obtenez ${discountPct}% de réduction sur votre prochaine chambre.\n\n👉 [Lien questionnaire]\n\nOffre valable 30 jours.`,
-          "9mois": `Cher {{nom}}, cela fait longtemps et nous aimerions avoir votre avis !\n\nRépondez à quelques questions sur votre dernier séjour à ${hotel} et bénéficiez de ${discountPct}% de réduction pour votre retour.\n\n👉 [Lien questionnaire]`,
-          "tous": `Bonjour {{nom}}, l'équipe de ${hotel} tient à votre satisfaction !\n\nPartagez votre avis en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour en remerciement.\n\n👉 [Lien questionnaire]`,
+          "3mois": `Bonjour {{nom}}, cela fait quelques mois et votre avis nous est précieux !\n\nPartagez votre expérience à ${hotel} en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour.\n\nMerci pour votre fidélité !`,
+          "6mois": `{{nom}}, vous nous manquez ! Pour votre retour à ${hotel}, nous avons une offre spéciale :\n\nComplétez notre questionnaire de satisfaction et obtenez ${discountPct}% de réduction sur votre prochaine chambre.\n\nOffre valable 30 jours.`,
+          "9mois": `Cher {{nom}}, cela fait longtemps et nous aimerions avoir votre avis !\n\nRépondez à quelques questions sur votre dernier séjour à ${hotel} et bénéficiez de ${discountPct}% de réduction pour votre retour.`,
+          "tous": `Bonjour {{nom}}, l'équipe de ${hotel} tient à votre satisfaction !\n\nPartagez votre avis en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour en remerciement.`,
         } : {
           "3mois": `Bonjour {{nom}}, cela fait un moment que vous n'êtes pas venus nous voir ! Pour votre prochain séjour, nous vous réservons : ${avantage}. Réservez avant la fin du mois pour en profiter.`,
           "6mois": `{{nom}}, vous nous manquez vraiment ! Pour fêter votre retour à ${hotelName || "l'hôtel"}, nous vous offrons : ${avantage}. Cette offre vous est réservée jusqu'à la fin du mois — profitez-en.`,
@@ -265,7 +265,7 @@ function OffresTab({
         const result = await ai.generateCampaignMessage({
           typeOffre: selected.name,
           avantage: selected.id === "sondage"
-            ? `${discountPct}% de réduction conditionnelle au renvoi du questionnaire de satisfaction complété`
+            ? `${discountPct}% de réduction offerte après avoir cliqué sur le bouton de questionnaire inclus dans le message. IMPORTANT : ne jamais dire "répondez OUI" — le client doit cliquer sur un lien, pas répondre. Terminer le message par une invitation à cliquer sur le bouton ci-dessous.`
             : avantage.trim(),
           segment: segmentId as "3mois" | "6mois" | "9mois" | "tous",
           hotelName: hotelName || undefined,
@@ -451,7 +451,7 @@ function OffresTab({
                         className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-sm"
                       />
                       <p className="text-xs text-slate-400 mt-1.5">
-                        Le lien du questionnaire sera automatiquement inséré à l&apos;envoi.
+                        Le bouton &quot;Remplir le questionnaire&quot; est ajouté automatiquement sous le message — ne pas mentionner de lien dans le texte.
                       </p>
                     </div>
                   )}
