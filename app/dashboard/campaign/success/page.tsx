@@ -11,6 +11,9 @@ function SuccessContent() {
   const avantageRaw = searchParams.get("avantage") || "";
   const avantage = avantageRaw || "Un surclassement gratuit en Suite Junior";
   const aiMessage = searchParams.get("message") || "";
+  const templateId = searchParams.get("template") || "";
+  const discountPct = searchParams.get("discountPct") || "50";
+  const isSondage = templateId === "sondage";
   const [profileId, setProfileId] = useState<string | null>(isDemoMode ? demoUser.id : null);
   const [copied, setCopied] = useState(false);
   const [campaignImage, setCampaignImage] = useState<string | null>(null);
@@ -36,6 +39,9 @@ function SuccessContent() {
   offreParams.set("avantage", avantage);
   offreParams.set("hotel", hotelName);
   if (profileId) offreParams.set("pid", profileId);
+  const sondageParams = new URLSearchParams();
+  sondageParams.set("hotel", hotelName);
+  sondageParams.set("discount", discountPct);
 
   const messageText = aiMessage || `Cher {{nom}}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : "${avantage}"`;
 
@@ -149,20 +155,34 @@ function SuccessContent() {
                     />
                   )}
                   <p className="text-slate-800 text-sm leading-snug whitespace-pre-wrap">{messageText}</p>
-                  <Link
-                    href={`/offre?${offreParams.toString()}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-blue-600 font-medium text-sm">Réserver</span>
-                  </Link>
+                  {isSondage ? (
+                    <Link
+                      href={`/sondage?${sondageParams.toString()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                      <span className="text-green-700 font-medium text-sm">Remplir le questionnaire ({discountPct}% offert)</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/offre?${offreParams.toString()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-blue-600 font-medium text-sm">Réserver</span>
+                    </Link>
+                  )}
                   <p className="text-slate-400 text-[10px] text-right mt-1">22:22</p>
                 </div>
               </div>
