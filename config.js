@@ -62,14 +62,17 @@ const config = {
   // Remplacez par votre domaine vérifié dans Resend
   
   resend: {
-    fromNoReply: `Baobab Loyalty <noreply@baobab-loyalty.com>`,
+    fromNoReply: `Baobab Loyalty <noreply@baobabloyalty.com>`,
     // → Emails automatiques (confirmations, etc.)
 
-    fromAdmin: `Support Baobab Loyalty <support@baobab-loyalty.com>`,
+    fromAdmin: `Support Baobab Loyalty <support@baobabloyalty.com>`,
     // → Emails de support
 
-    supportEmail: "support@baobab-loyalty.com",
+    supportEmail: "support@baobabloyalty.com",
     // → Adresse affichée pour contacter le support
+
+    inboundDomain: "baobabloyalty.com",
+    // → Domaine pour la réception des emails de sync clients
   },
 
   // ============================================

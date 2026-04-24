@@ -142,6 +142,7 @@ export default function ConfigurationPage() {
     } catch {
       setCounts({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
     }
+
     setLoading(false);
   }, []);
 
@@ -571,6 +572,7 @@ export default function ConfigurationPage() {
           </div>
         </div>
       </section>
+
     </div>
   );
 }

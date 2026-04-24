@@ -1,17 +1,96 @@
-import Link from "next/link";
+"use client";
+
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/libs/supabase/client";
 import Logo from "@/components/common/Logo";
 import config from "@/config";
 
-export const metadata = {
-  title: "Accès Bêta Privé — Baobab Loyalty",
-  description: "Rejoignez les premiers hôteliers à tester Baobab Loyalty gratuitement.",
-  robots: "noindex, nofollow",
-};
+type Step = "email" | "code";
 
 export default function BetaPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [step, setStep] = useState<Step>("email");
+  const [email, setEmail] = useState("");
+  const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [shake, setShake] = useState(false);
+  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+
+  async function sendCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true);
+    setError("");
+    const { error: err } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    if (err) {
+      setError("Impossible d'envoyer le code. Vérifiez votre adresse email.");
+    } else {
+      setStep("code");
+    }
+    setLoading(false);
+  }
+
+  async function verifyCode(code: string) {
+    setLoading(true);
+    setError("");
+    const { error: err } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: code,
+      type: "email",
+    });
+    if (err) {
+      setError("Code incorrect ou expiré.");
+      setShake(true);
+      setDigits(["", "", "", "", "", ""]);
+      setTimeout(() => {
+        setShake(false);
+        inputs.current[0]?.focus();
+      }, 500);
+    } else {
+      router.push("/dashboard");
+    }
+    setLoading(false);
+  }
+
+  function handleDigitChange(index: number, value: string) {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    const next = [...digits];
+    next[index] = digit;
+    setDigits(next);
+    setError("");
+
+    if (digit && index < 5) {
+      inputs.current[index + 1]?.focus();
+    }
+
+    if (next.every((d) => d !== "") && index === 5) {
+      verifyCode(next.join(""));
+    }
+  }
+
+  function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      inputs.current[index - 1]?.focus();
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted.length === 6) {
+      setDigits(pasted.split(""));
+      inputs.current[5]?.focus();
+      verifyCode(pasted);
+    }
+    e.preventDefault();
+  }
+
   return (
     <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-8">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-sm">
 
         {/* Logo */}
         <div className="text-center mb-10">
@@ -34,83 +113,90 @@ export default function BetaPage() {
             </span>
           </div>
 
-          {/* Titre */}
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">
-            Testez Baobab Loyalty en avant-première
-          </h1>
-          <p className="text-slate-500 text-center text-sm sm:text-base mb-8">
-            Vous avez été sélectionné pour faire partie des premiers hôteliers à utiliser notre plateforme.
-          </p>
+          {step === "email" ? (
+            <>
+              <h1 className="text-2xl font-extrabold text-slate-900 text-center mb-2">
+                Accédez à la bêta
+              </h1>
+              <p className="text-slate-500 text-center text-sm mb-8">
+                Entrez votre adresse email pour recevoir votre code d&apos;accès à 6 chiffres.
+              </p>
 
-          {/* Détails */}
-          <div className="space-y-4 mb-8">
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-primary">
-                  <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM1.49 15.326a.78.78 0 0 1-.358-.442 3 3 0 0 1 4.308-3.516 6.484 6.484 0 0 0-1.905 3.959c-.023.222-.014.442.025.654a4.97 4.97 0 0 1-2.07-.655ZM16.44 15.98a4.97 4.97 0 0 0 2.07-.654.78.78 0 0 0 .357-.442 3 3 0 0 0-4.308-3.517 6.484 6.484 0 0 1 1.907 3.96 2.32 2.32 0 0 1-.026.654ZM18 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.304 16.19a.844.844 0 0 1-.277-.71 5 5 0 0 1 9.947 0 .843.843 0 0 1-.277.71A6.975 6.975 0 0 1 10 18a6.974 6.974 0 0 1-4.696-1.81Z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Places limitées</p>
-                <p className="text-xs text-slate-500">Seulement 20 hôteliers sélectionnés pour cette phase bêta.</p>
-              </div>
-            </div>
+              <form onSubmit={sendCode} className="space-y-4">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="votre@email.com"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-900 text-sm outline-none focus:border-primary transition-all"
+                />
+                {error && (
+                  <p className="text-sm text-red-500 font-medium text-center">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary-dark transition-all disabled:opacity-60"
+                >
+                  {loading ? "Envoi en cours..." : "Recevoir mon code"}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl font-extrabold text-slate-900 text-center mb-2">
+                Vérifiez votre email
+              </h1>
+              <p className="text-slate-500 text-center text-sm mb-8">
+                Un code à 6 chiffres a été envoyé à{" "}
+                <span className="font-semibold text-slate-700">{email}</span>
+              </p>
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-primary">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" />
-                </svg>
+              <div
+                className={`flex gap-3 justify-center mb-6 ${shake ? "[animation:shake_0.4s_ease-in-out]" : ""}`}
+              >
+                {digits.map((digit, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => { inputs.current[i] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleDigitChange(i, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
+                    onPaste={handlePaste}
+                    disabled={loading}
+                    className={`w-11 h-14 text-center text-2xl font-bold rounded-xl border-2 outline-none transition-all disabled:opacity-50
+                      ${error
+                        ? "border-red-400 bg-red-50 text-red-600"
+                        : digit
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-slate-200 text-slate-900 focus:border-primary"
+                      }`}
+                  />
+                ))}
               </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Durée : 20 jours</p>
-                <p className="text-xs text-slate-500">Accès complet pendant toute la durée de la bêta.</p>
-              </div>
-            </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
-              <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-green-600">
-                  <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800">100% gratuit</p>
-                <p className="text-xs text-slate-500">Accès à toutes les fonctionnalités sans carte bancaire.</p>
-              </div>
-            </div>
+              {error && (
+                <p className="text-center text-sm text-red-500 font-medium mb-4">{error}</p>
+              )}
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-primary">
-                  <path d="M3.505 2.365A41.369 41.369 0 0 1 9 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 0 0-.577-.069 43.141 43.141 0 0 0-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 0 1 5 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914Z" />
-                  <path d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.141 2.841 2.705 2.932.302.017.605.032.91.044v2.5a.75.75 0 0 0 1.28.53l3.139-3.138a2.779 2.779 0 0 0 .469-.558 1.872 1.872 0 0 0 .07-.11c.276-.48.427-1.028.427-1.604V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0 0 14 6Z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Votre avis compte</p>
-                <p className="text-xs text-slate-500">On vous demande un retour simple sur votre expérience.</p>
-              </div>
-            </div>
-          </div>
+              {loading && (
+                <p className="text-center text-sm text-slate-400 mb-4">Vérification...</p>
+              )}
 
-          {/* CTA */}
-          <Link
-            href="/signup?ref=beta"
-            className="block w-full py-3.5 rounded-xl bg-primary text-white font-bold text-center hover:bg-primary-dark transition-all text-sm sm:text-base shadow-lg shadow-primary/20"
-          >
-            Rejoindre la bêta gratuitement
-          </Link>
-
-          <p className="text-center text-xs text-slate-400 mt-4">
-            Déjà un compte ?{" "}
-            <Link href="/signin" className="text-primary hover:underline font-medium">
-              Se connecter
-            </Link>
-          </p>
+              <button
+                onClick={() => { setStep("email"); setDigits(["", "", "", "", "", ""]); setError(""); }}
+                className="w-full text-center text-xs text-slate-400 hover:text-primary transition-colors"
+              >
+                Changer d&apos;adresse email
+              </button>
+            </>
+          )}
         </div>
 
-        {/* Footer */}
         <p className="text-center text-slate-600 text-xs mt-6">
           Cette page est réservée aux bêta testeurs invités.
         </p>
