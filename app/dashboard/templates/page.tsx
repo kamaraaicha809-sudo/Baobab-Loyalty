@@ -96,12 +96,35 @@ type Fete = { id: string; name: string; intro: string; avantage: string };
 // ============================================================
 // ONGLET 1 : Offres standards (contenu original)
 // ============================================================
-function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName: string }) {
+function OffresTab({
+  segmentId,
+  segmentName,
+  initialTemplateId = null,
+  initialAvantage = "",
+  initialMessage = null,
+  initialFeteName = "",
+}: {
+  segmentId: string;
+  segmentName: string;
+  initialTemplateId?: string | null;
+  initialAvantage?: string;
+  initialMessage?: string | null;
+  initialFeteName?: string;
+}) {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [selectedFete, setSelectedFete] = useState<Fete | null>(null);
-  const [avantage, setAvantage] = useState("");
-  const [generatedMessage, setGeneratedMessage] = useState<string | null>(null);
+
+  const initialTemplate = initialTemplateId ? TEMPLATES.find((t) => t.id === initialTemplateId) : null;
+  const initialFete =
+    initialFeteName && initialTemplate?.id === "evenements" && "fetes" in initialTemplate
+      ? (initialTemplate.fetes as Fete[]).find((f) => f.name === initialFeteName) ?? null
+      : null;
+
+  const [selectedId, setSelectedId] = useState<string | null>(initialTemplateId);
+  const [selectedFete, setSelectedFete] = useState<Fete | null>(initialFete);
+  const [avantage, setAvantage] = useState(
+    initialAvantage || initialTemplate?.description || ""
+  );
+  const [generatedMessage, setGeneratedMessage] = useState<string | null>(initialMessage);
   const [generating, setGenerating] = useState(false);
   const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
@@ -133,20 +156,44 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
   }, []);
 
   useEffect(() => {
-    setGeneratedMessage(null);
-    if (selected?.id === "evenements" && selectedFete) {
-      setAvantage(selectedFete.avantage);
-    } else if (selected) {
-      setAvantage(selected.description);
-    } else {
-      setAvantage("");
+    const savedDraft = sessionStorage.getItem("baobab_campaign_draft");
+    if (!savedDraft) return;
+    try {
+      const draft = JSON.parse(savedDraft) as {
+        templateId: string;
+        avantage: string;
+        message: string | null;
+        feteName: string;
+      };
+      if (!draft.templateId) return;
+      const template = TEMPLATES.find((t) => t.id === draft.templateId);
+      if (!template) return;
+      setSelectedId(draft.templateId);
+      setAvantage(draft.avantage || template.description || "");
+      setGeneratedMessage(draft.message ?? null);
+      if (draft.feteName && template.id === "evenements" && "fetes" in template) {
+        const fete = (template.fetes as Fete[]).find((f) => f.name === draft.feteName) ?? null;
+        setSelectedFete(fete);
+      }
+    } catch {
+      // ignore malformed draft
     }
-  }, [selected?.id, selected?.description, selectedFete?.id, selectedFete?.avantage]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelectTemplate = (id: string) => {
+    if (id === selectedId) return;
+    const template = TEMPLATES.find((t) => t.id === id);
     setSelectedId(id);
     setSelectedFete(null);
     setGeneratedMessage(null);
+    setAvantage(template?.description || "");
+  };
+
+  const handleSelectFete = (fete: Fete) => {
+    setSelectedFete(fete);
+    setGeneratedMessage(null);
+    setAvantage(fete.avantage);
   };
 
   const handleGenerateAI = async () => {
@@ -192,6 +239,13 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
       toast.error("Renseignez l'avantage et sélectionnez une offre.");
       return;
     }
+
+    sessionStorage.setItem("baobab_campaign_draft", JSON.stringify({
+      templateId: selected.id,
+      avantage: avantage.trim(),
+      message: selected.id === "vide" ? avantage.trim() : (generatedMessage ?? null),
+      feteName: selectedFete?.name ?? "",
+    }));
 
     if (attachedFile && attachedFile.type.startsWith("image/")) {
       const reader = new FileReader();
@@ -293,7 +347,7 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
                         {fetes.map((fete) => (
                           <button
                             key={fete.id}
-                            onClick={() => setSelectedFete(fete)}
+                            onClick={() => handleSelectFete(fete)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                               selectedFete?.id === fete.id
                                 ? "bg-primary text-white"
@@ -348,11 +402,14 @@ function OffresTab({ segmentId, segmentName }: { segmentId: string; segmentName:
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
                         Message généré
                       </label>
-                      <div className="p-4 rounded-2xl rounded-tl-sm bg-slate-100/80 border border-slate-200 max-w-md">
-                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{generatedMessage}</p>
-                      </div>
+                      <textarea
+                        value={generatedMessage}
+                        onChange={(e) => setGeneratedMessage(e.target.value)}
+                        rows={6}
+                        className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-sm"
+                      />
                       <p className="text-xs text-slate-400 mt-1.5">
-                        Vous pouvez modifier l&apos;avantage et regénérer si besoin.
+                        Modifiez directement le texte ou régénérez avec l&apos;IA si besoin.
                       </p>
                     </div>
                   )}
@@ -976,6 +1033,10 @@ function TemplatesContent() {
   const searchParams = useSearchParams();
   const segmentId = searchParams.get("segment") || "";
   const segmentName = SEGMENT_NAMES[segmentId] || "un segment";
+  const initialTemplateId = searchParams.get("template");
+  const initialAvantage = searchParams.get("avantage") || "";
+  const initialMessage = searchParams.get("message");
+  const initialFeteName = searchParams.get("fete") || "";
   const [activeTab, setActiveTab] = useState<"offres" | "linkedin" | "linkedin-post">("offres");
 
   return (
@@ -1054,7 +1115,14 @@ function TemplatesContent() {
 
       {/* Contenu des onglets */}
       {activeTab === "offres" && (
-        <OffresTab segmentId={segmentId} segmentName={segmentName} />
+        <OffresTab
+          segmentId={segmentId}
+          segmentName={segmentName}
+          initialTemplateId={initialTemplateId}
+          initialAvantage={initialAvantage}
+          initialMessage={initialMessage}
+          initialFeteName={initialFeteName}
+        />
       )}
       {activeTab === "linkedin" && <LinkedInTab />}
       {activeTab === "linkedin-post" && <LinkedInPostTab />}

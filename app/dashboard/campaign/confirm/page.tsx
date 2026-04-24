@@ -64,10 +64,16 @@ function ConfirmContent() {
   const offerName = feteName ? `${TEMPLATE_NAMES[templateId] || templateId} - ${feteName}` : (TEMPLATE_NAMES[templateId] || templateId);
   const clientCount = counts[segmentId] ?? 0;
 
-  const templatesUrl = `/dashboard/templates?segment=${segmentId}`;
+  const templatesParams = new URLSearchParams({ segment: segmentId });
+  if (templateId) templatesParams.set("template", templateId);
+  if (avantage) templatesParams.set("avantage", avantage);
+  if (feteName) templatesParams.set("fete", feteName);
+  if (aiMessage) templatesParams.set("message", aiMessage);
+  const templatesUrl = `/dashboard/templates?${templatesParams.toString()}`;
 
   const handleConfirmerEnvoi = () => {
     setSending(true);
+    sessionStorage.removeItem("baobab_campaign_draft");
     const params = new URLSearchParams();
     if (segmentId) params.set("segment", segmentId);
     params.set("template", templateId);
@@ -181,12 +187,12 @@ function ConfirmContent() {
               </>
             )}
           </button>
-          <Link
-            href={templatesUrl}
+          <button
+            onClick={() => { window.location.href = templatesUrl; }}
             className="flex-1 flex items-center justify-center py-3.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors"
           >
             Modifier
-          </Link>
+          </button>
         </div>
       </div>
     </div>
