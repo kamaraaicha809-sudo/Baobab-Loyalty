@@ -126,14 +126,23 @@ Deno.serve(async (req) => {
       return success({ sent: 3, failed: 0, total: 3, campaignId: null });
     }
 
-    const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
-    const accessToken = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
+    const db = getServiceClient();
+
+    // Fetch WhatsApp credentials from the hotelier's profile
+    const { data: profile, error: profileError } = await db
+      .from("profiles")
+      .select("whatsapp_phone_number_id, whatsapp_access_token")
+      .eq("id", profileId)
+      .single();
+
+    if (profileError) return errors.internal(profileError.message);
+
+    const phoneNumberId = profile?.whatsapp_phone_number_id;
+    const accessToken = profile?.whatsapp_access_token;
 
     if (!phoneNumberId || !accessToken) {
-      return errors.internal("WhatsApp API non configuré. Ajoutez WHATSAPP_PHONE_NUMBER_ID et WHATSAPP_ACCESS_TOKEN dans le Vault Supabase.");
+      return errors.badRequest("WhatsApp non configuré. Rendez-vous dans Configuration → WhatsApp Business API pour saisir vos identifiants.");
     }
-
-    const db = getServiceClient();
 
     // Fetch all clients for this profile
     const { data: allClients, error: clientsError } = await db
