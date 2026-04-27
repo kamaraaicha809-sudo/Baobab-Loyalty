@@ -560,7 +560,23 @@ export default function ConfigurationPage() {
           </div>
         )}
 
-        <div className="mt-6 pt-6 border-t border-slate-200">
+        <div className="mt-6 pt-4 border-t border-slate-200">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="mt-0.5 shrink-0 w-8 h-8 rounded-md bg-slate-200 flex items-center justify-center">
+              <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Synchronisation planifiée via API</p>
+              <p className="text-sm text-slate-500 mt-0.5">
+                Si votre PMS dispose d&apos;une API, nous créons une Edge Function qui tourne toutes les nuits pour récupérer automatiquement les nouveaux clients et mettre à jour les existants.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-6 border-t border-slate-200">
           <p className="text-sm font-medium text-slate-700 mb-3">Répartition par segment</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {(["3mois", "6mois", "9mois", "tous"] as const).map((id) => (
