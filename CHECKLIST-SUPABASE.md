@@ -182,7 +182,7 @@ NEXT_PUBLIC_DEMO_MODE=false
 ### Correction B3 — .env.local : corriger SITE_URL
 
 ```bash
-SITE_URL=https://baobab-loyalty.com
+SITE_URL=https://baobabloyalty.com
 ```
 
 ### Correction I1 — Edge Functions : ajouter protection demo mode

@@ -3,7 +3,30 @@
     "allow": [
       "Bash(vercel ls:*)",
       "Bash(find 'c:\\\\Users\\\\HP\\\\Desktop\\\\Micro-SaaS Baobab Loyalty\\\\Baobab Loyalty Kodefast' -type f -name *linkedin*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(node -e ':*)",
+      "Bash(curl -s -X GET https://api.resend.com/domains -H 'Authorization: Bearer re_4LesUStm_8UBmsVj4kzFKSGGq7s7hWqGd' -H 'Content-Type: application/json')",
+      "Bash(curl -s -X PATCH https://api.resend.com/domains/b0b2b779-b134-4cb4-89c0-119e924e51d7 -H 'Authorization: Bearer re_4LesUStm_8UBmsVj4kzFKSGGq7s7hWqGd' -H 'Content-Type: application/json' -d '{\"click_tracking\": false, \"open_tracking\": false}')",
+      "Bash(curl -s -X GET https://api.resend.com/inbound-addresses -H 'Authorization: Bearer re_4LesUStm_8UBmsVj4kzFKSGGq7s7hWqGd' -H 'Content-Type: application/json')",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "mcp__vercel__list_deployments",
+      "Bash(git commit *)",
+      "Bash(npx kill-port *)",
+      "Bash(rm -rf .next tsconfig.tsbuildinfo .tsbuildinfo node_modules/.cache)",
+      "Bash(gh pr create --title 'fix: restore campaign state on Modifier button' --body ' *)",
+      "Read(//c/c/Users/HP/Desktop/Micro-SaaS Baobab Loyalty/**)",
+      "Bash(grep -E \"\\\\.sql$\")",
+      "Bash(pandoc --version)",
+      "Bash(python generate_pdf.py)",
+      "Bash(python generate_pdfs.py)",
+      "Bash(curl -s -X POST https://graph.facebook.com/v19.0/1051182544753093/messages -H 'Authorization: Bearer EAAN2RL1xXIQBRf4RICDQZAiJM1hQc2C1XzrI8Se5LbSBeZBY0Nws6tZAlfWDTPKO7SS8lQCHqyQsmcjnUEKL4FlQt1CNrcQAk5XgumRhffQskxVcuIiRZCur1jPca0rimjzLGRZB1oYFLO4tloCzk8VkuA6ABabU3cJN6Qg1ZAZAX1hReahsblOVdMrUkfJzKvAegVckwqDzLqJMXHKQhkP9Jjdk9ThLGkzfHgKByLYTQ8TnTh6MsuDo2DKDw1mPzIRZCIgNslYc5DKvKj4PKM7J' -H 'Content-Type: application/json' -d '{\"messaging_product\":\"whatsapp\",\"recipient_type\":\"individual\",\"to\":\"+2250797671386\",\"type\":\"template\",\"template\":{\"name\":\"hello_world\",\"language\":{\"code\":\"en_US\"}}}')",
+      "Bash(grep -E \"\\\\.tsx$\")"
     ]
   },
   "defaultMode": "bypassPermissions"

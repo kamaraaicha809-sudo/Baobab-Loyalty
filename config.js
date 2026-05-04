@@ -25,7 +25,7 @@ const config = {
   appDescription: "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et leur base de données clients en automatisant l'envoi via WhatsApp en 2 minutes",
   // → Description courte pour le SEO et la homepage
   
-  domainName: "baobab-loyalty.com",
+  domainName: "baobabloyalty.com",
   // → Domaine de production (sans https://)
 
   // ============================================

@@ -14,6 +14,40 @@ const Footer = () => {
         <p className="text-slate-500 text-sm">
           © {new Date().getFullYear()} {config.appName}. Tous droits réservés.
         </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 mt-4 mb-1">
+          <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Marchés</span>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/cote-divoire" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Côte d'Ivoire
+          </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/senegal" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Sénégal
+          </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/cameroun" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Cameroun
+          </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/ghana" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Ghana
+          </Link>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 mt-3 mb-1">
+          <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Produit</span>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/fonctionnalites" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Fonctionnalités
+          </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/tarifs" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Tarifs
+          </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/comment-ca-marche" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Comment ça marche
+          </Link>
+        </div>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 mt-3">
           <Link href="/legal/mentions-legales" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Mentions légales

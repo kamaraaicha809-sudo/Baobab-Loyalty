@@ -28,6 +28,7 @@ export { ai } from "./ai";
 export { storage } from "./storage";
 export { prompts } from "./prompts";
 export { linkedin } from "./linkedin";
+export { newsletter } from "./newsletter";
 
 // Re-export types
 export type { CreateCheckoutParams, CreateCheckoutResponse, CreatePortalParams, CreatePortalResponse } from "./billing";
@@ -36,6 +37,7 @@ export type { GenerateParams, GenerateResponse, GenerateLinkedInPostParams } fro
 export type { UploadResponse, DeleteResponse } from "./storage";
 export type { Prompt, CreatePromptParams, UpdatePromptParams } from "./prompts";
 export type { GenerateTemplateParams, GenerateTemplateResponse, MessageTemplate, SaveTemplateParams } from "./linkedin";
+export type { NewsletterSubscribeParams, NewsletterSubscribeResponse } from "./newsletter";
 
 // Re-export error class
 export { SdkError } from "./_core";

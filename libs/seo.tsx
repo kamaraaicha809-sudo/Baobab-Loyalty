@@ -165,3 +165,65 @@ export const renderSchemaTags = () => {
     ></script>
   );
 };
+
+export const renderOrganizationSchema = () => {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: config.appName,
+          url: `https://${config.domainName}/`,
+          logo: {
+            "@type": "ImageObject",
+            url: `https://${config.domainName}/icon.svg`,
+          },
+          description: config.appDescription,
+          email: "support@baobabloyalty.com",
+          areaServed: [
+            { "@type": "Country", name: "Côte d'Ivoire" },
+            { "@type": "Country", name: "Sénégal" },
+            { "@type": "Country", name: "Cameroun" },
+            { "@type": "Country", name: "Ghana" },
+          ],
+          knowsLanguage: ["fr", "en"],
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer support",
+            email: "support@baobabloyalty.com",
+            availableLanguage: ["fr", "en"],
+          },
+        }),
+      }}
+    ></script>
+  );
+};
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export const renderFAQSchema = (items: FAQItem[]) => {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: items.map((item) => ({
+            "@type": "Question",
+            name: item.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: item.answer,
+            },
+          })),
+        }),
+      }}
+    ></script>
+  );
+};

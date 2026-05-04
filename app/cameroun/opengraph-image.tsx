@@ -1,9 +1,7 @@
 import { ImageResponse } from "next/og";
-import config from "@/config";
 
 export const runtime = "edge";
-
-export const alt = `${config.appName} — Fidélisation client hôtel via WhatsApp en Afrique de l'Ouest`;
+export const alt = "Baobab Loyalty — Fidélisation hôtelière au Cameroun";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -24,7 +22,6 @@ export default function OgImage() {
           position: "relative",
         }}
       >
-        {/* Top accent bar */}
         <div
           style={{
             position: "absolute",
@@ -36,7 +33,6 @@ export default function OgImage() {
           }}
         />
 
-        {/* Brand pill */}
         <div
           style={{
             display: "flex",
@@ -45,67 +41,68 @@ export default function OgImage() {
             border: "1px solid rgba(235,193,97,0.4)",
             borderRadius: "100px",
             padding: "8px 24px",
-            marginBottom: "36px",
+            marginBottom: "28px",
           }}
         >
-          <span style={{ color: "#EBC161", fontWeight: 700, fontSize: 17, letterSpacing: 1 }}>
-            BAOBAB LOYALTY
+          <span style={{ color: "#EBC161", fontWeight: 700, fontSize: 15, letterSpacing: 2 }}>
+            BAOBAB LOYALTY · CAMEROUN
           </span>
         </div>
 
-        {/* Headline */}
         <h1
           style={{
             color: "#ffffff",
-            fontSize: 56,
+            fontSize: 54,
             fontWeight: 700,
             textAlign: "center",
             margin: "0 0 20px 0",
             lineHeight: 1.15,
-            maxWidth: 880,
+            maxWidth: 900,
           }}
         >
-          Fidélisez vos clients hôtel{" "}
-          <span style={{ color: "#EBC161" }}>via WhatsApp</span>
+          Fidélisez vos clients hôtel à{" "}
+          <span style={{ color: "#EBC161" }}>Douala & Yaoundé</span>
+          {" "}via WhatsApp
         </h1>
 
-        {/* Subline */}
         <p
           style={{
-            color: "rgba(255,255,255,0.65)",
-            fontSize: 21,
+            color: "rgba(255,255,255,0.6)",
+            fontSize: 20,
             textAlign: "center",
             margin: "0 0 44px 0",
-            maxWidth: 660,
+            maxWidth: 640,
             lineHeight: 1.5,
           }}
         >
-          La solution IA pour remplir vos chambres vides en{" "}
-          <span style={{ color: "rgba(255,255,255,0.9)" }}>
-            Côte d&apos;Ivoire, Sénégal et Cameroun
-          </span>
+          Segmentation automatique · Campagnes ciblées · À partir de{" "}
+          <span style={{ color: "rgba(255,255,255,0.9)" }}>29 000 FCFA/mois</span>
         </p>
 
-        {/* Market tags */}
-        <div style={{ display: "flex", gap: 12 }}>
-          {["Côte d'Ivoire", "Sénégal", "Cameroun", "Ghana"].map((market) => (
+        <div style={{ display: "flex", gap: 16 }}>
+          {[
+            { value: "90%+", label: "taux d'ouverture WhatsApp" },
+            { value: "−35%", label: "dépendance OTAs" },
+            { value: "10 min", label: "1ère campagne" },
+          ].map((stat) => (
             <div
-              key={market}
+              key={stat.value}
               style={{
                 background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                borderRadius: 8,
-                padding: "7px 16px",
-                color: "rgba(255,255,255,0.7)",
-                fontSize: 15,
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 12,
+                padding: "14px 24px",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              {market}
+              <span style={{ color: "#EBC161", fontSize: 26, fontWeight: 700 }}>{stat.value}</span>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{stat.label}</span>
             </div>
           ))}
         </div>
 
-        {/* Domain */}
         <div
           style={{
             position: "absolute",
@@ -115,7 +112,7 @@ export default function OgImage() {
             fontSize: 14,
           }}
         >
-          {config.domainName}
+          baobabloyalty.com/cameroun
         </div>
       </div>
     ),

@@ -97,7 +97,7 @@ Fichier : `supabase/functions/_shared/cors.ts`
 ```
 
 - Utilise le wildcard `*` — accepte les requetes depuis n'importe quel domaine
-- En production, cette valeur devrait etre restreinte a `https://baobab-loyalty.com`
+- En production, cette valeur devrait etre restreinte a `https://baobabloyalty.com`
 - Note : l'auth JWT reste obligatoire, donc l'impact reel est limite — mais les bonnes pratiques exigent de restreindre CORS
 
 ---
@@ -181,7 +181,7 @@ const response = await fetch(`${url}/functions/v1/config-update`, {
 
 ```typescript
 // supabase/functions/_shared/cors.ts
-const allowedOrigin = Deno.env.get("SITE_URL") || "https://baobab-loyalty.com";
+const allowedOrigin = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": allowedOrigin,

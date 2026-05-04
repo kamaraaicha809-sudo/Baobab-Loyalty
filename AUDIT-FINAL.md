@@ -69,7 +69,7 @@ Toutes renseignées et cohérentes :
 - `NEXT_PUBLIC_SUPABASE_URL` ✅
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` ✅
 - `NEXT_PUBLIC_DEMO_MODE=false` ✅
-- `SITE_URL=https://baobab-loyalty.com` ✅
+- `SITE_URL=https://baobabloyalty.com` ✅
 - `SUPABASE_SERVICE_ROLE_KEY` ✅ (côté serveur uniquement)
 
 ---
@@ -109,10 +109,10 @@ Toutes les fonctions sont déployées et en statut `ACTIVE` :
 ### ⚠️ Templates emails Supabase — Test manuel requis
 
 Vérifier dans le Dashboard Supabase > Authentication > Email Templates que :
-- L'email de confirmation utilise l'URL `https://baobab-loyalty.com/auth/callback`
-- L'email de reset password utilise l'URL `https://baobab-loyalty.com/auth/callback`
+- L'email de confirmation utilise l'URL `https://baobabloyalty.com/auth/callback`
+- L'email de reset password utilise l'URL `https://baobabloyalty.com/auth/callback`
 - Les templates sont en français et aux couleurs de Baobab Loyalty
-- Les redirect URLs pointent vers `https://baobab-loyalty.com` (pas localhost)
+- Les redirect URLs pointent vers `https://baobabloyalty.com` (pas localhost)
 
 ---
 
@@ -147,10 +147,10 @@ Seules `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC
 
 ### ⚠️ CORS — Fallback potentiellement incorrect
 
-**Problème modéré :** Dans `supabase/functions/_shared/cors.ts`, le fallback hardcodé est `"https://baobabloyalty.com"` (sans tiret), mais le vrai domaine est `"https://baobab-loyalty.com"` (avec tiret).
+**Problème modéré :** Dans `supabase/functions/_shared/cors.ts`, le fallback hardcodé est `"https://baobabloyalty.com"` (sans tiret), mais le vrai domaine est `"https://baobabloyalty.com"` (avec tiret).
 Ce n'est un problème que si la variable `SITE_URL` n'est pas définie dans le Vault Supabase. À priorité basse si SITE_URL est correctement configuré.
 
-**Correction :** Vérifier que `SITE_URL=https://baobab-loyalty.com` est bien dans le Vault Supabase, ou corriger le fallback dans `cors.ts`.
+**Correction :** Vérifier que `SITE_URL=https://baobabloyalty.com` est bien dans le Vault Supabase, ou corriger le fallback dans `cors.ts`.
 
 ---
 
@@ -213,7 +213,7 @@ Aucune balise `<img>` HTML brute trouvée dans `app/` et `components/`. ✅
 |---------|--------|
 | Title | "Baobab Loyalty" |
 | Description | Aide les propriétaires d'hôtels à remplir leurs chambres vides... |
-| metadataBase | `NEXT_PUBLIC_SITE_URL` ou `https://baobab-loyalty.com/` |
+| metadataBase | `NEXT_PUBLIC_SITE_URL` ou `https://baobabloyalty.com/` |
 | OG Image | `app/icon.tsx` (généré dynamiquement, logo "B" doré) |
 | Twitter Card | summary_large_image |
 | Robots | index + follow |
@@ -252,7 +252,7 @@ npm run build
 Vérifier dans le Dashboard Vercel > Settings > Environment Variables que ces variables sont présentes :
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_SITE_URL=https://baobab-loyalty.com`
+- `NEXT_PUBLIC_SITE_URL=https://baobabloyalty.com`
 - `SUPABASE_SERVICE_ROLE_KEY` (pour `/offre` API)
 - `NEXT_PUBLIC_DEMO_MODE=false`
 
@@ -261,15 +261,15 @@ Vérifier dans le Dashboard Vercel > Settings > Environment Variables que ces va
 ### ⚠️ Domaine Resend — Vérification manuelle requise
 
 Vérifier dans le Dashboard Resend que :
-- Le domaine `baobab-loyalty.com` est vérifié (DNS TXT/DKIM configurés)
-- Un test d'envoi depuis `noreply@baobab-loyalty.com` fonctionne
+- Le domaine `baobabloyalty.com` est vérifié (DNS TXT/DKIM configurés)
+- Un test d'envoi depuis `noreply@baobabloyalty.com` fonctionne
 - L'email de bienvenue à l'inscription arrive bien en boîte de réception (pas spam)
 
 ---
 
 ### ⚠️ Domaine final — Vérification manuelle requise
 
-- Vérifier que `https://baobab-loyalty.com` est accessible
+- Vérifier que `https://baobabloyalty.com` est accessible
 - HTTP → HTTPS redirige automatiquement
 - Certificat SSL valide
 

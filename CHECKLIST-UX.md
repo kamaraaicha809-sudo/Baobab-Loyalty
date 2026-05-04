@@ -118,7 +118,7 @@
 **Statut : ✅**
 
 - `libs/seo.tsx` : `getSEOTags()` configure title, description, keywords pour Baobab Loyalty
-- `config.js` : `appName = "Baobab Loyalty"`, `domainName = "baobab-loyalty.com"`
+- `config.js` : `appName = "Baobab Loyalty"`, `domainName = "baobabloyalty.com"`
 - Schema.org JSON-LD (SoftwareApplication) presente
 - OpenGraph + Twitter Cards configures
 - `lang="fr"` sur le HTML
@@ -277,20 +277,20 @@ href="/#tarifs"
 
 ```javascript
 // config.js — a remplacer par les vraies adresses
-fromNoReply: "noreply@baobab-loyalty.com"
-fromAdmin: "support@baobab-loyalty.com"
-supportEmail: "support@baobab-loyalty.com"
+fromNoReply: "noreply@baobabloyalty.com"
+fromAdmin: "support@baobabloyalty.com"
+supportEmail: "support@baobabloyalty.com"
 ```
 
 ### U7 — Mettre a jour robots.txt et sitemap.xml
 
 ```
 // public/robots.txt
-Host: https://baobab-loyalty.com
-Sitemap: https://baobab-loyalty.com/sitemap.xml
+Host: https://baobabloyalty.com
+Sitemap: https://baobabloyalty.com/sitemap.xml
 
 // public/sitemap.xml
-<loc>https://baobab-loyalty.com/sitemap-0.xml</loc>
+<loc>https://baobabloyalty.com/sitemap-0.xml</loc>
 ```
 
 ---

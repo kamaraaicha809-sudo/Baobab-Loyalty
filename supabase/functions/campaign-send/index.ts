@@ -65,9 +65,12 @@ async function sendWhatsApp(
   phoneNumberId: string,
   accessToken: string,
   to: string,
-  message: string,
+  clientName: string,
+  templateName: string,
+  messageBody: string,
 ): Promise<{ ok: boolean; errorMsg?: string }> {
   try {
+    const firstName = clientName.split(" ")[0];
     const res = await fetch(
       `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`,
       {
@@ -80,8 +83,20 @@ async function sendWhatsApp(
           messaging_product: "whatsapp",
           recipient_type: "individual",
           to,
-          type: "text",
-          text: { body: message, preview_url: false },
+          type: "template",
+          template: {
+            name: templateName,
+            language: { code: "fr" },
+            components: [
+              {
+                type: "body",
+                parameters: [
+                  { type: "text", text: firstName },
+                  { type: "text", text: messageBody },
+                ],
+              },
+            ],
+          },
         }),
       },
     );
@@ -200,7 +215,14 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const result = await sendWhatsApp(phoneNumberId, accessToken, e164, message);
+      const result = await sendWhatsApp(
+        phoneNumberId,
+        accessToken,
+        e164,
+        client.nom,
+        "baobab_offre_hotel",
+        message,
+      );
 
       sentRows.push({
         campaign_id: campaignId,

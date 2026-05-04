@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
     if (isDemoMode) {
       return success({
         id: "demo-user-id",
-        email: "demo@baobab-loyalty.com",
+        email: "demo@baobabloyalty.com",
         has_access: true,
         role: "admin",
         hotel_name: "Hôtel Demo",

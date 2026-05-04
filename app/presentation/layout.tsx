@@ -1,10 +1,12 @@
-import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import { ReactNode } from "react";
 
-export const metadata = {
-  title: `Présentation | ${config.appName}`,
-  description: `Découvrez ${config.appName} - ${config.appDescription}`,
-};
+export const metadata = getSEOTags({
+  title: "Présentation — Baobab Loyalty",
+  description:
+    "Découvrez Baobab Loyalty, la solution de fidélisation client pour hôtels en Afrique de l'Ouest.",
+  robots: { index: false, follow: false },
+});
 
 export default function PresentationLayout({ children }: { children: ReactNode }) {
   return (
