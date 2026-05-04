@@ -8,6 +8,7 @@ import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients } from "@/src/sdk/clients";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/demo";
+import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
 
 const SEGMENT_LABELS: Record<string, string> = {
   "3mois": "Clients - 3 mois",
@@ -47,9 +48,9 @@ interface ProfileForm {
   longitude: string;
 }
 
-interface WhatsAppForm {
-  phone_number_id: string;
-  access_token: string;
+interface WhatsAppStatus {
+  connected: boolean;
+  phone?: string;
 }
 
 const emptyForm: ProfileForm = {
@@ -80,9 +81,7 @@ export default function ConfigurationPage() {
   const [importStatus, setImportStatus] = useState<string>("");
   const [counts, setCounts] = useState<Record<string, number>>({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
-  const [waForm, setWaForm] = useState<WhatsAppForm>({ phone_number_id: "", access_token: "" });
-  const [waConfigured, setWaConfigured] = useState(false);
-  const [savingWa, setSavingWa] = useState(false);
+  const [waStatus, setWaStatus] = useState<WhatsAppStatus>({ connected: false });
 
   const set = (field: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -105,7 +104,7 @@ export default function ConfigurationPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, whatsapp_phone_number_id, whatsapp_access_token")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, whatsapp_phone_number_id, whatsapp_access_token, bsp_status, bsp_phone_number")
       .eq("id", user.id)
       .single();
 
@@ -123,10 +122,15 @@ export default function ConfigurationPage() {
         longitude: profile.longitude?.toString() || "",
       });
       setConfigComplete(profile.config_complete ?? false);
-      if (profile.whatsapp_phone_number_id) {
-        setWaForm({ phone_number_id: profile.whatsapp_phone_number_id, access_token: "" });
-        setWaConfigured(true);
-      }
+      const p = profile as Record<string, unknown>;
+      const waConnected =
+        (!!profile.whatsapp_phone_number_id && !!profile.whatsapp_access_token) ||
+        p.bsp_status === "active";
+      setWaStatus({
+        connected: waConnected,
+        phone: (p.bsp_phone_number as string | undefined)
+          || profile.whatsapp_phone_number_id || undefined,
+      });
     }
 
     const { data: existingRooms } = await supabase
@@ -258,31 +262,6 @@ export default function ConfigurationPage() {
       toast.error("Erreur lors de l'enregistrement des chambres");
     } finally {
       setSavingRooms(false);
-    }
-  };
-
-  const handleSaveWhatsApp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isDemoMode) { toast.success("WhatsApp configuré (démo)"); setWaConfigured(true); return; }
-    if (!profileId) return;
-    if (!waForm.phone_number_id.trim()) { toast.error("Le Phone Number ID est requis"); return; }
-
-    setSavingWa(true);
-    try {
-      const supabase = createClient();
-      const update: Record<string, string> = { whatsapp_phone_number_id: waForm.phone_number_id.trim() };
-      if (waForm.access_token.trim()) {
-        update.whatsapp_access_token = waForm.access_token.trim();
-      }
-      const { error } = await supabase.from("profiles").update(update).eq("id", profileId);
-      if (error) throw error;
-      setWaConfigured(true);
-      setWaForm((f) => ({ ...f, access_token: "" }));
-      toast.success("Identifiants WhatsApp enregistrés");
-    } catch {
-      toast.error("Erreur lors de l'enregistrement");
-    } finally {
-      setSavingWa(false);
     }
   };
 
@@ -553,16 +532,16 @@ export default function ConfigurationPage() {
         </form>
       </section>
 
-      {/* WhatsApp Business API */}
+      {/* WhatsApp Business */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
             </svg>
-            WhatsApp Business API
+            WhatsApp Business
           </h2>
-          {waConfigured && (
+          {waStatus.connected && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -571,63 +550,29 @@ export default function ConfigurationPage() {
             </span>
           )}
         </div>
-        <p className="text-slate-600 text-sm mb-5">
-          Connectez votre compte WhatsApp Business pour que vos clients reçoivent les messages directement depuis le numéro de votre hôtel.
+        <p className="text-slate-600 text-sm mb-6">
+          Connectez votre numéro WhatsApp Business en 5 minutes. Vos clients recevront les messages directement depuis le numéro de votre hôtel.
         </p>
 
-        {/* Info banner */}
-        <div className="mb-5 flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3.5">
-          <svg className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-          </svg>
-          <p className="text-sm text-blue-800">
-            Vous ne savez pas où trouver ces identifiants ?{" "}
-            <a
-              href="/docs/guide-whatsapp-business-hoteliers.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold underline"
-            >
-              Consultez le guide étape par étape
-            </a>{" "}
-            pour créer votre compte Meta WhatsApp Business en 30 minutes.
-          </p>
+        <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 mb-6">
+          <div className="shrink-0 w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-800">Connexion sécurisée via Meta</p>
+            <p className="text-sm text-slate-500 mt-0.5">
+              En cliquant sur le bouton, une fenêtre Meta s&apos;ouvre. Connectez-vous avec le compte Facebook lié à votre numéro WhatsApp Business. Baobab Loyalty stocke les identifiants de façon sécurisée — vous ne les saisissez jamais manuellement.
+            </p>
+          </div>
         </div>
 
-        <form onSubmit={handleSaveWhatsApp} className="space-y-4">
-          <div>
-            <label className={labelClass}>Phone Number ID <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              value={waForm.phone_number_id}
-              onChange={(e) => setWaForm((f) => ({ ...f, phone_number_id: e.target.value }))}
-              placeholder="Ex : 123456789012345"
-              className={inputClass}
-            />
-            <p className="text-xs text-slate-400 mt-1">Trouvez cette valeur dans Meta for Developers → WhatsApp → Démarrage rapide</p>
-          </div>
-          <div>
-            <label className={labelClass}>
-              Access Token {waConfigured && <span className="text-xs font-normal text-slate-400">(laisser vide pour conserver l&apos;actuel)</span>}
-              {!waConfigured && <span className="text-red-500 ml-0.5">*</span>}
-            </label>
-            <input
-              type="password"
-              value={waForm.access_token}
-              onChange={(e) => setWaForm((f) => ({ ...f, access_token: e.target.value }))}
-              placeholder={waConfigured ? "••••••••••••••••" : "EAABcd..."}
-              className={inputClass}
-            />
-            <p className="text-xs text-slate-400 mt-1">Token permanent généré depuis les Utilisateurs Système de votre compte Meta Business</p>
-          </div>
-          <button
-            type="submit"
-            disabled={savingWa}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-70"
-          >
-            {savingWa ? "Enregistrement…" : waConfigured ? "Mettre à jour" : "Connecter WhatsApp"}
-          </button>
-        </form>
+        <WhatsAppConnectButton
+          initialConnected={waStatus.connected}
+          initialPhone={waStatus.phone}
+          onStatusChange={(connected) => setWaStatus((s) => ({ ...s, connected }))}
+        />
       </section>
 
       {/* Import base clients */}

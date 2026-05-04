@@ -61,7 +61,7 @@ function clientMatchesSegment(client: Client, segmentCode: string, customMonths?
   return true;
 }
 
-async function sendWhatsApp(
+async function sendViaMeta(
   phoneNumberId: string,
   accessToken: string,
   to: string,
@@ -112,6 +112,59 @@ async function sendWhatsApp(
   }
 }
 
+// BSP path: 360dialog v2 API
+// Header: D360-API-KEY (not Bearer)
+// Phone format: digits only, no + prefix
+async function sendViaBsp(
+  bspApiKey: string,
+  to: string,
+  clientName: string,
+  templateName: string,
+  messageBody: string,
+): Promise<{ ok: boolean; errorMsg?: string }> {
+  try {
+    const firstName = clientName.split(" ")[0];
+    // 360dialog v2 requires phone without + prefix
+    const toDigits = to.startsWith("+") ? to.slice(1) : to;
+
+    const res = await fetch("https://waba-v2.360dialog.io/messages", {
+      method: "POST",
+      headers: {
+        "D360-API-KEY": bspApiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: toDigits,
+        type: "template",
+        template: {
+          name: templateName,
+          language: { code: "fr" },
+          components: [
+            {
+              type: "body",
+              parameters: [
+                { type: "text", text: firstName },
+                { type: "text", text: messageBody },
+              ],
+            },
+          ],
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      return { ok: false, errorMsg: body };
+    }
+
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, errorMsg: err instanceof Error ? err.message : "Network error" };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
@@ -143,20 +196,20 @@ Deno.serve(async (req) => {
 
     const db = getServiceClient();
 
-    // Fetch WhatsApp credentials from the hotelier's profile
+    // Fetch WhatsApp credentials — BSP path takes priority over legacy Meta direct path
     const { data: profile, error: profileError } = await db
       .from("profiles")
-      .select("whatsapp_phone_number_id, whatsapp_access_token")
+      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status")
       .eq("id", profileId)
       .single();
 
     if (profileError) return errors.internal(profileError.message);
 
-    const phoneNumberId = profile?.whatsapp_phone_number_id;
-    const accessToken = profile?.whatsapp_access_token;
+    const hasBsp = profile?.bsp_api_key && profile?.bsp_status === "active";
+    const hasMeta = profile?.whatsapp_phone_number_id && profile?.whatsapp_access_token;
 
-    if (!phoneNumberId || !accessToken) {
-      return errors.badRequest("WhatsApp non configuré. Rendez-vous dans Configuration → WhatsApp Business API pour saisir vos identifiants.");
+    if (!hasBsp && !hasMeta) {
+      return errors.badRequest("WhatsApp non configuré. Rendez-vous dans Configuration pour connecter votre compte WhatsApp.");
     }
 
     // Fetch all clients for this profile
@@ -215,14 +268,22 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const result = await sendWhatsApp(
-        phoneNumberId,
-        accessToken,
-        e164,
-        client.nom,
-        "baobab_offre_hotel",
-        message,
-      );
+      const result = hasBsp
+        ? await sendViaBsp(
+            profile.bsp_api_key!,
+            e164,
+            client.nom,
+            "baobab_offre_hotel",
+            message,
+          )
+        : await sendViaMeta(
+            profile.whatsapp_phone_number_id!,
+            profile.whatsapp_access_token!,
+            e164,
+            client.nom,
+            "baobab_offre_hotel",
+            message,
+          );
 
       sentRows.push({
         campaign_id: campaignId,

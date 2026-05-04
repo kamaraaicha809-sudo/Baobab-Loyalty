@@ -29,6 +29,7 @@ export { storage } from "./storage";
 export { prompts } from "./prompts";
 export { linkedin } from "./linkedin";
 export { newsletter } from "./newsletter";
+export { whatsapp } from "./whatsapp";
 
 // Re-export types
 export type { CreateCheckoutParams, CreateCheckoutResponse, CreatePortalParams, CreatePortalResponse } from "./billing";

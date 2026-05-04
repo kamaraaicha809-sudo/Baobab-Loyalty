@@ -131,7 +131,18 @@ const config = {
   },
 
   // ============================================
-  // 6. FEATURE FLAGS
+  // 6. WHATSAPP BUSINESS (Meta Embedded Signup)
+  // ============================================
+  // Permet aux hôteliers de connecter leur WhatsApp en 5 minutes
+  // Obtenez ces valeurs dans developers.facebook.com après vérification Meta Business
+
+  whatsapp: {
+    metaAppId: process.env.NEXT_PUBLIC_META_APP_ID || "",
+    // → App ID Meta (ex: "1234567890123456") — vide jusqu'à validation Meta Business
+  },
+
+  // ============================================
+  // 7. FEATURE FLAGS
   // ============================================
   // Activez/désactivez des fonctionnalités
   // Utile pour activer progressivement des features
