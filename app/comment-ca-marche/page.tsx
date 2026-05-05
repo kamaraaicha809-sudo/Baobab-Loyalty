@@ -3,6 +3,13 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
+
+export const metadata = getSEOTags({
+  title: "Comment fonctionne Baobab Loyalty — Guide étape par étape",
+  description: "Importez votre CSV → segmentez vos clients → lancez une campagne WhatsApp en 10 min. Zéro commission, zéro compétence technique. Résultats dès le premier envoi.",
+  canonicalUrlRelative: "/comment-ca-marche",
+});
 
 const steps = [
   {

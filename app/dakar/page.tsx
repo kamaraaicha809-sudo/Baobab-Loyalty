@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Fidélisation hôtelière à Dakar — Baobab Loyalty",
+  description: "Hôtels à Dakar : 8 réservations en 48h grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Opérationnel en 10 min. Essai gratuit.",
+  canonicalUrlRelative: "/dakar",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

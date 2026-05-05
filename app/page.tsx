@@ -7,7 +7,13 @@ import Solution from "@/components/landing/Solution";
 import Features from "@/components/landing/Features";
 import Testimonials from "@/components/landing/Testimonials";
 import Footer from "@/components/landing/Footer";
-import { renderSchemaTags, renderOrganizationSchema, renderFAQSchema } from "@/libs/seo";
+import { getSEOTags, renderSchemaTags, renderOrganizationSchema, renderFAQSchema } from "@/libs/seo";
+
+export const metadata = getSEOTags({
+  title: "Baobab Loyalty — Remplissez vos chambres vides sans Booking.com",
+  description: "Campagnes WhatsApp IA en 2 min, zéro commission. Reconquérez vos clients inactifs depuis votre base existante. Hôtels en Afrique de l'Ouest — essai gratuit.",
+  canonicalUrlRelative: "/",
+});
 
 // Below the fold — code split to reduce initial JS bundle
 const LinkedInFeature = dynamic(() => import("@/components/landing/LinkedInFeature"));

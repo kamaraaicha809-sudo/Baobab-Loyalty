@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Hotel Loyalty Software for Ghana — Baobab Loyalty",
+  description: "Accra hotels: 3× more direct bookings with targeted WhatsApp campaigns. Zero OTA commission, AI-generated messages. Get started in 10 minutes. Free trial.",
+  canonicalUrlRelative: "/ghana",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

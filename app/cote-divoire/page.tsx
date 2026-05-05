@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Fidélisation hôtelière en Côte d'Ivoire — Baobab Loyalty",
+  description: "Hôtels ivoiriens : 3× plus de réservations directes, −35% commissions OTA. Campagnes WhatsApp ciblées en FCFA, opérationnel en 10 min. Essai gratuit.",
+  canonicalUrlRelative: "/cote-divoire",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

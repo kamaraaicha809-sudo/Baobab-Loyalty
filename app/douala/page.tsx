@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Fidélisation hôtelière à Douala — Baobab Loyalty",
+  description: "Hôtels à Douala : 12 réservations en une semaine avec Baobab Loyalty. Campagnes WhatsApp IA, −30% commissions OTA, prix en FCFA. Essai gratuit.",
+  canonicalUrlRelative: "/douala",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Fidélisation hôtelière à Abidjan — Baobab Loyalty",
+  description: "Hôtels à Abidjan : 3× plus de réservations directes, zéro commission Booking.com. Campagnes WhatsApp en 10 min, segmentation automatique. Essai gratuit.",
+  canonicalUrlRelative: "/abidjan",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

@@ -3,6 +3,13 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
+
+export const metadata = getSEOTags({
+  title: "Espace Presse — Baobab Loyalty",
+  description: "Communiqués de presse, chiffres clés et ressources pour journalistes. Baobab Loyalty, solution de fidélisation hôtelière n°1 en Afrique francophone.",
+  canonicalUrlRelative: "/presse",
+});
 
 const keyFacts = [
   { value: "3", label: "pays actifs", detail: "Côte d'Ivoire, Sénégal, Cameroun" },

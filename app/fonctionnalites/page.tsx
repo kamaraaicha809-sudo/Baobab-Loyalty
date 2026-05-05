@@ -3,6 +3,13 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
+
+export const metadata = getSEOTags({
+  title: "Fonctionnalités — Baobab Loyalty",
+  description: "Import CSV, segmentation 3-6-9 mois, campagnes WhatsApp IA, tableau de bord réservations, tracking temps réel. Tout pour fidéliser vos clients hôtel en Afrique.",
+  canonicalUrlRelative: "/fonctionnalites",
+});
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

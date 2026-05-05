@@ -3,6 +3,13 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
+
+export const metadata = getSEOTags({
+  title: "Tarifs Baobab Loyalty — À partir de 29 000 FCFA/mois",
+  description: "Plans Essentiel, Croissance et Premium : 29 000, 49 000 et 69 000 FCFA/mois. Sans engagement, résiliable à tout moment. Pour hôtels d'Afrique de l'Ouest.",
+  canonicalUrlRelative: "/tarifs",
+});
 
 const plans = [
   {

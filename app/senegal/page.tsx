@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Fidélisation hôtelière au Sénégal — Baobab Loyalty",
+  description: "Hôtels au Sénégal : reconquérez vos clients inactifs via WhatsApp en 10 min. −30% dépendance Booking.com, prix en FCFA. Essai gratuit sans carte bancaire.",
+  canonicalUrlRelative: "/senegal",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

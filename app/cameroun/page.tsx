@@ -2,10 +2,17 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
+
+export const metadata = getSEOTags({
+  title: "Fidélisation hôtelière au Cameroun — Baobab Loyalty",
+  description: "Hôtels de Douala et Yaoundé : campagnes WhatsApp ciblées, −30% commissions OTA, prix en FCFA. 12 réservations en 1 semaine. Essai gratuit.",
+  canonicalUrlRelative: "/cameroun",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

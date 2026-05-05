@@ -4,6 +4,13 @@ import { NewsletterBanner } from "@/components/newsletter/NewsletterBanner";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { Suspense } from "react";
+import { getSEOTags } from "@/libs/seo";
+
+export const metadata = getSEOTags({
+  title: "Blog Baobab Loyalty — Fidélisation hôtelière en Afrique",
+  description: "Guides pratiques, stratégies WhatsApp et conseils CRM pour hôteliers en Afrique de l'Ouest. Côte d'Ivoire, Sénégal, Cameroun, Ghana — en français et en anglais.",
+  canonicalUrlRelative: "/blog",
+});
 
 export default function BlogPage() {
   const posts = getAllPosts();
