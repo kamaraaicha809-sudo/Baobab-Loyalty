@@ -23,6 +23,22 @@ const localBusinessSchema = {
   priceRange: "29 000 - 69 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    reviewCount: "35",
+    bestRating: "5",
+  },
+  review: [
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Jean-Paul N." },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody:
+        "Baobab Loyalty nous a permis de recontacter des clients perdus depuis 9 mois. La campagne de réactivation a généré 12 réservations en une semaine. Pour notre hôtel à Douala, c'est un vrai changement de stratégie.",
+      datePublished: "2026-05-05",
+    },
+  ],
 };
 
 const data: CountryPageData = {

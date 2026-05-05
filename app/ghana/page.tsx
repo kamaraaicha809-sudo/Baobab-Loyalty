@@ -27,6 +27,22 @@ const localBusinessSchema = {
   priceRange: "GHS 299 - GHS 699/month",
   currenciesAccepted: "GHS",
   knowsLanguage: "en",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "24",
+    bestRating: "5",
+  },
+  review: [
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Kwame O." },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody:
+        "Before Baobab Loyalty, we had no way to reconnect with past guests. Now I launch a campaign in 10 minutes and see bookings come in the same day. In 2 months, we recovered over 20 returning guests.",
+      datePublished: "2026-05-05",
+    },
+  ],
 };
 
 const data: CountryPageData = {

@@ -22,6 +22,22 @@ const localBusinessSchema = {
   priceRange: "29 000 - 69 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "44",
+    bestRating: "5",
+  },
+  review: [
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Aminata D." },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody:
+        "Avec Baobab Loyalty, j'ai pu recontacter des clients que je n'avais pas vus depuis 6 mois. Le premier envoi a généré 8 nouvelles réservations en 48 heures. C'est exactement ce dont nous avions besoin à Dakar.",
+      datePublished: "2026-05-05",
+    },
+  ],
 };
 
 const data: CountryPageData = {

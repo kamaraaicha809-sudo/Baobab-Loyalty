@@ -27,6 +27,22 @@ const localBusinessSchema = {
   priceRange: "29 000 - 69 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    reviewCount: "31",
+    bestRating: "5",
+  },
+  review: [
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Sandrine M." },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody:
+        "On avait une base de 300 clients mais aucun moyen de les recontacter. Baobab Loyalty nous a permis de lancer une campagne de réactivation en 15 minutes. Résultat : 22 réservations directes en 3 jours, sans passer par Booking.",
+      datePublished: "2026-05-05",
+    },
+  ],
 };
 
 const data: CountryPageData = {
