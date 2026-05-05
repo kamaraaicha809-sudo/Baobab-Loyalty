@@ -22,7 +22,7 @@ const pressReleases = [
     flag: "🇨🇮",
     headline:
       "Baobab Loyalty lance sa solution de fidélisation hôtelière en Côte d'Ivoire : les hôteliers abidjanais reprennent le contrôle de leurs réservations directes",
-    body: `ABIDJAN, le 5 mai 2026 — Baobab Loyalty, startup spécialisée dans la fidélisation clients pour hôtels africains, annonce le lancement officiel de sa plateforme en Côte d'Ivoire. La solution, accessible dès aujourd'hui aux hôteliers ivoiriens, permet de créer et d'envoyer des campagnes de réservation via WhatsApp en moins de 10 minutes — sans commission, directement depuis leur tableau de bord.
+    body: `ABIDJAN, le 5 mai 2026 — Baobab Loyalty, startup spécialisée dans la fidélisation clients pour hôtels africains, annonce le lancement officiel de sa plateforme en Côte d'Ivoire. La solution, accessible dès aujourd'hui aux hôteliers ivoiriens, permet de créer et d'envoyer des campagnes de réservation via WhatsApp en moins de 2 minutes — sans commission, directement depuis leur tableau de bord.
 
 Les hôtels ivoiriens font face à une double pression : d'un côté, les plateformes de réservation en ligne (OTAs) comme Booking.com et Expedia qui prélèvent entre 15% et 20% de commission sur chaque réservation ; de l'autre, l'absence d'outils numériques adaptés au marché local, au FCFA et aux habitudes de communication africaines.
 
@@ -90,7 +90,7 @@ La plateforme s'intègre directement avec WhatsApp Business — le canal de comm
 
 Dès les premiers mois d'utilisation, les hôtels camerounais partenaires ont généré en moyenne 12 à 22 réservations directes supplémentaires par campagne, sans passer par Booking.com ou Expedia.
 
-Baobab Loyalty est accessible à partir de 29 000 FCFA par mois, sans engagement et sans frais d'installation. Un essai gratuit en mode démo est disponible sur baobabloyalty.com.
+Baobab Loyalty est accessible à partir de 39 000 FCFA par mois, sans engagement et sans frais d'installation. Un essai gratuit en mode démo est disponible sur baobabloyalty.com.
 
 ###
 
