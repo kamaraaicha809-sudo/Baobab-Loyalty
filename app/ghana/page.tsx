@@ -14,6 +14,11 @@ const localBusinessSchema = {
   description:
     "Hotel loyalty software for Ghana. Targeted WhatsApp campaigns, automatic segmentation and direct bookings without OTA commission.",
   url: `https://${config.domainName}/ghana`,
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 5.56,
+    longitude: -0.2057,
+  },
   areaServed: [
     { "@type": "AdministrativeArea", name: "Ghana" },
     { "@type": "City", name: "Accra" },
@@ -139,6 +144,11 @@ const data: CountryPageData = {
   ctaSubtitle:
     "Join Ghanaian hoteliers who are increasing direct reservations with Baobab Loyalty. Up and running in 10 minutes, no credit card required.",
   ctaButton: "Start for free",
+  relatedBlog: {
+    slug: "hotel-loyalty-program-ghana-accra",
+    title: "Hotel Guest Loyalty in Ghana: How Accra Hotels Can Win Back Direct Bookings",
+    readingTime: 7,
+  },
 };
 
 export default function GhanaPage() {

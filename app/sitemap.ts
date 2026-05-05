@@ -56,6 +56,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
+      url: `${BASE_URL}/blog/hotel-loyalty-program-ghana-accra`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
       url: `${BASE_URL}/fonctionnalites`,
       lastModified: now,
       changeFrequency: "monthly",
