@@ -6,7 +6,7 @@ import { isDemoMode } from "@/src/lib/demo";
 
 const Hero = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isDemoMode) {

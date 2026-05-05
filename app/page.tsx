@@ -5,15 +5,15 @@ import Hero from "@/components/landing/Hero";
 import Problem from "@/components/landing/Problem";
 import Solution from "@/components/landing/Solution";
 import Features from "@/components/landing/Features";
-import LinkedInFeature from "@/components/landing/LinkedInFeature";
 import Testimonials from "@/components/landing/Testimonials";
-import FAQ from "@/components/landing/FAQ";
-import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
 import { renderSchemaTags, renderOrganizationSchema, renderFAQSchema } from "@/libs/seo";
 
-// Below the fold — code split to reduce initial JS
+// Below the fold — code split to reduce initial JS bundle
+const LinkedInFeature = dynamic(() => import("@/components/landing/LinkedInFeature"));
 const Pricing = dynamic(() => import("@/components/landing/Pricing"));
+const FAQ = dynamic(() => import("@/components/landing/FAQ"));
+const CTA = dynamic(() => import("@/components/landing/CTA"));
 
 export default function Home() {
   return (
