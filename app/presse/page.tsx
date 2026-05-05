@@ -32,7 +32,7 @@ La plateforme permet aux hôtels d'importer leur base clients depuis un fichier 
 
 Les premiers hôtels utilisateurs à Abidjan constatent en moyenne un triplement de leurs réservations directes et une réduction de 35% de leur dépendance aux OTAs après trois mois d'utilisation.
 
-Baobab Loyalty est disponible à partir de 29 000 FCFA par mois, sans engagement. Un accès gratuit en mode démo est proposé sans carte bancaire. La solution est déjà opérationnelle au Sénégal et au Cameroun.
+Baobab Loyalty est disponible à partir de 39 000 FCFA par mois, sans engagement. Un accès gratuit en mode démo est proposé sans carte bancaire. La solution est déjà opérationnelle au Sénégal et au Cameroun.
 
 ###
 
@@ -61,7 +61,7 @@ Grâce à Baobab Loyalty, les hôtels sénégalais peuvent identifier leurs clie
 
 Les hôtels utilisateurs constatent un taux d'ouverture supérieur à 90% pour leurs messages WhatsApp, contre moins de 20% pour les campagnes email classiques. Les réservations directes générées permettent d'économiser l'intégralité des commissions OTA sur ces transactions.
 
-Baobab Loyalty est proposé à partir de 29 000 FCFA par mois. La plateforme est opérationnelle sans formation technique préalable — si vous savez utiliser Excel, vous savez utiliser Baobab Loyalty.
+Baobab Loyalty est proposé à partir de 39 000 FCFA par mois. La plateforme est opérationnelle sans formation technique préalable — si vous savez utiliser Excel, vous savez utiliser Baobab Loyalty.
 
 ###
 
@@ -198,7 +198,7 @@ export default function PressePage() {
                   opérationnelle en Côte d&apos;Ivoire, au Sénégal et au Cameroun.
                 </p>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  La plateforme est accessible à partir de 29 000 FCFA par mois, sans
+                  La plateforme est accessible à partir de 39 000 FCFA par mois, sans
                   engagement, et fonctionnelle en moins de 10 minutes.
                 </p>
               </div>
