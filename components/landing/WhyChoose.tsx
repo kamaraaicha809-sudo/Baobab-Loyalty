@@ -47,11 +47,12 @@ const WhyChoose = () => {
           <div className="relative">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 relative">
               <Image
-                src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80"
-                alt="Hôtel"
+                src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=75"
+                alt="Hôtel de charme en Afrique de l'Ouest"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
+                quality={75}
               />
               <div className="absolute top-4 right-4 sm:left-auto sm:max-w-xs bg-white/95 rounded-xl p-4 shadow-lg">
                 <p className="font-display text-[#2C2C2C] italic text-sm sm:text-base mb-2">

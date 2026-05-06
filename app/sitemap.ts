@@ -56,7 +56,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
+      url: `${BASE_URL}/accra`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${BASE_URL}/blog/hotel-loyalty-program-ghana-accra`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/blog/whatsapp-hotel-marketing-ghana`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/blog/cut-ota-commissions-ghana-hotels`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.75,

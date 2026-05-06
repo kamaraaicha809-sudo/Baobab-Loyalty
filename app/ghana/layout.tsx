@@ -4,7 +4,7 @@ import config from "@/config";
 export const metadata: Metadata = {
   title: "Hotel Guest Loyalty in Ghana — Baobab Loyalty",
   description:
-    "Grow direct bookings for your Accra hotel with Baobab Loyalty. Targeted WhatsApp campaigns, automatic segmentation and guest retention — built for the Ghanaian hospitality market.",
+    "Ghana hotels: 3× more direct bookings, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min — free trial.",
   keywords: [
     "hotel loyalty Ghana",
     "WhatsApp marketing hotel Accra",
@@ -13,11 +13,14 @@ export const metadata: Metadata = {
     "direct bookings hotel Ghana",
     "hotel software Ghana GHS",
   ],
-  alternates: { canonical: `/ghana` },
+  alternates: {
+    canonical: `/ghana`,
+    languages: { en: `/ghana` },
+  },
   openGraph: {
     title: "Hotel Guest Loyalty in Ghana — Baobab Loyalty",
     description:
-      "Grow direct bookings for your Accra hotel with Baobab Loyalty. WhatsApp campaigns, automatic segmentation and guest retention.",
+      "Ghana hotels: 3× more direct bookings, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min.",
     url: `https://${config.domainName}/ghana`,
     type: "website",
   },

@@ -201,6 +201,64 @@ export const renderOrganizationSchema = () => {
   );
 };
 
+interface ReviewItem {
+  author: string;
+  ratingValue: number;
+  reviewBody: string;
+  datePublished: string;
+}
+
+interface AggregateRatingData {
+  ratingValue: string;
+  reviewCount: string;
+  itemName: string;
+  itemDescription?: string;
+  itemUrl?: string;
+  reviews?: ReviewItem[];
+}
+
+export const renderReviewSchema = ({
+  ratingValue,
+  reviewCount,
+  itemName,
+  itemDescription,
+  itemUrl,
+  reviews = [],
+}: AggregateRatingData) => {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: itemName,
+          description: itemDescription || config.appDescription,
+          url: itemUrl || `https://${config.domainName}/`,
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue,
+            reviewCount,
+            bestRating: "5",
+            worstRating: "1",
+          },
+          review: reviews.map((r) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: r.author },
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: String(r.ratingValue),
+              bestRating: "5",
+            },
+            reviewBody: r.reviewBody,
+            datePublished: r.datePublished,
+          })),
+        }),
+      }}
+    />
+  );
+};
+
 interface FAQItem {
   question: string;
   answer: string;
