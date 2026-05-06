@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import config from "@/config";
 
 export const metadata: Metadata = {
-  title: "Fidélisation clients hôtel en Côte d'Ivoire — Baobab Loyalty",
+  title: "Logiciel fidélisation hôtel Côte d'Ivoire — Baobab Loyalty",
   description:
-    "Hôtels Abidjan : 3× plus de réservations directes, zéro commission Booking.com. Campagnes WhatsApp IA, segmentation auto. Opérationnel en 10 min — essai gratuit.",
+    "Logiciel de fidélisation hôtel pour la Côte d'Ivoire : 3× plus de réservations directes, zéro commission Booking.com. WhatsApp IA, FCFA, opérationnel en 10 min.",
   keywords: [
     "fidélisation hôtel Côte d'Ivoire",
     "marketing hôtel Abidjan",
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `/cote-divoire` },
   openGraph: {
-    title: "Fidélisation clients hôtel en Côte d'Ivoire — Baobab Loyalty",
+    title: "Logiciel fidélisation hôtel Côte d'Ivoire — Baobab Loyalty",
     description:
-      "Fidélisez vos clients hôtel à Abidjan avec Baobab Loyalty. Campagnes WhatsApp, segmentation automatique et réservations directes.",
+      "Logiciel de fidélisation hôtel pour la Côte d'Ivoire. Campagnes WhatsApp IA, segmentation automatique, réservations directes sans commission OTA.",
     url: `https://${config.domainName}/cote-divoire`,
     type: "website",
   },

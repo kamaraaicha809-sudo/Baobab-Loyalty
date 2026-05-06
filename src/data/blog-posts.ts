@@ -104,6 +104,8 @@ La fidélisation client n'est pas un luxe — c'est une nécessité économique 
 
 La bonne nouvelle : vous n'avez pas besoin d'un budget marketing immense. Vous avez besoin d'une base de données clients, d'un message WhatsApp personnalisé, et d'un outil qui automatise le travail.
 
+[Solution dédiée aux hôtels en Côte d'Ivoire →](/cote-divoire) · [Sénégal →](/senegal) · [Cameroun →](/cameroun) · [Ghana →](/ghana)
+
 [Découvrez comment Baobab Loyalty permet aux hôtels africains de fidéliser leurs clients via WhatsApp en moins de 2 minutes.](/demo)`,
   },
   {
@@ -456,6 +458,8 @@ Le marché hôtelier abidjanais offre des opportunités exceptionnelles pour les
 
 La clé est de commencer par construire votre base de données clients et de mettre en place un système de communication direct et régulier avec vos anciens clients.
 
+[Voir notre logiciel de fidélisation hôtel pour la Côte d'Ivoire →](/cote-divoire)
+
 [Découvrez comment des hôtels à Abidjan utilisent Baobab Loyalty pour augmenter leurs réservations directes.](/demo)`,
   },
   {
@@ -536,6 +540,8 @@ Le mois de décembre et la période estivale (juillet-août) sont des pics de de
 Fidéliser ses clients à Dakar, c'est allier la technologie moderne (WhatsApp, segmentation automatique) avec les valeurs culturelles du Sénégal (teranga, personnalisation, bouche-à-oreille communautaire).
 
 Les hôtels dakarois qui réussissent le mieux ne sont pas forcément les plus grands ni les plus chers — ce sont ceux qui traitent chaque client comme un invité personnel et qui ont mis en place les outils pour maintenir cette relation dans le temps.
+
+[Voir notre solution pour les hôtels au Sénégal →](/senegal)
 
 [Découvrez comment Baobab Loyalty aide les hôtels au Sénégal à fidéliser leurs clients.](/demo)`,
   },
@@ -775,6 +781,8 @@ Les CRM classiques ont été conçus pour d'autres marchés, d'autres canaux, d'
 
 La bonne nouvelle : ces outils existent maintenant. Et ils changent radicalement la façon dont les hôtels africains gèrent leur relation client.
 
+[Logiciel fidélisation hôtel Côte d'Ivoire →](/cote-divoire) · [Sénégal →](/senegal) · [Cameroun →](/cameroun)
+
 [Découvrez Baobab Loyalty — le CRM WhatsApp conçu spécifiquement pour les hôtels d'Afrique de l'Ouest.](/demo)`,
   },
   {
@@ -939,6 +947,8 @@ C'est précisément ce que propose Baobab Loyalty, conçu spécifiquement pour l
 La fidélisation client dans l'hôtellerie ivoirienne n'est pas une question de budget. C'est une question de méthode. Avec la bonne segmentation, les bons messages au bon moment, et le bon canal (WhatsApp), même un petit hôtel de 20 chambres à Abidjan peut construire une base de clients fidèles qui réservent directement.
 
 Les hôtels qui gagnent en Côte d'Ivoire ne sont pas ceux qui dépensent le plus en acquisition. Ce sont ceux qui transforment chaque séjour en relation durable.
+
+[Découvrir le logiciel de fidélisation hôtel pour la Côte d'Ivoire →](/cote-divoire)
 
 [Testez Baobab Loyalty gratuitement — votre première campagne de fidélisation en 10 minutes.](/demo)`,
   },
@@ -2249,6 +2259,8 @@ Start with your 3-month inactive guests. Write one message. Send it to 50 people
 
 The hotels in Accra that are growing their direct bookings today are not spending more on advertising. They are doing a better job of staying connected with the guests they already have.
 
+[Hotel loyalty software for Accra →](/accra) · [Ghana hotels overview →](/ghana)
+
 [See how Baobab Loyalty helps Ghanaian hotels run WhatsApp loyalty campaigns in under 10 minutes — free trial, no credit card required.](/demo)`,
   },
   {
@@ -2392,6 +2404,8 @@ The barrier to starting is lower than most hoteliers think. You need:
 
 The hotels in Accra gaining market share right now are not spending more on advertising. They are doing a better job of staying in touch with the guests they already have — through the channel those guests actually use.
 
+[WhatsApp loyalty software for Accra hotels →](/accra)
+
 [Start your first WhatsApp hotel campaign with Baobab Loyalty — free trial, no credit card required.](/demo)`,
   },
   {
@@ -2531,6 +2545,8 @@ Hotels that invest in direct booking relationships have a structural advantage o
 In a market as competitive as Accra — with new hotels opening regularly along the Spintex Road corridor, in East Legon, and around the Airport Residential Area — the hotels that build direct relationships today will have a significant cost and loyalty advantage tomorrow.
 
 The OTAs are not going away. But they work best as a discovery channel for new guests, not as your primary source of repeat business. That is what your WhatsApp campaigns, your loyalty program, and your direct booking engine are for.
+
+[Hotel loyalty software for Ghana →](/ghana) · [Accra-specific page →](/accra)
 
 [Start reducing your OTA commissions with Baobab Loyalty — free 14-day trial for Ghanaian hotels.](/demo)`,
   },

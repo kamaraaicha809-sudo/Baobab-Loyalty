@@ -9,8 +9,8 @@ import {
 } from "@/components/landing/CountryLandingPage";
 
 export const metadata = getSEOTags({
-  title: "Fidélisation hôtelière en Côte d'Ivoire — Baobab Loyalty",
-  description: "Hôtels ivoiriens : 3× plus de réservations directes, −35% commissions OTA. Campagnes WhatsApp ciblées en FCFA, opérationnel en 10 min. Essai gratuit.",
+  title: "Logiciel fidélisation hôtel Côte d'Ivoire — Baobab Loyalty",
+  description: "Logiciel fidélisation hôtel Côte d'Ivoire : 3× plus de réservations directes, −35% commissions OTA. Campagnes WhatsApp IA en FCFA, opérationnel en 10 min. Essai gratuit.",
   canonicalUrlRelative: "/cote-divoire",
 });
 
@@ -47,12 +47,82 @@ const localBusinessSchema = {
   ],
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Qu'est-ce qu'un logiciel de fidélisation hôtel ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Un logiciel de fidélisation hôtel automatise la relance de vos anciens clients via WhatsApp. Il identifie automatiquement les clients inactifs depuis 3, 6 ou 9 mois, génère des messages personnalisés avec l'IA, et vous permet de lancer une campagne ciblée en moins de 10 minutes — sans compétence technique.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Combien coûte un logiciel de fidélisation hôtel en Côte d'Ivoire ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Baobab Loyalty propose des formules adaptées aux hôtels ivoiriens à partir de 29 000 FCFA/mois pour les établissements jusqu'à 30 chambres. Le plan Croissance (49 000 FCFA/mois) convient aux hôtels jusqu'à 100 chambres. Le plan Premium (69 000 FCFA/mois) est illimité. Pas d'engagement, résiliable à tout moment.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Comment réduire les commissions Booking.com pour un hôtel en Côte d'Ivoire ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "La méthode la plus efficace est de reconnecter directement avec vos anciens clients via WhatsApp, sans passer par les OTAs. Avec Baobab Loyalty, les hôtels ivoiriens observent une réduction de 35% de leur dépendance aux OTAs après 3 mois : chaque réservation directe vous fait économiser 15 à 20% de commission Booking.com.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "En combien de temps peut-on lancer une première campagne WhatsApp ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Avec Baobab Loyalty, vous pouvez lancer votre première campagne WhatsApp en moins de 10 minutes : importez votre fichier CSV clients, choisissez un segment (clients inactifs depuis 3, 6 ou 9 mois), laissez l'IA rédiger le message, et envoyez. Aucune compétence technique requise.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Baobab Loyalty est-il adapté aux petits hôtels en Côte d'Ivoire ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui. Baobab Loyalty est conçu spécifiquement pour les hôtels d'Afrique francophone, quelle que soit leur taille. Le plan Essentiel à 29 000 FCFA/mois est rentabilisé dès 2 à 3 réservations directes supplémentaires par mois. L'interface est en français, les prix sont en FCFA, et le support est francophone.",
+      },
+    },
+  ],
+};
+
+const faqItems = [
+  {
+    q: "Qu'est-ce qu'un logiciel de fidélisation hôtel ?",
+    a: "Un logiciel de fidélisation hôtel automatise la relance de vos anciens clients via WhatsApp. Il identifie les clients inactifs depuis 3, 6 ou 9 mois, génère des messages personnalisés avec l'IA, et vous permet de lancer une campagne ciblée en moins de 10 minutes.",
+  },
+  {
+    q: "Combien coûte un logiciel de fidélisation hôtel en Côte d'Ivoire ?",
+    a: "Baobab Loyalty propose des formules en FCFA à partir de 29 000 FCFA/mois pour les hôtels jusqu'à 30 chambres. Le plan Croissance (49 000 FCFA/mois) couvre jusqu'à 100 chambres, et le plan Premium (69 000 FCFA/mois) est illimité. Sans engagement.",
+  },
+  {
+    q: "Comment réduire les commissions Booking.com pour mon hôtel en Côte d'Ivoire ?",
+    a: "En relançant directement vos anciens clients via WhatsApp, vous les faites réserver sans passer par les OTAs. Les hôtels ivoiriens utilisant Baobab Loyalty observent −35% de dépendance aux OTAs en 3 mois, économisant 15 à 20% de commission sur chaque réservation directe.",
+  },
+  {
+    q: "En combien de temps peut-on lancer une campagne WhatsApp ?",
+    a: "Moins de 10 minutes : importez votre CSV clients, sélectionnez un segment d'inactifs, laissez l'IA rédiger le message, envoyez. Aucune compétence technique requise. Vos clients reçoivent l'offre directement sur WhatsApp.",
+  },
+  {
+    q: "Baobab Loyalty fonctionne-t-il pour les petits hôtels ivoiriens ?",
+    a: "Oui. Le logiciel est conçu pour les hôtels africains dès 20 chambres. Interface en français, prix en FCFA, support francophone. Le plan Essentiel est rentabilisé dès 2-3 réservations directes supplémentaires par mois.",
+  },
+];
+
 const data: CountryPageData = {
   locale: "fr",
   country: "Côte d'Ivoire",
   countryCode: "CI",
-  heroEyebrow: "Fidélisation hôtelière · Côte d'Ivoire",
-  heroTitle: "Fidélisez vos clients hôtel en",
+  heroEyebrow: "Logiciel fidélisation hôtel · Côte d'Ivoire",
+  heroTitle: "Logiciel de fidélisation hôtel en",
   heroTitleHighlight: "Côte d'Ivoire",
   heroSubtitle:
     "Abidjan concentre les plus grands hôtels d'affaires d'Afrique de l'Ouest. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans commission.",
@@ -177,10 +247,29 @@ export default function CoteDIvoirePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <Suspense>
         <Header />
       </Suspense>
       <CountryLandingPage data={data} />
+      <section className="py-16 sm:py-20 bg-[#FDFDF9]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-10 text-center">
+            Questions fréquentes
+          </h2>
+          <div className="space-y-6">
+            {faqItems.map((item, i) => (
+              <div key={i} className="border-b border-slate-100 pb-6 last:border-0">
+                <h3 className="font-bold text-[#2C2C2C] mb-2 text-base">{item.q}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <Footer />
     </>
   );
