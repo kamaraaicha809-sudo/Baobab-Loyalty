@@ -47,6 +47,10 @@ const Footer = () => {
           <Link href="/comment-ca-marche" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Comment ça marche
           </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/blog" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            Blog
+          </Link>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 mt-3">
           <Link href="/legal/mentions-legales" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">

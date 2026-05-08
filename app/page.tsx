@@ -7,6 +7,7 @@ import Solution from "@/components/landing/Solution";
 import Features from "@/components/landing/Features";
 import Testimonials from "@/components/landing/Testimonials";
 import Footer from "@/components/landing/Footer";
+import { NewsletterBanner } from "@/components/newsletter/NewsletterBanner";
 import { getSEOTags, renderSchemaTags, renderOrganizationSchema, renderFAQSchema } from "@/libs/seo";
 
 export const metadata = getSEOTags({
@@ -72,6 +73,7 @@ export default function Home() {
         <FAQ />
         <CTA />
       </main>
+      <NewsletterBanner />
       <Footer />
     </>
   );
