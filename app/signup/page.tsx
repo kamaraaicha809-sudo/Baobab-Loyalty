@@ -105,6 +105,7 @@ function SignUpContent() {
       if (data.session) {
         // mailer_autoconfirm activé : l'utilisateur est directement connecté
         toast.success("Compte créé avec succès !");
+        import("@/src/sdk").then(({ email }) => email.sendWelcomeEmail()).catch(() => {});
         window.location.href = config.auth.callbackUrl;
       } else {
         // Vérification email requise

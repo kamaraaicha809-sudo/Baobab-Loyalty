@@ -14,6 +14,10 @@ export interface UserProfile {
   customer_id: string | null;
   price_id: string | null;
   role?: string;
+  hotel_name?: string | null;
+  config_complete?: boolean;
+  onboarding_completed?: boolean;
+  onboarding_step?: number;
   created_at?: string;
   updated_at?: string;
 }

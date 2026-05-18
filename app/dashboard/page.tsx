@@ -7,6 +7,7 @@ import { user, billing } from "@/src/sdk";
 import { reservations } from "@/src/sdk/reservations";
 import config from "@/config";
 import { isDemoMode, demoUser, demoChartData, demoFlux, demoCampagnesSummary, demoMetrics } from "@/src/lib/demo";
+import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 
 const maxChartFromData = (data: { directes: number; autres: number }[]) =>
   Math.max(1, ...data.flatMap((d) => d.directes + d.autres));
@@ -144,6 +145,11 @@ export default function Dashboard() {
           Lancer une relance
         </Link>
       </header>
+
+      {/* Checklist d'onboarding — disparaît une fois les 3 étapes complétées */}
+      {!isDemoMode && profile?.id && (
+        <OnboardingChecklist profileId={profile.id} />
+      )}
 
       {/* Deux cartes métriques — M3: hiérarchie visuelle KPI principal en premier */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

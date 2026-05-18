@@ -30,6 +30,7 @@ export { prompts } from "./prompts";
 export { linkedin } from "./linkedin";
 export { newsletter } from "./newsletter";
 export { whatsapp } from "./whatsapp";
+export { email } from "./email";
 
 // Re-export types
 export type { CreateCheckoutParams, CreateCheckoutResponse, CreatePortalParams, CreatePortalResponse } from "./billing";

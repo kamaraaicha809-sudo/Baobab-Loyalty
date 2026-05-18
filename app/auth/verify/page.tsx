@@ -96,6 +96,8 @@ function VerifyContent() {
           const pendingPlan = sessionStorage.getItem("pending_checkout_plan");
           sessionStorage.removeItem("pending_checkout_plan");
           toast.success("Email vérifié avec succès !");
+          // Non-blocking — we do not await to avoid delaying navigation
+          import("@/src/sdk").then(({ email }) => email.sendWelcomeEmail()).catch(() => {});
           if (signupRef === "beta") {
             router.push("/");
           } else {
