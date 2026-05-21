@@ -47,6 +47,8 @@ interface ProfileForm {
   email_responsable: string;
   latitude: string;
   longitude: string;
+  reception_whatsapp: string;
+  reception_email: string;
 }
 
 interface WhatsAppStatus {
@@ -65,6 +67,8 @@ const emptyForm: ProfileForm = {
   email_responsable: "",
   latitude: "",
   longitude: "",
+  reception_whatsapp: "",
+  reception_email: "",
 };
 
 export default function ConfigurationPage() {
@@ -105,7 +109,7 @@ export default function ConfigurationPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, whatsapp_phone_number_id, whatsapp_access_token, bsp_status, bsp_phone_number")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, whatsapp_phone_number_id, whatsapp_access_token, bsp_status, bsp_phone_number")
       .eq("id", user.id)
       .single();
 
@@ -121,6 +125,8 @@ export default function ConfigurationPage() {
         email_responsable: profile.email_responsable || "",
         latitude: profile.latitude?.toString() || "",
         longitude: profile.longitude?.toString() || "",
+        reception_whatsapp: (profile as Record<string, unknown>).reception_whatsapp as string || "",
+        reception_email: (profile as Record<string, unknown>).reception_email as string || "",
       });
       setConfigComplete(profile.config_complete ?? false);
       const p = profile as Record<string, unknown>;
@@ -213,6 +219,8 @@ export default function ConfigurationPage() {
           email_responsable: form.email_responsable.trim() || null,
           latitude: form.latitude ? parseFloat(form.latitude) : null,
           longitude: form.longitude ? parseFloat(form.longitude) : null,
+          reception_whatsapp: form.reception_whatsapp.trim() || null,
+          reception_email: form.reception_email.trim() || null,
           config_complete: true,
           updated_at: new Date().toISOString(),
         })
@@ -448,6 +456,42 @@ export default function ConfigurationPage() {
                     </>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Anti-surréservation — Réception</p>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm text-amber-800">
+                Quand un client réserve depuis un lien WhatsApp, la réception est notifiée ici pour vérifier la disponibilité avant de confirmer.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="reception_email" className={labelClass}>Email de la réception</label>
+                <input
+                  id="reception_email"
+                  type="email"
+                  value={form.reception_email}
+                  onChange={set("reception_email")}
+                  placeholder="reception@monhotel.com"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="reception_whatsapp" className={labelClass}>WhatsApp de la réception</label>
+                <input
+                  id="reception_whatsapp"
+                  type="tel"
+                  value={form.reception_whatsapp}
+                  onChange={set("reception_whatsapp")}
+                  placeholder="+225 07 00 00 00 00"
+                  className={inputClass}
+                />
               </div>
             </div>
           </div>
