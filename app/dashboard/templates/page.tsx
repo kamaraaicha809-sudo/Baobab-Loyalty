@@ -157,6 +157,7 @@ function OffresTab({
   const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [discountPct, setDiscountPct] = useState(50);
+  const [eligibleDays, setEligibleDays] = useState<"lun-jeu" | "7jours">("7jours");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selected = TEMPLATES.find((t) => t.id === selectedId);
@@ -193,6 +194,7 @@ function OffresTab({
         avantage: string;
         message: string | null;
         feteName: string;
+        eligibleDays?: "lun-jeu" | "7jours";
       };
       if (!draft.templateId) return;
       const template = TEMPLATES.find((t) => t.id === draft.templateId);
@@ -204,6 +206,7 @@ function OffresTab({
         const fete = (template.fetes as Fete[]).find((f) => f.name === draft.feteName) ?? null;
         setSelectedFete(fete);
       }
+      if (draft.eligibleDays) setEligibleDays(draft.eligibleDays);
     } catch {
       // ignore malformed draft
     }
@@ -296,6 +299,7 @@ function OffresTab({
       message: selected.id === "vide" ? avantage.trim() : (generatedMessage ?? null),
       feteName: selectedFete?.name ?? "",
       discountPct: selected.id === "sondage" ? discountPct : undefined,
+      eligibleDays,
     }));
 
     if (attachedFile && attachedFile.type.startsWith("image/")) {
@@ -316,6 +320,7 @@ function OffresTab({
       params.set("template", selected!.id);
       params.set("avantage", avantage.trim());
       if (selectedFete) params.set("fete", selectedFete.name);
+      params.set("eligibleDays", eligibleDays);
       if (selected!.id === "sondage") {
         params.set("discountPct", String(discountPct));
         if (generatedMessage) params.set("message", generatedMessage);
@@ -459,6 +464,37 @@ function OffresTab({
                     </div>
                   )}
 
+                  {/* Jours éligibles */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                      Jours éligibles pour la promo
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEligibleDays("lun-jeu")}
+                        className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          eligibleDays === "lun-jeu"
+                            ? "bg-slate-900 text-white border-slate-900"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        Lundi → Jeudi
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEligibleDays("7jours")}
+                        className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          eligibleDays === "7jours"
+                            ? "bg-slate-900 text-white border-slate-900"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        7 jours
+                      </button>
+                    </div>
+                  </div>
+
                   <button
                     onClick={handleValiderEnvoyer}
                     className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
@@ -564,16 +600,49 @@ function OffresTab({
               )}
 
               {selected.id !== "sondage" && (
-                <button
-                  onClick={handleValiderEnvoyer}
-                  disabled={!avantage.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Valider et envoyer
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </button>
+                <>
+                  {/* Jours éligibles */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                      Jours éligibles pour la promo
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEligibleDays("lun-jeu")}
+                        className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          eligibleDays === "lun-jeu"
+                            ? "bg-slate-900 text-white border-slate-900"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        Lundi → Jeudi
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEligibleDays("7jours")}
+                        className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          eligibleDays === "7jours"
+                            ? "bg-slate-900 text-white border-slate-900"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        7 jours
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleValiderEnvoyer}
+                    disabled={!avantage.trim()}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Valider et envoyer
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
+                </>
               )}
             </div>
           ) : (
