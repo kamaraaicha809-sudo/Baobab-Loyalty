@@ -17,10 +17,11 @@ import {
 import type { MessageTemplate } from "@/src/sdk/linkedin";
 
 const SEGMENT_NAMES: Record<string, string> = {
-  "3mois": "Clients - 3 mois",
-  "6mois": "Clients - 6 mois",
-  "9mois": "Clients - 9 mois",
-  tous: "Tous les clients",
+  "3-6mois":  "Clients 3 à 6 mois",
+  "6-9mois":  "Clients 6 à 9 mois",
+  "9-12mois": "Clients 9 à 12 mois",
+  "1an+":     "Plus d'un an",
+  tous:       "Tous les clients",
 };
 
 const TEMPLATES = [
@@ -249,14 +250,16 @@ function OffresTab({
         await new Promise((r) => setTimeout(r, 1300));
         const hotel = hotelName || "notre hôtel";
         const demoMessages: Record<string, string> = selected.id === "sondage" ? {
-          "3mois": `Bonjour {{nom}}, cela fait quelques mois et votre avis nous est précieux !\n\nPartagez votre expérience à ${hotel} en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour.\n\nMerci pour votre fidélité !`,
-          "6mois": `{{nom}}, vous nous manquez ! Pour votre retour à ${hotel}, nous avons une offre spéciale :\n\nComplétez notre questionnaire de satisfaction et obtenez ${discountPct}% de réduction sur votre prochaine chambre.\n\nOffre valable 30 jours.`,
-          "9mois": `Cher {{nom}}, cela fait longtemps et nous aimerions avoir votre avis !\n\nRépondez à quelques questions sur votre dernier séjour à ${hotel} et bénéficiez de ${discountPct}% de réduction pour votre retour.`,
+          "3-6mois":  `Bonjour {{nom}}, cela fait quelques mois et votre avis nous est précieux !\n\nPartagez votre expérience à ${hotel} en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour.\n\nMerci pour votre fidélité !`,
+          "6-9mois":  `{{nom}}, vous nous manquez ! Pour votre retour à ${hotel}, nous avons une offre spéciale :\n\nComplétez notre questionnaire de satisfaction et obtenez ${discountPct}% de réduction sur votre prochaine chambre.\n\nOffre valable 30 jours.`,
+          "9-12mois": `Cher {{nom}}, cela fait longtemps et nous aimerions avoir votre avis !\n\nRépondez à quelques questions sur votre dernier séjour à ${hotel} et bénéficiez de ${discountPct}% de réduction pour votre retour.`,
+          "1an+":     `Cher {{nom}}, plus d'un an sans vous voir — nous pensons à vous !\n\nPartagez votre ressenti sur votre dernier séjour à ${hotel} et recevez ${discountPct}% de réduction pour votre retour tant attendu.`,
           "tous": `Bonjour {{nom}}, l'équipe de ${hotel} tient à votre satisfaction !\n\nPartagez votre avis en 2 minutes et recevez ${discountPct}% de réduction sur votre prochain séjour en remerciement.`,
         } : {
-          "3mois": `Bonjour {{nom}}, cela fait un moment que vous n'êtes pas venus nous voir ! Pour votre prochain séjour, nous vous réservons : ${avantage}. Réservez avant la fin du mois pour en profiter.`,
-          "6mois": `{{nom}}, vous nous manquez vraiment ! Pour fêter votre retour à ${hotelName || "l'hôtel"}, nous vous offrons : ${avantage}. Cette offre vous est réservée jusqu'à la fin du mois — profitez-en.`,
-          "9mois": `Cher {{nom}}, cela fait longtemps et on pense à vous ! Nous avons une surprise : ${avantage}, rien que pour vous. Répondez simplement OUI et on s'occupe du reste.`,
+          "3-6mois":  `Bonjour {{nom}}, cela fait un moment que vous n'êtes pas venus nous voir ! Pour votre prochain séjour, nous vous réservons : ${avantage}. Réservez avant la fin du mois pour en profiter.`,
+          "6-9mois":  `{{nom}}, vous nous manquez vraiment ! Pour fêter votre retour à ${hotelName || "l'hôtel"}, nous vous offrons : ${avantage}. Cette offre vous est réservée jusqu'à la fin du mois — profitez-en.`,
+          "9-12mois": `Cher {{nom}}, cela fait longtemps et on pense à vous ! Nous avons une surprise : ${avantage}, rien que pour vous. Répondez simplement OUI et on s'occupe du reste.`,
+          "1an+":     `Cher {{nom}}, plus d'un an sans vous — votre retour nous ferait vraiment plaisir ! Pour l'occasion, nous vous réservons : ${avantage}. Une façon de vous accueillir comme vous le méritez.`,
           "tous": `Bonjour {{nom}}, l'équipe de ${hotelName || "notre hôtel"} pense à vous ! Pour votre prochaine visite, profitez de : ${avantage}. Réservez dès maintenant.`,
         };
         setGeneratedMessage(demoMessages[segmentId] || demoMessages["tous"]);
@@ -267,7 +270,7 @@ function OffresTab({
           avantage: selected.id === "sondage"
             ? `${discountPct}% de réduction offerte après avoir cliqué sur le bouton de questionnaire inclus dans le message. IMPORTANT : ne jamais dire "répondez OUI" — le client doit cliquer sur un lien, pas répondre. Terminer le message par une invitation à cliquer sur le bouton ci-dessous.`
             : avantage.trim(),
-          segment: segmentId as "3mois" | "6mois" | "9mois" | "tous",
+          segment: segmentId as "3-6mois" | "6-9mois" | "9-12mois" | "1an+" | "tous",
           hotelName: hotelName || undefined,
         });
         setGeneratedMessage(result.content);

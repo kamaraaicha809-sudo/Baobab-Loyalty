@@ -61,10 +61,11 @@ export const demoClients = [
 // ============================================
 
 export const demoSegmentCounts = {
-  "3mois": 124,
-  "6mois": 89,
-  "9mois": 56,
-  tous: 450,
+  "3-6mois":  87,
+  "6-9mois":  64,
+  "9-12mois": 43,
+  "1an+":     38,
+  tous:       450,
 };
 
 // ============================================
@@ -95,10 +96,10 @@ export const demoRoomTypes = [
 // ============================================
 
 export const demoCampaigns = [
-  { id: "camp1", name: "Remise printemps", segment_code: "6mois", offer_id: "o1", status: "completed", recipient_count: 89, started_at: "2026-02-24T10:00:00Z", ended_at: "2026-02-24T10:05:00Z" },
+  { id: "camp1", name: "Remise printemps", segment_code: "6-9mois", offer_id: "o1", status: "completed", recipient_count: 64, started_at: "2026-02-24T10:00:00Z", ended_at: "2026-02-24T10:05:00Z" },
   { id: "camp2", name: "Cocktail Saint-Valentin", segment_code: "tous", offer_id: "o3", status: "completed", recipient_count: 450, started_at: "2026-02-14T09:00:00Z", ended_at: "2026-02-14T09:12:00Z" },
-  { id: "camp3", name: "Surclassement VIP", segment_code: "3mois", offer_id: "o2", status: "completed", recipient_count: 124, started_at: "2026-02-10T14:00:00Z", ended_at: "2026-02-10T14:03:00Z" },
-  { id: "camp4", name: "Offre Famille Pâques", segment_code: "9mois", offer_id: "o4", status: "sending", recipient_count: 56, started_at: "2026-03-12T08:00:00Z", ended_at: null },
+  { id: "camp3", name: "Surclassement VIP", segment_code: "3-6mois", offer_id: "o2", status: "completed", recipient_count: 87, started_at: "2026-02-10T14:00:00Z", ended_at: "2026-02-10T14:03:00Z" },
+  { id: "camp4", name: "Offre Famille Pâques", segment_code: "9-12mois", offer_id: "o4", status: "sending", recipient_count: 43, started_at: "2026-03-12T08:00:00Z", ended_at: null },
 ];
 
 // ============================================
@@ -175,10 +176,10 @@ export const demoFlux = [
 // ============================================
 
 export const demoCampagnesSummary = [
-  { date: "24 Fév 2026", segment: "Clients - 6 mois", offre: "Remise 20%", resultats: "8 résas", statut: "TERMINÉE" },
+  { date: "24 Fév 2026", segment: "Clients 6 à 9 mois", offre: "Remise 20%", resultats: "8 résas", statut: "TERMINÉE" },
   { date: "18 Fév 2026", segment: "Tous les clients", offre: "Cocktail offert", resultats: "14 résas", statut: "TERMINÉE" },
-  { date: "10 Fév 2026", segment: "Clients - 3 mois", offre: "Surclassement", resultats: "5 résas", statut: "TERMINÉE" },
-  { date: "12 Mar 2026", segment: "Clients - 9 mois", offre: "Offre Famille", resultats: "En cours", statut: "EN COURS" },
+  { date: "10 Fév 2026", segment: "Clients 3 à 6 mois", offre: "Surclassement", resultats: "5 résas", statut: "TERMINÉE" },
+  { date: "12 Mar 2026", segment: "Clients 9 à 12 mois", offre: "Offre Famille", resultats: "En cours", statut: "EN COURS" },
 ];
 
 // ============================================

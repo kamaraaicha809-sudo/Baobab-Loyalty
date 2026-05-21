@@ -11,10 +11,11 @@ import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
 
 const SEGMENT_LABELS: Record<string, string> = {
-  "3mois": "Clients - 3 mois",
-  "6mois": "Clients - 6 mois",
-  "9mois": "Clients - 9 mois",
-  tous: "Tous les clients",
+  "3-6mois":  "Clients 3 à 6 mois",
+  "6-9mois":  "Clients 6 à 9 mois",
+  "9-12mois": "Clients 9 à 12 mois",
+  "1an+":     "Plus d'un an",
+  tous:       "Tous les clients",
 };
 
 const ROOM_TYPE_LIST = [
@@ -79,7 +80,7 @@ export default function ConfigurationPage() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [importStatus, setImportStatus] = useState<string>("");
-  const [counts, setCounts] = useState<Record<string, number>>({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
+  const [counts, setCounts] = useState<Record<string, number>>({ "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>({ connected: false });
 
@@ -156,7 +157,7 @@ export default function ConfigurationPage() {
       const seg = await clients.getSegmentCounts(user.id);
       setCounts(seg);
     } catch {
-      setCounts({ "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 });
+      setCounts({ "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 });
     }
 
     setLoading(false);
@@ -270,7 +271,7 @@ export default function ConfigurationPage() {
     if (!csvFile || !profileId) return;
     if (isDemoMode) {
       toast.success("Import simulé en mode démo");
-      setCounts((c) => ({ ...c, tous: c.tous + 50, "3mois": c["3mois"] + 20, "6mois": c["6mois"] + 15, "9mois": c["9mois"] + 15 }));
+      setCounts((c) => ({ ...c, tous: c.tous + 50, "3-6mois": c["3-6mois"] + 20, "6-9mois": c["6-9mois"] + 15, "9-12mois": c["9-12mois"] + 10, "1an+": c["1an+"] + 5 }));
       setCsvFile(null);
       return;
     }
@@ -637,8 +638,8 @@ export default function ConfigurationPage() {
 
         <div className="mt-4 pt-6 border-t border-slate-200">
           <p className="text-sm font-medium text-slate-700 mb-3">Répartition par segment</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {(["3mois", "6mois", "9mois", "tous"] as const).map((id) => (
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            {(["3-6mois", "6-9mois", "9-12mois", "1an+", "tous"] as const).map((id) => (
               <div key={id} className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <p className="text-2xl font-bold text-slate-900">{counts[id] ?? 0}</p>
                 <p className="text-xs text-slate-500">{SEGMENT_LABELS[id]}</p>

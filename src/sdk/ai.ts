@@ -27,7 +27,7 @@ export interface GenerateResponse {
 export interface GenerateCampaignMessageParams {
   typeOffre: string;
   avantage: string;
-  segment: "3mois" | "6mois" | "9mois" | "tous";
+  segment: "3-6mois" | "6-9mois" | "9-12mois" | "1an+" | "tous";
   hotelName?: string;
 }
 
@@ -39,10 +39,11 @@ export interface GenerateLinkedInPostParams {
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
-  "3mois": "clients absents depuis 3 mois",
-  "6mois": "clients absents depuis 6 mois",
-  "9mois": "clients absents depuis 9 mois",
-  "tous": "tous les clients",
+  "3-6mois":  "clients absents depuis 3 à 6 mois",
+  "6-9mois":  "clients absents depuis 6 à 9 mois",
+  "9-12mois": "clients absents depuis 9 à 12 mois",
+  "1an+":     "clients absents depuis plus d'un an",
+  "tous":     "tous les clients",
 };
 
 const LINKEDIN_SYSTEM_PROMPT = `Tu es un expert en contenu LinkedIn pour directeurs d'hotels en Afrique francophone.

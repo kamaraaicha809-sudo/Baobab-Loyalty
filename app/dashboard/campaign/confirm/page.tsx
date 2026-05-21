@@ -8,10 +8,11 @@ import { clients } from "@/src/sdk/clients";
 import { createClient } from "@/libs/supabase/client";
 
 const SEGMENT_NAMES: Record<string, string> = {
-  "3mois": "Clients - 3 mois",
-  "6mois": "Clients - 6 mois",
-  "9mois": "Clients - 9 mois",
-  tous: "Tous les clients",
+  "3-6mois":  "Clients 3 à 6 mois",
+  "6-9mois":  "Clients 6 à 9 mois",
+  "9-12mois": "Clients 9 à 12 mois",
+  "1an+":     "Plus d'un an",
+  tous:       "Tous les clients",
 };
 
 const TEMPLATE_NAMES: Record<string, string> = {

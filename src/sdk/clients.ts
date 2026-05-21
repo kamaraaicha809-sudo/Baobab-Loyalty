@@ -1,5 +1,5 @@
 /**
- * Base clients — import, segmentation 3/6/9 mois, tous
+ * Base clients — import, segmentation par tranches, tous
  */
 
 import { createClient } from "@/libs/supabase/client";
@@ -18,9 +18,10 @@ export interface Client {
 }
 
 export interface SegmentCounts extends Record<string, number> {
-  "3mois": number;
-  "6mois": number;
-  "9mois": number;
+  "3-6mois": number;
+  "6-9mois": number;
+  "9-12mois": number;
+  "1an+": number;
   tous: number;
 }
 
@@ -35,7 +36,7 @@ export async function getSegmentCounts(profileId: string): Promise<SegmentCounts
     p_profile_id: profileId,
   });
   if (rpcError) throw rpcError;
-  return (data ?? { "3mois": 0, "6mois": 0, "9mois": 0, tous: 0 }) as SegmentCounts;
+  return (data ?? { "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 }) as SegmentCounts;
 }
 
 /**

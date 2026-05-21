@@ -13,30 +13,47 @@ interface SegmentDef {
   name: string;
   description: string;
   months: number | null;
+  minDays?: number;
+  maxDays?: number | null;
   icon: "clock" | "users";
   isCustom?: boolean;
 }
 
 const DEFAULT_SEGMENTS: SegmentDef[] = [
   {
-    id: "3mois",
-    name: "Clients - 3 mois",
-    description: "Clients n'ayant pas séjourné depuis 3 mois",
-    months: 3,
+    id: "3-6mois",
+    name: "Clients 3 à 6 mois",
+    description: "Clients inactifs depuis 3 à moins de 6 mois",
+    months: null,
+    minDays: 90,
+    maxDays: 179,
     icon: "clock",
   },
   {
-    id: "6mois",
-    name: "Clients - 6 mois",
-    description: "Clients n'ayant pas séjourné depuis 6 mois",
-    months: 6,
+    id: "6-9mois",
+    name: "Clients 6 à 9 mois",
+    description: "Clients inactifs depuis 6 à moins de 9 mois",
+    months: null,
+    minDays: 180,
+    maxDays: 269,
     icon: "clock",
   },
   {
-    id: "9mois",
-    name: "Clients - 9 mois",
-    description: "Clients n'ayant pas séjourné depuis 9 mois",
-    months: 9,
+    id: "9-12mois",
+    name: "Clients 9 à 12 mois",
+    description: "Clients inactifs depuis 9 à moins de 12 mois",
+    months: null,
+    minDays: 270,
+    maxDays: 364,
+    icon: "clock",
+  },
+  {
+    id: "1an+",
+    name: "Plus d'un an",
+    description: "Clients inactifs depuis plus d'un an",
+    months: null,
+    minDays: 365,
+    maxDays: null,
     icon: "clock",
   },
   {
@@ -49,24 +66,68 @@ const DEFAULT_SEGMENTS: SegmentDef[] = [
 ];
 
 function filterBySegment(allClients: Client[], segment: SegmentDef): Client[] {
+  if (segment.id === "tous") return allClients;
+
+  const now = Date.now();
+
+  if (segment.minDays !== undefined) {
+    return allClients.filter((c) => {
+      const days = (now - new Date(c.derniere_visite).getTime()) / (1000 * 60 * 60 * 24);
+      if (days < segment.minDays!) return false;
+      if (segment.maxDays != null && days > segment.maxDays) return false;
+      return true;
+    });
+  }
+
+  // Segments personnalisés : seuil minimum en mois
   if (segment.months === null) return allClients;
   const cutoff = segment.months * 30 * 24 * 60 * 60 * 1000;
-  const now = Date.now();
   return allClients.filter((c) => now - new Date(c.derniere_visite).getTime() >= cutoff);
 }
 
-const DEMO_CLIENTS: Client[] = Array.from({ length: 19 }, (_, i) => ({
-  id: `demo-${i}`,
-  profile_id: "demo-user-id",
-  nom: `Client Demo ${i + 1}`,
-  email: `client${i + 1}@hotel.com`,
-  telephone: `+221 7${i}0 000 000`,
-  whatsapp: null,
-  derniere_visite: new Date(Date.now() - (i * 45 + 30) * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0],
-  notes: null,
-}));
+// Clients répartis sur les 5 tranches (3-6, 6-9, 9-12 mois, 1an+, récents)
+const DEMO_CLIENTS: Client[] = [
+  ...Array.from({ length: 5 }, (_, i) => ({
+    id: `demo-a${i}`,
+    profile_id: "demo-user-id",
+    nom: `Client 3-6 mois ${i + 1}`,
+    email: `c3_${i + 1}@hotel.com`,
+    telephone: null,
+    whatsapp: null,
+    derniere_visite: new Date(Date.now() - (100 + i * 10) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    notes: null,
+  })),
+  ...Array.from({ length: 4 }, (_, i) => ({
+    id: `demo-b${i}`,
+    profile_id: "demo-user-id",
+    nom: `Client 6-9 mois ${i + 1}`,
+    email: `c6_${i + 1}@hotel.com`,
+    telephone: null,
+    whatsapp: null,
+    derniere_visite: new Date(Date.now() - (190 + i * 15) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    notes: null,
+  })),
+  ...Array.from({ length: 3 }, (_, i) => ({
+    id: `demo-c${i}`,
+    profile_id: "demo-user-id",
+    nom: `Client 9-12 mois ${i + 1}`,
+    email: `c9_${i + 1}@hotel.com`,
+    telephone: null,
+    whatsapp: null,
+    derniere_visite: new Date(Date.now() - (280 + i * 20) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    notes: null,
+  })),
+  ...Array.from({ length: 3 }, (_, i) => ({
+    id: `demo-d${i}`,
+    profile_id: "demo-user-id",
+    nom: `Client +1 an ${i + 1}`,
+    email: `c12_${i + 1}@hotel.com`,
+    telephone: null,
+    whatsapp: null,
+    derniere_visite: new Date(Date.now() - (400 + i * 30) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    notes: null,
+  })),
+];
 
 export default function SegmentsPage() {
   const [counts, setCounts] = useState<Record<string, number>>(demoSegmentCounts);

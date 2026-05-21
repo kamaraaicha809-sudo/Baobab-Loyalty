@@ -7,37 +7,46 @@ import Link from "next/link";
 
 const SEGMENTS = [
   {
-    id: "3mois",
-    label: "Clients - 3 mois",
-    count: 124,
-    description: "Inactifs depuis 3 mois",
+    id: "3-6mois",
+    label: "Clients 3 à 6 mois",
+    count: 87,
+    description: "Inactifs depuis 3 à moins de 6 mois",
     badge: "Relance facile",
     badgeColor: "bg-amber-100 text-amber-700",
     ringColor: "ring-amber-400",
   },
   {
-    id: "6mois",
-    label: "Clients - 6 mois",
-    count: 89,
-    description: "Inactifs depuis 6 mois",
+    id: "6-9mois",
+    label: "Clients 6 à 9 mois",
+    count: 64,
+    description: "Inactifs depuis 6 à moins de 9 mois",
     badge: "Prioritaire",
     badgeColor: "bg-orange-100 text-orange-700",
     ringColor: "ring-orange-400",
   },
   {
-    id: "9mois",
-    label: "Clients - 9 mois",
-    count: 56,
-    description: "Inactifs depuis 9 mois",
+    id: "9-12mois",
+    label: "Clients 9 à 12 mois",
+    count: 43,
+    description: "Inactifs depuis 9 à moins de 12 mois",
     badge: "Urgent",
     badgeColor: "bg-red-100 text-red-700",
     ringColor: "ring-red-400",
   },
   {
+    id: "1an+",
+    label: "Plus d'un an",
+    count: 38,
+    description: "Inactifs depuis plus d'un an",
+    badge: "Reconquête",
+    badgeColor: "bg-purple-100 text-purple-700",
+    ringColor: "ring-purple-400",
+  },
+  {
     id: "tous",
     label: "Tous les clients",
-    count: 269,
-    description: "Base complète",
+    count: 232,
+    description: "Base complète — événements spéciaux",
     badge: "Grande portée",
     badgeColor: "bg-green-100 text-green-700",
     ringColor: "ring-green-400",
@@ -92,12 +101,14 @@ const TEMPLATES = [
 ];
 
 const DEMO_MESSAGE: Record<string, (avantage: string) => string> = {
-  "3mois": (a) =>
+  "3-6mois": (a) =>
     `Bonjour {{nom}}, cela fait un moment que vous n'êtes pas venus nous voir à l'Hôtel Le Baobab ! Pour votre prochain séjour, nous avons une surprise : ${a}. Réservez avant la fin du mois pour en profiter.`,
-  "6mois": (a) =>
+  "6-9mois": (a) =>
     `{{nom}}, vous nous manquez vraiment ! Pour fêter votre retour à l'Hôtel Le Baobab, nous vous offrons ${a}. Cette offre exclusive vous est réservée jusqu'à la fin du mois — profitez-en.`,
-  "9mois": (a) =>
+  "9-12mois": (a) =>
     `Cher {{nom}}, cela fait bien longtemps et nous pensons souvent à vous ! Pour votre retour tant attendu, nous avons une surprise : ${a}, rien que pour vous. Répondez simplement OUI et nous nous occupons du reste.`,
+  "1an+": (a) =>
+    `{{nom}}, une année s'est écoulée et nous n'avons pas oublié votre fidélité ! Pour marquer vos retrouvailles avec l'Hôtel Le Baobab, nous avons préparé quelque chose de spécial : ${a}. Revenez, vous serez accueillis comme des VIP.`,
   "tous": (a) =>
     `Bonjour {{nom}}, l'équipe de l'Hôtel Le Baobab pense à vous ! Pour votre prochaine visite, profitez de ${a}. Réservez dès maintenant, nous serons ravis de vous accueillir.`,
 };

@@ -49,11 +49,12 @@ function clientMatchesSegment(client: Client, segmentCode: string, customMonths?
   const daysDiff = (now - last) / (1000 * 60 * 60 * 24);
 
   if (segmentCode === "tous") return true;
-  if (segmentCode === "3mois") return daysDiff >= 90;
-  if (segmentCode === "6mois") return daysDiff >= 180;
-  if (segmentCode === "9mois") return daysDiff >= 270;
+  if (segmentCode === "3-6mois")  return daysDiff >= 90  && daysDiff < 180;
+  if (segmentCode === "6-9mois")  return daysDiff >= 180 && daysDiff < 270;
+  if (segmentCode === "9-12mois") return daysDiff >= 270 && daysDiff < 365;
+  if (segmentCode === "1an+")     return daysDiff >= 365;
 
-  // Custom segment
+  // Segment personnalisé
   if (segmentCode.startsWith("custom-") && customMonths) {
     return daysDiff >= customMonths * 30;
   }
@@ -224,7 +225,7 @@ Deno.serve(async (req) => {
     const targets = clients.filter((c) => clientMatchesSegment(c, segmentCode, customMonths));
 
     // Create campaign record (map custom segments to "tous")
-    const dbSegmentCode = ["3mois", "6mois", "9mois", "tous"].includes(segmentCode)
+    const dbSegmentCode = ["3-6mois", "6-9mois", "9-12mois", "1an+", "tous"].includes(segmentCode)
       ? segmentCode
       : "tous";
 
