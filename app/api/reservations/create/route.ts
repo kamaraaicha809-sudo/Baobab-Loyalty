@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("id, hotel_name, reception_email, reception_whatsapp")
+      .select("id, hotel_name, reception_email, reception_whatsapp, bsp_api_key, bsp_status")
       .eq("id", profile_id)
       .single();
 
@@ -166,6 +166,46 @@ ACTION REQUISE : Appelez le client pour confirmer la disponibilité et valider l
         }
       } catch {
         // Email non bloquant
+      }
+    }
+
+    const p = profile as Record<string, unknown>;
+    if (
+      profile.reception_whatsapp &&
+      p.bsp_api_key &&
+      p.bsp_status === "active"
+    ) {
+      try {
+        const waTo = (profile.reception_whatsapp as string).startsWith("+")
+          ? (profile.reception_whatsapp as string).slice(1)
+          : profile.reception_whatsapp;
+
+        const waText =
+          `*Nouvelle réservation — ${hotelLabel}*\n\n` +
+          `Client : ${clientLabel}\n` +
+          `Téléphone : ${client_phone || "Non renseigné"}\n` +
+          `Offre : ${offerLabel}\n\n` +
+          `Arrivée : ${checkinFormatted}\n` +
+          `Départ : ${checkoutFormatted}\n` +
+          `Durée : ${nightCount} nuit${nightCount > 1 ? "s" : ""}\n\n` +
+          `ACTION : Appelez le client pour confirmer la disponibilité.`;
+
+        await fetch("https://waba-v2.360dialog.io/messages", {
+          method: "POST",
+          headers: {
+            "D360-API-KEY": p.bsp_api_key as string,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: waTo,
+            type: "text",
+            text: { body: waText },
+          }),
+        });
+      } catch {
+        // WhatsApp non bloquant
       }
     }
 
