@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
         hotel_name: "Hôtel Demo",
         config_complete: true,
         customer_id: null,
-        price_id: null,
+        price_id: "premium",
       });
     }
 

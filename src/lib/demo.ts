@@ -26,7 +26,7 @@ export const demoProfile = {
   email: "directeur@hotel-baobab.sn",
   full_name: "Amadou Diallo",
   customer_id: null,
-  price_id: null,
+  price_id: "premium",
   has_access: true,
   role: "admin",
   hotel_name: "Hôtel Le Baobab",

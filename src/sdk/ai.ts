@@ -130,6 +130,7 @@ export async function generateLinkedInPost(
     body: {
       prompt: promptParts.join("\n"),
       system: LINKEDIN_SYSTEM_PROMPT,
+      promptName: "linkedin_post",
       model: "openai/gpt-4o",
       maxTokens: 800,
     },

@@ -58,23 +58,6 @@ Deno.serve(async (req) => {
   try {
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
 
-    if (!isDemoMode) {
-      const { user, userClient, error: authError } = await requireAuth(req);
-      if (authError || !user || !userClient) {
-        return errors.unauthorized(authError || "Authentication required");
-      }
-
-      const { data: profile } = await userClient
-        .from("profiles")
-        .select("has_access")
-        .eq("id", user.id)
-        .single();
-
-      if (!profile?.has_access) {
-        return errors.forbidden("Active subscription required");
-      }
-    }
-
     const body = await req.json();
     const {
       prompt,
@@ -87,6 +70,27 @@ Deno.serve(async (req) => {
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return errors.badRequest("Le prompt est requis.");
+    }
+
+    if (!isDemoMode) {
+      const { user, userClient, error: authError } = await requireAuth(req);
+      if (authError || !user || !userClient) {
+        return errors.unauthorized(authError || "Authentication required");
+      }
+
+      const { data: profile } = await userClient
+        .from("profiles")
+        .select("has_access, price_id")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile?.has_access) {
+        return errors.forbidden("Active subscription required");
+      }
+
+      if (promptName === "linkedin_post" && (profile.price_id || "").toLowerCase() !== "premium") {
+        return errors.forbidden("Fonctionnalité réservée au plan Premium.");
+      }
     }
 
     if (prompt.length > 4000) {

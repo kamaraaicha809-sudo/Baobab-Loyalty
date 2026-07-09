@@ -7,6 +7,7 @@ import { Icons } from "@/components/common/Icons";
 import toast from "react-hot-toast";
 import config from "@/config";
 import { linkedin, ai } from "@/src/sdk";
+import { usePremiumAccess } from "@/src/hooks/usePremiumAccess";
 import {
   demoGeneratedTemplate,
   demoLinkedinPost,
@@ -1255,7 +1256,16 @@ function TemplatesContent() {
   const initialAvantage = searchParams.get("avantage") || "";
   const initialMessage = searchParams.get("message");
   const initialFeteName = searchParams.get("fete") || "";
+  const isPremium = usePremiumAccess();
   const [activeTab, setActiveTab] = useState<"offres" | "linkedin" | "linkedin-post">("offres");
+
+  // Les onglets LinkedIn sont reserves au plan Premium — si le plan change
+  // ou n'est pas encore resolu, on retombe sur l'onglet Offres.
+  useEffect(() => {
+    if (!isPremium && (activeTab === "linkedin" || activeTab === "linkedin-post")) {
+      setActiveTab("offres");
+    }
+  }, [isPremium, activeTab]);
 
   return (
     <div className="space-y-6">
@@ -1285,9 +1295,13 @@ function TemplatesContent() {
           Templates de messages
         </h1>
         <p className="text-slate-600 text-base">
-          {segmentId
-            ? `Vous ciblez « ${segmentName} ». Choisissez un template ou générez-en un depuis LinkedIn.`
-            : "Choisissez un template prêt à l'emploi ou générez-en un depuis un post LinkedIn."}
+          {isPremium
+            ? segmentId
+              ? `Vous ciblez « ${segmentName} ». Choisissez un template ou générez-en un depuis LinkedIn.`
+              : "Choisissez un template prêt à l'emploi ou générez-en un depuis un post LinkedIn."
+            : segmentId
+              ? `Vous ciblez « ${segmentName} ». Choisissez un template prêt à l'emploi.`
+              : "Choisissez un template prêt à l'emploi."}
         </p>
       </header>
 
@@ -1303,32 +1317,36 @@ function TemplatesContent() {
         >
           Offres standards
         </button>
-        <button
-          onClick={() => setActiveTab("linkedin")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-            activeTab === "linkedin"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-700"
-          }`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-          </svg>
-          Depuis LinkedIn
-        </button>
-        <button
-          onClick={() => setActiveTab("linkedin-post")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-            activeTab === "linkedin-post"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-700"
-          }`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Post LinkedIn IA
-        </button>
+        {isPremium && (
+          <>
+            <button
+              onClick={() => setActiveTab("linkedin")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                activeTab === "linkedin"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              Depuis LinkedIn
+            </button>
+            <button
+              onClick={() => setActiveTab("linkedin-post")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                activeTab === "linkedin-post"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Post LinkedIn IA
+            </button>
+          </>
+        )}
       </div>
 
       {/* Contenu des onglets */}
@@ -1342,8 +1360,8 @@ function TemplatesContent() {
           initialFeteName={initialFeteName}
         />
       )}
-      {activeTab === "linkedin" && <LinkedInTab />}
-      {activeTab === "linkedin-post" && <LinkedInPostTab />}
+      {isPremium && activeTab === "linkedin" && <LinkedInTab />}
+      {isPremium && activeTab === "linkedin-post" && <LinkedInPostTab />}
     </div>
   );
 }

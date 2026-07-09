@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { ai } from "@/src/sdk";
+import { usePremiumAccess } from "@/src/hooks/usePremiumAccess";
+import LinkedInLoading from "./loading";
 
 const TONES = [
   { value: "professionnel", label: "Professionnel", desc: "Sobre, orienté résultats" },
@@ -9,7 +12,30 @@ const TONES = [
   { value: "inspirant", label: "Inspirant", desc: "Vision, leadership, ambition" },
 ];
 
+function LinkedInPremiumUpsell() {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-20 px-6 bg-white rounded-xl border border-slate-200">
+      <div className="w-14 h-14 rounded-full bg-[var(--color-light)] flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-[var(--color-main)]">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+        </svg>
+      </div>
+      <h2 className="text-lg font-bold text-slate-900 mb-2">Fonctionnalité réservée au plan Premium</h2>
+      <p className="text-sm text-slate-500 max-w-md mb-6">
+        La génération de posts LinkedIn est disponible uniquement avec le plan Premium. Passe au plan supérieur pour y accéder.
+      </p>
+      <Link
+        href="/dashboard/abonnement"
+        className="px-5 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
+      >
+        Voir les plans
+      </Link>
+    </div>
+  );
+}
+
 export default function LinkedInPage() {
+  const isPremium = usePremiumAccess();
   const [hotelName, setHotelName] = useState("");
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("professionnel");
@@ -53,6 +79,14 @@ export default function LinkedInPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (isPremium === null) {
+    return <LinkedInLoading />;
+  }
+
+  if (!isPremium) {
+    return <LinkedInPremiumUpsell />;
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8">

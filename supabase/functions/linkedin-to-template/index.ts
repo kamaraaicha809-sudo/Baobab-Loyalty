@@ -88,12 +88,16 @@ Deno.serve(async (req) => {
 
       const { data: profile } = await userClient
         .from("profiles")
-        .select("has_access")
+        .select("has_access, price_id")
         .eq("id", user.id)
         .single();
 
       if (!profile?.has_access) {
         return errors.forbidden("Active subscription required");
+      }
+
+      if ((profile.price_id || "").toLowerCase() !== "premium") {
+        return errors.forbidden("Fonctionnalité réservée au plan Premium.");
       }
 
       userId = user.id;
