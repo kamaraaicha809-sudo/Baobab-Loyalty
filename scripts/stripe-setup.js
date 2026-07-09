@@ -21,9 +21,9 @@ async function main() {
   const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
   const plans = [
-    { name: "Essentiel", price: 29000, id: "essentiel" },
-    { name: "Croissance", price: 49000, id: "croissance" },
-    { name: "Premium", price: 69000, id: "premium" },
+    { name: "Essentiel", price: 39000, id: "essentiel" },
+    { name: "Croissance", price: 69000, id: "croissance" },
+    { name: "Premium", price: 189000, id: "premium" },
   ];
 
   console.log("🔧 Création des produits Stripe pour Baobab Loyalty...\n");

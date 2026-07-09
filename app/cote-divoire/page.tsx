@@ -26,7 +26,7 @@ const localBusinessSchema = {
     { "@type": "City", name: "Abidjan" },
   ],
   serviceType: "Logiciel de fidélisation hôtelière",
-  priceRange: "29 000 - 69 000 FCFA/mois",
+  priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
   aggregateRating: {
@@ -64,7 +64,7 @@ const faqSchema = {
       name: "Combien coûte un logiciel de fidélisation hôtel en Côte d'Ivoire ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Baobab Loyalty propose des formules adaptées aux hôtels ivoiriens à partir de 29 000 FCFA/mois pour les établissements jusqu'à 30 chambres. Le plan Croissance (49 000 FCFA/mois) convient aux hôtels jusqu'à 100 chambres. Le plan Premium (69 000 FCFA/mois) est illimité. Pas d'engagement, résiliable à tout moment.",
+        text: "Baobab Loyalty propose des formules adaptées aux hôtels ivoiriens à partir de 39 000 FCFA/mois pour les établissements jusqu'à 30 chambres. Le plan Croissance (69 000 FCFA/mois) convient aux hôtels jusqu'à 100 chambres. Le plan Premium (189 000 FCFA/mois) est illimité. Pas d'engagement, résiliable à tout moment.",
       },
     },
     {
@@ -88,7 +88,7 @@ const faqSchema = {
       name: "Baobab Loyalty est-il adapté aux petits hôtels en Côte d'Ivoire ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Oui. Baobab Loyalty est conçu spécifiquement pour les hôtels d'Afrique francophone, quelle que soit leur taille. Le plan Essentiel à 29 000 FCFA/mois est rentabilisé dès 2 à 3 réservations directes supplémentaires par mois. L'interface est en français, les prix sont en FCFA, et le support est francophone.",
+        text: "Oui. Baobab Loyalty est conçu spécifiquement pour les hôtels d'Afrique francophone, quelle que soit leur taille. Le plan Essentiel à 39 000 FCFA/mois est rentabilisé dès 2 à 3 réservations directes supplémentaires par mois. L'interface est en français, les prix sont en FCFA, et le support est francophone.",
       },
     },
   ],
@@ -101,7 +101,7 @@ const faqItems = [
   },
   {
     q: "Combien coûte un logiciel de fidélisation hôtel en Côte d'Ivoire ?",
-    a: "Baobab Loyalty propose des formules en FCFA à partir de 29 000 FCFA/mois pour les hôtels jusqu'à 30 chambres. Le plan Croissance (49 000 FCFA/mois) couvre jusqu'à 100 chambres, et le plan Premium (69 000 FCFA/mois) est illimité. Sans engagement.",
+    a: "Baobab Loyalty propose des formules en FCFA à partir de 39 000 FCFA/mois pour les hôtels jusqu'à 30 chambres. Le plan Croissance (69 000 FCFA/mois) couvre jusqu'à 100 chambres, et le plan Premium (189 000 FCFA/mois) est illimité. Sans engagement.",
   },
   {
     q: "Comment réduire les commissions Booking.com pour mon hôtel en Côte d'Ivoire ?",
@@ -187,7 +187,7 @@ const data: CountryPageData = {
   plans: [
     {
       name: "Essentiel",
-      price: "29 000 FCFA",
+      price: "39 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 30 chambres",
       highlighted: false,
@@ -201,7 +201,7 @@ const data: CountryPageData = {
     },
     {
       name: "Croissance",
-      price: "49 000 FCFA",
+      price: "69 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 100 chambres",
       highlighted: true,
@@ -215,7 +215,7 @@ const data: CountryPageData = {
     },
     {
       name: "Premium",
-      price: "69 000 FCFA",
+      price: "189 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Chambres illimitées",
       highlighted: false,

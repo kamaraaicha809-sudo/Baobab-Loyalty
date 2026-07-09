@@ -37,17 +37,17 @@ export default function CGVPage() {
               <tbody>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium">Essentiel</td>
-                  <td className="p-3 border border-slate-200">29 000 FCFA</td>
+                  <td className="p-3 border border-slate-200">39 000 FCFA</td>
                   <td className="p-3 border border-slate-200">Jusqu&apos;à 30 chambres</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200 font-medium">Croissance</td>
-                  <td className="p-3 border border-slate-200">49 000 FCFA</td>
+                  <td className="p-3 border border-slate-200">69 000 FCFA</td>
                   <td className="p-3 border border-slate-200">Jusqu&apos;à 100 chambres</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium">Premium</td>
-                  <td className="p-3 border border-slate-200">69 000 FCFA</td>
+                  <td className="p-3 border border-slate-200">189 000 FCFA</td>
                   <td className="p-3 border border-slate-200">Illimité</td>
                 </tr>
               </tbody>

@@ -87,7 +87,7 @@ const howToSchema = {
   estimatedCost: {
     "@type": "MonetaryAmount",
     currency: "XOF",
-    value: "29000",
+    value: "39000",
   },
   step: steps.map((step, i) => ({
     "@type": "HowToStep",

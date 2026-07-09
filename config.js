@@ -76,37 +76,30 @@ const config = {
   },
 
   // ============================================
-  // 5. PLANS STRIPE
+  // 5. PLANS BILLING (Moneroo)
   // ============================================
-  // Configurez vos produits et prix Stripe
-  // 
-  // COMMENT OBTENIR VOS priceId :
-  // 1. Allez sur dashboard.stripe.com/products
-  // 2. Créez un produit avec un prix
-  // 3. Copiez le "Price ID" (commence par price_)
-  // 
-  // En développement, utilisez vos clés de test (price_test_...)
-  // En production, utilisez vos clés live (price_live_...)
-  
-  stripe: {
+  // Plans disponibles pour les hôteliers
+  // Prix en FCFA — marché Afrique francophone
+
+  billing: {
     currency: "FCFA",
     plans: [
       {
-        name: "Starter",
-        description: "Pour tester et démarrer",
+        name: "Essentiel",
+        description: "Pour démarrer et tester",
         price: 39000,
         features: [
           { name: "Jusqu'à 30 chambres" },
-          { name: "Segmentation clients de base" },
-          { name: "Campagnes WhatsApp" },
+          { name: "Segmentation clients (3, 6, 9 mois)" },
+          { name: "Campagnes WhatsApp ciblées" },
           { name: "Support par email" },
         ],
       },
       {
         isFeatured: true,
-        name: "Pro",
+        name: "Croissance",
         description: "Le meilleur rapport qualité/prix",
-        price: 79000,
+        price: 69000,
         features: [
           { name: "Jusqu'à 100 chambres" },
           { name: "Segmentation avancée" },
@@ -118,11 +111,11 @@ const config = {
       {
         name: "Premium",
         description: "Pour les grands établissements",
-        price: 249000,
+        price: 189000,
         features: [
           { name: "Chambres illimitées" },
-          { name: "Automatisation avancée" },
-          { name: "Campagnes illimitées" },
+          { name: "API WhatsApp dédiée" },
+          { name: "Accès multi-utilisateurs" },
           { name: "IA personnalisée" },
           { name: "Account Manager dédié" },
         ],
@@ -148,7 +141,7 @@ const config = {
   // Utile pour activer progressivement des features
   
   features: {
-    payments: true,                   // Paiements Stripe
+    payments: true,                   // Paiements Moneroo
     oauth: {
       google: false,                  // OAuth Google (configurer dans Supabase)
       github: false,                  // OAuth GitHub (configurer dans Supabase)

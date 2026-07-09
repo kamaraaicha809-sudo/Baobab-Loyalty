@@ -76,7 +76,7 @@ export default function OgImage() {
           }}
         >
           Segmentation automatique · Campagnes ciblées · À partir de{" "}
-          <span style={{ color: "rgba(255,255,255,0.9)" }}>29 000 FCFA/mois</span>
+          <span style={{ color: "rgba(255,255,255,0.9)" }}>39 000 FCFA/mois</span>
         </p>
 
         <div style={{ display: "flex", gap: 16 }}>

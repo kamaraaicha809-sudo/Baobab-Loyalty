@@ -771,7 +771,7 @@ Avant de choisir un outil, calculez ce que représente une réservation supplém
 
 Si votre chambre moyenne est à 40 000 FCFA/nuit et qu'un client séjourne en moyenne 2 nuits, une réservation supplémentaire = 80 000 FCFA. Par mois, 4 réservations supplémentaires = 320 000 FCFA.
 
-Un outil à 49 000 FCFA/mois qui génère 4 réservations directes supplémentaires est rentabilisé à 650% chaque mois.
+Un outil à 69 000 FCFA/mois qui génère 4 réservations directes supplémentaires est rentabilisé à 650% chaque mois.
 
 La question n'est pas "est-ce que cet outil est cher ?" mais "est-ce qu'il me rapporte plus qu'il ne me coûte ?"
 
@@ -1399,7 +1399,7 @@ Les éditeurs de logiciels ont tendance à empiler les fonctionnalités pour jus
 
 ### Option 4 : Solution spécialisée marché africain
 
-**Coût** : 29 000 - 69 000 FCFA/mois
+**Coût** : 39 000 - 189 000 FCFA/mois
 **Pour qui** : Hôtels de 10 à 200 chambres en Afrique francophone
 **Avantages** : Interface français, FCFA, WhatsApp natif, prix adaptés, support local
 **Limites** : Fonctionnalités moins étendues que les solutions enterprise
@@ -1449,7 +1449,7 @@ Voici un calcul conservateur pour un hôtel de 50 chambres en Côte d'Ivoire :
 - Réservations générées : 16
 - Revenu moyen par réservation : 110 000 FCFA (2 nuits × 55 000 FCFA)
 - Revenu total campagne : 1 760 000 FCFA
-- Coût du CRM : 49 000 FCFA/mois
+- Coût du CRM : 69 000 FCFA/mois
 - ROI de la campagne : 3 490%
 
 Ce calcul ne prend pas en compte les campagnes régulières (une par mois en moyenne), ni la réduction des commissions OTA sur les réservations directes.
@@ -2630,7 +2630,7 @@ Envoyez depuis un numéro WhatsApp Business dédié à l'hôtel. Cela paraît pr
 
 Un programme de fidélité hôtel peut être très simple au départ : un tableur, WhatsApp Business gratuit et 2 heures par mois. Le retour sur investissement est immédiat.
 
-Pour aller plus loin et automatiser (segmentation auto, IA de génération de messages, tableau de bord des réservations), des solutions comme Baobab Loyalty existent à partir de 29 000 FCFA/mois — rentabilisées dès 2 à 3 réservations directes supplémentaires par mois.
+Pour aller plus loin et automatiser (segmentation auto, IA de génération de messages, tableau de bord des réservations), des solutions comme Baobab Loyalty existent à partir de 39 000 FCFA/mois — rentabilisées dès 2 à 3 réservations directes supplémentaires par mois.
 
 ## Ce que les hôtels de Douala obtiennent après 3 mois
 
@@ -2738,7 +2738,7 @@ Prenons un hôtel de 60 chambres avec un tarif moyen de 45 000 FCFA/nuit :
 - 150 nuits OTA par mois = 1 350 000 FCFA de commission mensuelle
 - Convertir 30% de ces nuits en réservations directes = **405 000 FCFA économisés par mois**
 
-Le retour sur investissement d'un logiciel à 29 000 FCFA/mois est évident dès les premières réservations directes récupérées.
+Le retour sur investissement d'un logiciel à 39 000 FCFA/mois est évident dès les premières réservations directes récupérées.
 
 ## Par où commencer ?
 
@@ -2817,7 +2817,7 @@ Si votre CRM tombe en panne un lundi matin à 8h, vous avez besoin d'un support 
 
 **Baobab Loyalty**
 - Conçu spécifiquement pour les hôtels d'Afrique francophone
-- Prix en FCFA : 29 000 à 69 000 FCFA/mois selon la taille
+- Prix en FCFA : 39 000 à 189 000 FCFA/mois selon la taille
 - WhatsApp comme canal principal d'envoi
 - Segmentation automatique des clients inactifs
 - IA de génération de messages en français

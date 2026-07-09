@@ -31,7 +31,7 @@ const localBusinessSchema = {
     { "@type": "AdministrativeArea", name: "Côte d'Ivoire" },
   ],
   serviceType: "Logiciel de fidélisation hôtelière",
-  priceRange: "29 000 - 69 000 FCFA/mois",
+  priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
   aggregateRating: {
@@ -122,7 +122,7 @@ const data: CountryPageData = {
   plans: [
     {
       name: "Essentiel",
-      price: "29 000 FCFA",
+      price: "39 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 30 chambres",
       highlighted: false,
@@ -136,7 +136,7 @@ const data: CountryPageData = {
     },
     {
       name: "Croissance",
-      price: "49 000 FCFA",
+      price: "69 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 100 chambres",
       highlighted: true,
@@ -150,7 +150,7 @@ const data: CountryPageData = {
     },
     {
       name: "Premium",
-      price: "69 000 FCFA",
+      price: "189 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Chambres illimitées",
       highlighted: false,

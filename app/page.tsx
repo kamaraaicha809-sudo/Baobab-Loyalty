@@ -36,7 +36,7 @@ export default function Home() {
         {
           question: "Combien coûte Baobab Loyalty ?",
           answer:
-            "Baobab Loyalty propose trois plans en FCFA : Essentiel à 29 000 FCFA/mois pour les hôtels de moins de 30 chambres, Croissance à 49 000 FCFA/mois pour moins de 100 chambres, et Premium à 69 000 FCFA/mois pour les hôtels sans limite de chambres.",
+            "Baobab Loyalty propose trois plans en FCFA : Essentiel à 39 000 FCFA/mois pour les hôtels de moins de 30 chambres, Croissance à 69 000 FCFA/mois pour moins de 100 chambres, et Premium à 189 000 FCFA/mois pour les hôtels sans limite de chambres.",
         },
         {
           question: "Dans quels pays est disponible Baobab Loyalty ?",

@@ -143,9 +143,9 @@ const softwareSchema = {
   ],
   offers: {
     "@type": "Offer",
-    price: "29000",
+    price: "39000",
     priceCurrency: "XOF",
-    description: "À partir de 29 000 FCFA par mois",
+    description: "À partir de 39 000 FCFA par mois",
   },
 };
 
