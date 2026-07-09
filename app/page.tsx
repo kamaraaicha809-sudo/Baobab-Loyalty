@@ -17,7 +17,6 @@ export const metadata = getSEOTags({
 });
 
 // Below the fold — code split to reduce initial JS bundle
-const LinkedInFeature = dynamic(() => import("@/components/landing/LinkedInFeature"));
 const Pricing = dynamic(() => import("@/components/landing/Pricing"));
 const FAQ = dynamic(() => import("@/components/landing/FAQ"));
 const CTA = dynamic(() => import("@/components/landing/CTA"));
@@ -67,7 +66,6 @@ export default function Home() {
         <Problem />
         <Solution />
         <Features />
-        <LinkedInFeature />
         <Testimonials />
         <Pricing />
         <FAQ />
