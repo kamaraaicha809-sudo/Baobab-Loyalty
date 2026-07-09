@@ -85,7 +85,7 @@ const config = {
     currency: "FCFA",
     plans: [
       {
-        name: "Essentiel",
+        name: "Starter",
         description: "Pour démarrer et tester",
         price: 39000,
         features: [
@@ -97,7 +97,7 @@ const config = {
       },
       {
         isFeatured: true,
-        name: "Croissance",
+        name: "Pro",
         description: "Le meilleur rapport qualité/prix",
         price: 69000,
         features: [

@@ -116,7 +116,7 @@ const data: CountryPageData = {
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",
   plans: [
     {
-      name: "Essentiel",
+      name: "Starter",
       price: "39 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 30 chambres",
@@ -130,13 +130,13 @@ const data: CountryPageData = {
       ],
     },
     {
-      name: "Croissance",
+      name: "Pro",
       price: "69 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 100 chambres",
       highlighted: true,
       features: [
-        "Tout Essentiel inclus",
+        "Tout Starter inclus",
         "IA de génération de messages",
         "Suivi des réservations en temps réel",
         "Statistiques campagnes avancées",
@@ -150,7 +150,7 @@ const data: CountryPageData = {
       rooms: "Chambres illimitées",
       highlighted: false,
       features: [
-        "Tout Croissance inclus",
+        "Tout Pro inclus",
         "API WhatsApp dédiée",
         "Accès multi-utilisateurs",
         "Onboarding personnalisé",

@@ -12,7 +12,7 @@ const planSlugs: Record<string, string> = {
 };
 
 const Pricing = () => {
-  const plans = config.stripe.plans;
+  const plans = config.billing.plans;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +65,7 @@ const Pricing = () => {
                 <p className="text-slate-400 text-sm mb-4">{plan.description}</p>
                 <div className="mb-6">
                   <span className={`text-3xl sm:text-4xl font-bold ${isFeatured ? "text-[#EBC161]" : "text-white"}`}>
-                    {String(plan.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} {config.stripe.currency}
+                    {String(plan.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} {config.billing.currency}
                   </span>
                   <span className="text-slate-400 text-sm ml-1">/mois</span>
                 </div>

@@ -7,13 +7,13 @@ import { getSEOTags } from "@/libs/seo";
 
 export const metadata = getSEOTags({
   title: "Tarifs Baobab Loyalty — À partir de 39 000 FCFA/mois",
-  description: "Plans Essentiel, Croissance et Premium : 39 000, 69 000 et 189 000 FCFA/mois. Sans engagement, résiliable à tout moment. Pour hôtels d'Afrique de l'Ouest.",
+  description: "Plans Starter, Pro et Premium : 39 000, 69 000 et 189 000 FCFA/mois. Sans engagement, résiliable à tout moment. Pour hôtels d'Afrique de l'Ouest.",
   canonicalUrlRelative: "/tarifs",
 });
 
 const plans = [
   {
-    name: "Essentiel",
+    name: "Starter",
     price: "39 000",
     priceRaw: "39000",
     priceDetail: "FCFA / mois",
@@ -29,14 +29,14 @@ const plans = [
     notIncluded: ["IA de génération de messages", "API WhatsApp dédiée"],
   },
   {
-    name: "Croissance",
+    name: "Pro",
     price: "69 000",
     priceRaw: "69000",
     priceDetail: "FCFA / mois",
     rooms: "Jusqu'à 100 chambres",
     highlighted: true,
     features: [
-      "Tout Essentiel inclus",
+      "Tout Starter inclus",
       "IA de génération de messages",
       "Suivi des réservations en temps réel",
       "Statistiques campagnes avancées",
@@ -52,7 +52,7 @@ const plans = [
     rooms: "Chambres illimitées",
     highlighted: false,
     features: [
-      "Tout Croissance inclus",
+      "Tout Pro inclus",
       "API WhatsApp dédiée",
       "Accès multi-utilisateurs",
       "Onboarding personnalisé",
@@ -85,7 +85,7 @@ const faqs = [
   },
   {
     q: "Comment fonctionne le support ?",
-    a: "Le support est assuré par email en français pour tous les plans. Le plan Croissance bénéficie d'un support prioritaire avec réponse sous 4 heures. Le plan Premium inclut un account manager dédié.",
+    a: "Le support est assuré par email en français pour tous les plans. Le plan Pro bénéficie d'un support prioritaire avec réponse sous 4 heures. Le plan Premium inclut un account manager dédié.",
   },
 ];
 
@@ -311,8 +311,8 @@ export default function TarifsPage() {
                 <thead>
                   <tr className="border-b border-slate-200">
                     <th className="text-left py-3 pr-6 text-slate-500 font-normal w-2/5">Fonctionnalité</th>
-                    <th className="text-center py-3 px-4 text-[#2C2C2C] font-semibold">Essentiel</th>
-                    <th className="text-center py-3 px-4 text-[#1a2f2a] font-bold">Croissance</th>
+                    <th className="text-center py-3 px-4 text-[#2C2C2C] font-semibold">Starter</th>
+                    <th className="text-center py-3 px-4 text-[#1a2f2a] font-bold">Pro</th>
                     <th className="text-center py-3 px-4 text-[#2C2C2C] font-semibold">Premium</th>
                   </tr>
                 </thead>

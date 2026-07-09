@@ -6,7 +6,13 @@ import config from "@/config";
 import { billing } from "@/src/sdk";
 import toast from "react-hot-toast";
 
-const PLAN_SLUGS = ["starter", "pro", "premium"] as const;
+const PLAN_SLUG_TO_INDEX: Record<string, number> = {
+  essentiel: 0,
+  starter: 0,
+  croissance: 1,
+  pro: 1,
+  premium: 2,
+};
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -15,14 +21,14 @@ function CheckoutContent() {
 
   useEffect(() => {
     const planSlug = searchParams.get("plan")?.toLowerCase();
-    if (!planSlug || !PLAN_SLUGS.includes(planSlug as (typeof PLAN_SLUGS)[number])) {
+    if (!planSlug || !(planSlug in PLAN_SLUG_TO_INDEX)) {
       toast.error("Plan invalide");
       router.replace("/#tarifs");
       return;
     }
 
-    const planIndex = PLAN_SLUGS.indexOf(planSlug as (typeof PLAN_SLUGS)[number]);
-    const plan = config.stripe.plans[planIndex];
+    const planIndex = PLAN_SLUG_TO_INDEX[planSlug];
+    const plan = config.billing.plans[planIndex];
     if (!plan) {
       toast.error("Plan introuvable");
       router.replace("/#tarifs");

@@ -60,7 +60,7 @@ const data: CountryPageData = {
   heroTitle: "Fidélisez vos clients hôtel à",
   heroTitleHighlight: "Dakar",
   heroSubtitle:
-    "Dakar est le hub économique et touristique du Sénégal, avec une clientèle d'affaires en forte croissance. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans aucune commission.",
+    "Dakar est le hub économique et touristique du Sénégal, avec une clientèle d'affaires en forte Pro. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans aucune commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
     {
@@ -121,7 +121,7 @@ const data: CountryPageData = {
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",
   plans: [
     {
-      name: "Essentiel",
+      name: "Starter",
       price: "39 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 30 chambres",
@@ -135,13 +135,13 @@ const data: CountryPageData = {
       ],
     },
     {
-      name: "Croissance",
+      name: "Pro",
       price: "69 000 FCFA",
       priceDetail: "/ mois",
       rooms: "Jusqu'à 100 chambres",
       highlighted: true,
       features: [
-        "Tout Essentiel inclus",
+        "Tout Starter inclus",
         "IA de génération de messages",
         "Suivi des réservations en temps réel",
         "Statistiques campagnes avancées",
@@ -155,7 +155,7 @@ const data: CountryPageData = {
       rooms: "Chambres illimitées",
       highlighted: false,
       features: [
-        "Tout Croissance inclus",
+        "Tout Pro inclus",
         "API WhatsApp dédiée",
         "Accès multi-utilisateurs",
         "Onboarding personnalisé",

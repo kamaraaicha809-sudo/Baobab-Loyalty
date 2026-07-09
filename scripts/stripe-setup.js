@@ -21,8 +21,8 @@ async function main() {
   const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
   const plans = [
-    { name: "Essentiel", price: 39000, id: "essentiel" },
-    { name: "Croissance", price: 69000, id: "croissance" },
+    { name: "Starter", price: 39000, id: "Starter" },
+    { name: "Pro", price: 69000, id: "Pro" },
     { name: "Premium", price: 189000, id: "premium" },
   ];
 
