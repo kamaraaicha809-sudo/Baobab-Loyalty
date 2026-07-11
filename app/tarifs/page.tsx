@@ -57,6 +57,7 @@ const plans = [
       "Accès multi-utilisateurs",
       "Onboarding personnalisé",
       "Account manager dédié",
+      "Bonus : génération de posts LinkedIn (IA)",
     ],
     notIncluded: [],
   },
@@ -328,6 +329,7 @@ export default function TarifsPage() {
                     ["API WhatsApp dédiée", false, false, true],
                     ["Accès multi-utilisateurs", false, false, true],
                     ["Account manager dédié", false, false, true],
+                    ["Bonus : posts LinkedIn (IA)", false, false, true],
                   ].map(([label, ess, cro, pre], i) => (
                     <tr key={i} className="hover:bg-slate-50/50">
                       <td className="py-3 pr-6 text-slate-600">{label as string}</td>

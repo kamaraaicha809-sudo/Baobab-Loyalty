@@ -118,6 +118,7 @@ const config = {
           { name: "Accès multi-utilisateurs" },
           { name: "IA personnalisée" },
           { name: "Account Manager dédié" },
+          { name: "Bonus : génération de posts LinkedIn (IA)" },
         ],
       },
     ],

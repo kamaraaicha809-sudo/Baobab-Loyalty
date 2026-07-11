@@ -156,6 +156,7 @@ const data: CountryPageData = {
         "Accès multi-utilisateurs",
         "Onboarding personnalisé",
         "Account manager dédié",
+        "Bonus : génération de posts LinkedIn (IA)",
       ],
     },
   ],
