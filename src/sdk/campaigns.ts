@@ -2,7 +2,7 @@
  * Campaigns SDK — envoi de campagnes WhatsApp
  */
 
-import { createClient } from "@/libs/supabase/client";
+import { callEdgeFunction } from "./_core";
 
 export interface SendCampaignParams {
   segmentCode: string;
@@ -20,16 +20,7 @@ export interface SendCampaignResult {
 }
 
 export async function sendCampaign(params: SendCampaignParams): Promise<SendCampaignResult> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase.functions.invoke("campaign-send", {
-    body: params,
-  });
-
-  if (error) throw new Error(error.message);
-  if (!data?.ok) throw new Error(data?.error?.message || "Erreur lors de l'envoi");
-
-  return data.data as SendCampaignResult;
+  return callEdgeFunction<SendCampaignResult>("campaign-send", { body: params });
 }
 
 export const campaigns = { sendCampaign };
