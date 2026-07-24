@@ -5,7 +5,6 @@ import Hero from "@/components/landing/Hero";
 import Problem from "@/components/landing/Problem";
 import Solution from "@/components/landing/Solution";
 import Features from "@/components/landing/Features";
-import Testimonials from "@/components/landing/Testimonials";
 import Footer from "@/components/landing/Footer";
 import { NewsletterBanner } from "@/components/newsletter/NewsletterBanner";
 import { getSEOTags, renderSchemaTags, renderOrganizationSchema, renderFAQSchema } from "@/libs/seo";
@@ -66,7 +65,6 @@ export default function Home() {
         <Problem />
         <Solution />
         <Features />
-        <Testimonials />
         <Pricing />
         <FAQ />
         <CTA />
