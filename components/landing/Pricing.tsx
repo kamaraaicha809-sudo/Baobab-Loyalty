@@ -48,7 +48,7 @@ const Pricing = () => {
             return (
               <div
                 key={i}
-                className={`relative rounded-2xl p-6 sm:p-8 bg-[#252525] border-2 transition-all ${
+                className={`relative flex h-full flex-col rounded-2xl p-6 sm:p-8 bg-[#252525] border-2 transition-all ${
                   isFeatured
                     ? "border-[#EBC161] shadow-lg shadow-[#EBC161]/20"
                     : "border-[#333]"
@@ -69,7 +69,7 @@ const Pricing = () => {
                   </span>
                   <span className="text-slate-400 text-sm ml-1">/mois</span>
                 </div>
-                <ul className="space-y-3 mb-8 text-slate-300 text-sm">
+                <ul className="flex-1 space-y-3 mb-8 text-slate-300 text-sm">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-2">
                       <svg className={`w-4 h-4 flex-shrink-0 ${isFeatured ? "text-[#EBC161]" : "text-slate-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
