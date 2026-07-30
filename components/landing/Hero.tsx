@@ -64,7 +64,7 @@ const Hero = () => {
               href={isLoggedIn ? "/dashboard" : "/beta"}
               className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
             >
-              {isLoggedIn ? "Accéder au dashboard" : "Commencer maintenant"}
+              {isLoggedIn ? "Tableau de bord" : "Commencer maintenant"}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
