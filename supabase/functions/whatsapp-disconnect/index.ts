@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
       .update({
         whatsapp_phone_number_id: null,
         whatsapp_access_token: null,
+        whatsapp_display_phone: null,
         bsp_api_key: null,
         bsp_phone_number: null,
         bsp_waba_id: null,

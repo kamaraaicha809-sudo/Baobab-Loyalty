@@ -13,6 +13,7 @@ interface ConnectParams {
 
 interface ConnectResponse {
   status: "active";
+  phone_number?: string;
   connected_at: string;
 }
 

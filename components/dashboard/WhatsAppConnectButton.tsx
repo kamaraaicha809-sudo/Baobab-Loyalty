@@ -136,13 +136,13 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
         }
 
         try {
-          await whatsapp.connect({
+          const result = await whatsapp.connect({
             code,
             phone_number_id: extra.phone_number_id,
             waba_id: extra.waba_id,
           });
           setConnected(true);
-          setPhone(extra.phone_number_id);
+          setPhone(result.phone_number || extra.phone_number_id);
           onStatusChange?.(true);
           toast.success("WhatsApp Business connecté");
         } catch {

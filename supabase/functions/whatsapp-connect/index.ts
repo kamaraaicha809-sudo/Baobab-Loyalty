@@ -65,6 +65,20 @@ Deno.serve(async (req) => {
       return errors.internal("Aucun token reçu de Meta");
     }
 
+    // Récupère le vrai numéro affichable (phone_number_id est un identifiant interne, pas un numéro lisible)
+    let displayPhone: string | undefined;
+    try {
+      const phoneRes = await fetch(
+        `https://graph.facebook.com/v19.0/${phone_number_id}?fields=display_phone_number&access_token=${encodeURIComponent(accessToken)}`,
+      );
+      if (phoneRes.ok) {
+        const phoneData = await phoneRes.json();
+        displayPhone = phoneData.display_phone_number;
+      }
+    } catch {
+      // Non bloquant — on garde phone_number_id en repli si l'appel échoue
+    }
+
     const db = getServiceClient();
 
     const { error: updateError } = await db
@@ -72,6 +86,7 @@ Deno.serve(async (req) => {
       .update({
         whatsapp_phone_number_id: phone_number_id,
         whatsapp_access_token: accessToken,
+        whatsapp_display_phone: displayPhone || null,
         bsp_waba_id: waba_id,
         bsp_status: "active",
         bsp_connected_at: new Date().toISOString(),
@@ -82,6 +97,7 @@ Deno.serve(async (req) => {
 
     return success({
       status: "active",
+      phone_number: displayPhone,
       connected_at: new Date().toISOString(),
     });
   } catch (err) {

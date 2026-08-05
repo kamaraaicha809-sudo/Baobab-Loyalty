@@ -109,7 +109,7 @@ export default function ConfigurationPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, whatsapp_phone_number_id, whatsapp_access_token, bsp_status, bsp_phone_number")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, whatsapp_phone_number_id, whatsapp_access_token, whatsapp_display_phone, bsp_status, bsp_phone_number")
       .eq("id", user.id)
       .single();
 
@@ -136,6 +136,7 @@ export default function ConfigurationPage() {
       setWaStatus({
         connected: waConnected,
         phone: (p.bsp_phone_number as string | undefined)
+          || (p.whatsapp_display_phone as string | undefined)
           || profile.whatsapp_phone_number_id || undefined,
       });
     }
