@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { user as userSdk } from "@/src/sdk";
 import { isDemoMode } from "@/src/lib/demo";
+import { hasActiveAccess } from "@/src/lib/access";
 
 const ALLOWED_WITHOUT_SUBSCRIPTION = [
   "/dashboard/configuration",
@@ -21,7 +22,7 @@ export default function SubscriptionGate() {
     userSdk
       .getProfile()
       .then((profile) => {
-        if (profile.onboarding_completed && !profile.has_access) {
+        if (profile.onboarding_completed && !hasActiveAccess(profile)) {
           router.replace("/dashboard/abonnement");
         }
       })

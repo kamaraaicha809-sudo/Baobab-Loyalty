@@ -10,6 +10,7 @@
 import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
+import { hasActiveAccess } from "../_shared/access.ts";
 
 const DEFAULT_MODEL = "openai/gpt-4o-mini";
 const DEFAULT_PROMPT_NAME = "campaign_whatsapp";
@@ -80,11 +81,11 @@ Deno.serve(async (req) => {
 
       const { data: profile } = await userClient
         .from("profiles")
-        .select("has_access, price_id")
+        .select("has_access, price_id, trial_ends_at")
         .eq("id", user.id)
         .single();
 
-      if (!profile?.has_access) {
+      if (!profile || !hasActiveAccess(profile)) {
         return errors.forbidden("Active subscription required");
       }
 

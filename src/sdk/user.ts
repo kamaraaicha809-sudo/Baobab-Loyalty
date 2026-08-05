@@ -11,6 +11,7 @@ export interface UserProfile {
   id: string;
   email: string;
   has_access: boolean;
+  trial_ends_at?: string | null;
   customer_id: string | null;
   price_id: string | null;
   role?: string;

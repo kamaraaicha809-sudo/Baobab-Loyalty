@@ -28,6 +28,7 @@ export const demoProfile = {
   customer_id: null,
   price_id: "premium",
   has_access: true,
+  trial_ends_at: null,
   role: "admin",
   hotel_name: "Hôtel Le Baobab",
   config_complete: true,

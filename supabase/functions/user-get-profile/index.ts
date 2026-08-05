@@ -23,6 +23,7 @@ Deno.serve(async (req) => {
         id: "demo-user-id",
         email: "demo@baobabloyalty.com",
         has_access: true,
+        trial_ends_at: null,
         role: "admin",
         hotel_name: "Hôtel Demo",
         config_complete: true,
