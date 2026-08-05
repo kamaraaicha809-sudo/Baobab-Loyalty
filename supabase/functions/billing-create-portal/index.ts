@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
     }
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://example.com";
-    return success({ url: `${siteUrl}/dashboard/billing` });
+    return success({ url: `${siteUrl}/dashboard/abonnement` });
   } catch (err) {
     console.error("billing-create-portal error:", err);
     return errors.internal(err instanceof Error ? err.message : "Portal creation failed");

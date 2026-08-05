@@ -19,7 +19,6 @@ GRANT ALL ON public.redemptions TO authenticated;
 GRANT ALL ON public.message_templates TO authenticated;
 GRANT ALL ON public.ai_prompts TO authenticated;
 GRANT ALL ON public.app_config TO authenticated;
-GRANT ALL ON public.sync_logs TO authenticated;
 
 -- Sequences (pour les INSERT avec serial/bigserial)
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;

@@ -104,8 +104,8 @@ export const getSEOTags = ({
  */
 export const renderSchemaTags = () => {
   // Get the first plan price for offers
-  const firstPlan = config.stripe?.plans?.[0];
-  const featuredPlan = config.stripe?.plans?.find((p: { isFeatured?: boolean }) => p.isFeatured) || firstPlan;
+  const firstPlan = config.billing?.plans?.[0];
+  const featuredPlan = config.billing?.plans?.find((p: { isFeatured?: boolean }) => p.isFeatured) || firstPlan;
 
   return (
     <script

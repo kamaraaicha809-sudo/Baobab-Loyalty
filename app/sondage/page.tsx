@@ -219,6 +219,7 @@ function SondageContent() {
 
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
 
   const currentCategory = CATEGORIES[step];
@@ -239,13 +240,25 @@ function SondageContent() {
     });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < totalSteps - 1) {
       setStep((s) => s + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setSubmitting(true);
+      try {
+        await fetch("/api/survey", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ hotel, discount, answers }),
+        });
+      } catch {
+        // Silent fail — l'utilisateur voit quand meme le succes et son code promo
+      } finally {
+        setSubmitting(false);
+        setSubmitted(true);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 
@@ -385,10 +398,10 @@ function SondageContent() {
           <button
             type="button"
             onClick={handleNext}
-            disabled={!isCategoryAnswered()}
+            disabled={!isCategoryAnswered() || submitting}
             className="flex-1 py-3.5 rounded-xl bg-[#075E54] text-white font-semibold text-sm hover:bg-[#064A42] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            {step === totalSteps - 1 ? "Envoyer mon avis" : "Suivant"}
+            {submitting ? "Envoi en cours..." : step === totalSteps - 1 ? "Envoyer mon avis" : "Suivant"}
           </button>
         </div>
 
