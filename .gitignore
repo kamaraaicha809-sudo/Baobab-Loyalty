@@ -81,5 +81,8 @@ lerna-debug.log*
 __pycache__/
 *.pyc
 
+# Local test fixtures (contiennent des donnees personnelles)
+clients_test.csv
+
 
 .vercel

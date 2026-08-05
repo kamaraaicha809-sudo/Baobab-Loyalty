@@ -1,0 +1,54 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Baobab Loyalty",
+  "applicationCategory": "BusinessApplication",
+  "applicationSubCategory": "Customer Loyalty Software",
+  "operatingSystem": "Web",
+  "url": "https://baobabloyalty.com",
+  "image": "https://baobabloyalty.com/og-default.jpg",
+  "description": "Plateforme SaaS de fidélisation client : cartes digitales, points, récompenses, analytics. Lancement en 7 jours.",
+  "inLanguage": "fr-FR",
+  "softwareVersion": "2.0",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Plan Starter",
+      "price": "49",
+      "priceCurrency": "EUR",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": "49",
+        "priceCurrency": "EUR",
+        "unitText": "MONTH"
+      },
+      "url": "https://baobabloyalty.com/tarifs"
+    },
+    {
+      "@type": "Offer",
+      "name": "Plan Pro",
+      "price": "149",
+      "priceCurrency": "EUR",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": "149",
+        "priceCurrency": "EUR",
+        "unitText": "MONTH"
+      },
+      "url": "https://baobabloyalty.com/tarifs"
+    }
+  ],
+  "featureList": [
+    "Cartes de fidélité digitales (Apple/Google Wallet)",
+    "Système de points et niveaux",
+    "Catalogue de récompenses personnalisable",
+    "Notifications push et email",
+    "Tableau de bord analytics",
+    "Intégrations (Stripe, Shopify, Zapier)"
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "Baobab Loyalty",
+    "url": "https://baobabloyalty.com"
+  }
+}

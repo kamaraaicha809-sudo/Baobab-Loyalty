@@ -1,0 +1,42 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://baobabloyalty.com/#organization",
+  "name": "Baobab Loyalty",
+  "alternateName": "Baobab",
+  "url": "https://baobabloyalty.com",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://baobabloyalty.com/logo.png",
+    "width": 512,
+    "height": 512
+  },
+  "description": "Plateforme française de fidélisation client B2B. Cartes digitales, points, récompenses, analytics.",
+  "foundingDate": "2022",
+  "email": "contact@baobabloyalty.com",
+  "telephone": "+33-1-00-00-00-00",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "FR",
+    "addressLocality": "Paris"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/baobabloyalty",
+    "https://twitter.com/baobabloyalty",
+    "https://www.instagram.com/baobabloyalty"
+  ],
+  "contactPoint": [
+    {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "support@baobabloyalty.com",
+      "availableLanguage": ["French", "English"]
+    },
+    {
+      "@type": "ContactPoint",
+      "contactType": "sales",
+      "email": "sales@baobabloyalty.com",
+      "availableLanguage": ["French", "English"]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Combien coûte Baobab Loyalty ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nos plans démarrent à 49 €/mois pour le Starter (jusqu'à 1 000 clients) et 149 €/mois pour le Pro (clients illimités, intégrations avancées). Tous nos plans incluent un essai gratuit de 14 jours sans carte bancaire."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Combien de temps pour lancer mon programme de fidélité ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En moyenne 7 jours entre l'inscription et le lancement public. Notre équipe vous accompagne sur la configuration, le design des cartes et l'intégration à vos outils existants."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Puis-je intégrer Baobab à mon e-commerce Shopify ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Nous avons une intégration native avec Shopify, WooCommerce, Stripe et plus de 30 outils via Zapier. L'API REST permet aussi des intégrations sur mesure."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Mes données clients sont-elles hébergées en France ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, l'ensemble de nos données est hébergé en France (OVHcloud, Roubaix) et conforme au RGPD. Aucune donnée n'est transférée hors UE."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Y a-t-il des frais cachés ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non. Le prix affiché est le prix payé. Pas de frais d'installation, pas de commission sur les transactions, pas de surcoût par client. Vous pouvez résilier à tout moment."
+      }
+    }
+  ]
+}

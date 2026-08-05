@@ -1,0 +1,47 @@
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Comment installer Baobab Loyalty sur Shopify",
+  "description": "Installation en 5 minutes du widget de fidélité Baobab sur ta boutique Shopify.",
+  "totalTime": "PT5M",
+  "image": "https://baobabloyalty.com/guides/shopify-cover.jpg",
+  "supply": [
+    { "@type": "HowToSupply", "name": "Compte Shopify actif" },
+    { "@type": "HowToSupply", "name": "Compte Baobab Loyalty (essai gratuit OK)" }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Installer l'app Baobab depuis le Shopify App Store",
+      "text": "Rends-toi sur le Shopify App Store, recherche \"Baobab Loyalty\" et clique sur Installer.",
+      "url": "https://baobabloyalty.com/guides/shopify#step1",
+      "image": "https://baobabloyalty.com/guides/shopify-step1.png"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Connecter ton compte Baobab",
+      "text": "Si tu as déjà un compte, connecte-toi. Sinon, l'app crée un compte automatiquement.",
+      "url": "https://baobabloyalty.com/guides/shopify#step2"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Choisir ton modèle de programme",
+      "text": "Points, niveaux ou cashback : 3 modèles préconfigurés, tu pourras les ajuster ensuite."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Personnaliser le widget",
+      "text": "Couleurs, position, texte : adapte le widget à ta charte. Aperçu en direct."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 5,
+      "name": "Activer et tester",
+      "text": "Active le widget. Passe une commande test pour vérifier que les points s'attribuent bien."
+    }
+  ]
+}

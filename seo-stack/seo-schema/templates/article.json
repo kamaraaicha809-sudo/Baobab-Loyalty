@@ -1,0 +1,32 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Comment lancer un programme de fidélité en 2026 : guide complet",
+  "description": "Les 7 étapes pour lancer un programme de fidélité performant : choix du modèle, intégration technique, communication, mesure du ROI.",
+  "image": [
+    "https://baobabloyalty.com/blog/programme-fidelite-2026.jpg"
+  ],
+  "datePublished": "2026-05-03T09:00:00+02:00",
+  "dateModified": "2026-05-03T09:00:00+02:00",
+  "author": {
+    "@type": "Person",
+    "name": "Aïchatou Kamara",
+    "url": "https://baobabloyalty.com/equipe/aichatou-kamara"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Baobab Loyalty",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://baobabloyalty.com/logo.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://baobabloyalty.com/blog/lancer-programme-fidelite-2026"
+  },
+  "inLanguage": "fr-FR",
+  "wordCount": 1850,
+  "articleSection": "Stratégie",
+  "keywords": ["programme fidélité", "rétention client", "loyalty B2B", "marketing 2026"]
+}

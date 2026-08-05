@@ -1,0 +1,24 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Plan Pro Baobab Loyalty",
+  "description": "Programme de fidélité tout-en-un pour PME et chaînes : cartes digitales, points, récompenses, analytics avancés.",
+  "image": [
+    "https://baobabloyalty.com/products/plan-pro.jpg"
+  ],
+  "brand": { "@type": "Brand", "name": "Baobab Loyalty" },
+  "sku": "BBL-PRO-2026",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://baobabloyalty.com/tarifs",
+    "priceCurrency": "EUR",
+    "price": "149",
+    "priceValidUntil": "2026-12-31",
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": "https://schema.org/InStock",
+    "seller": {
+      "@type": "Organization",
+      "name": "Baobab Loyalty"
+    }
+  }
+}
