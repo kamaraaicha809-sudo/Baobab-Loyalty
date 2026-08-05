@@ -23,7 +23,8 @@
       "Bash(python generate_pdf.py)",
       "Bash(python generate_pdfs.py)",
       "Bash(grep -E \"\\\\.tsx$\")",
-      "Bash(awk '{print NR\": \"$0}')"
+      "Bash(awk '{print NR\": \"$0}')",
+      "Bash(git stash *)"
     ]
   },
   "defaultMode": "bypassPermissions"
