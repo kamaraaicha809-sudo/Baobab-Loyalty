@@ -2,8 +2,8 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/libs/supabase/client";
-import Logo from "@/components/common/Logo";
 import config from "@/config";
 
 type Step = "email" | "code";
@@ -94,9 +94,8 @@ export default function BetaPage() {
 
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-light mb-4 p-3">
-            <Logo size={36} variant="white" />
-          </div>
+          <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-14 h-14 rounded-2xl mb-4 inline-block" />
+
           <p className="text-slate-400 text-sm font-medium tracking-widest uppercase mt-2">
             {config.appName}
           </p>

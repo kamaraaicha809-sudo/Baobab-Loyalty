@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: Props) {
       name: config.appName,
       logo: {
         "@type": "ImageObject",
-        url: `https://${config.domainName}/icon.svg`,
+        url: `https://${config.domainName}/brand/baobab-tree.png`,
       },
     },
     url: `https://${config.domainName}/blog/${post.slug}`,

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
-import Logo from "@/components/common/Logo";
 import { isDemoMode } from "@/src/lib/demo";
 
 function SignInContent() {
@@ -100,9 +100,8 @@ function SignInContent() {
 
         {/* Header / Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-slate-900 mb-4 p-3">
-            <Logo size={36} variant="white" />
-          </div>
+          <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-16 h-16 rounded-xl mb-4 inline-block" />
+
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
             Bienvenue sur {config.appName}
           </h1>

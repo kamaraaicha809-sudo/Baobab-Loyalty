@@ -1,14 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 import config from "@/config";
 
 const Footer = () => {
   return (
     <footer className="py-12 bg-[#FDFDF9] border-t border-slate-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-        <Link href="/" className="inline-flex items-center gap-2.5 mb-4">
-          <div className="w-9 h-9 rounded-lg bg-[#2C2C2C] flex items-center justify-center">
-            <span className="text-white font-display font-bold text-lg">B</span>
-          </div>
+        <Link href="/" className="inline-flex items-center gap-2 mb-4">
+          <Image
+            src="/brand/baobab-tree.png"
+            alt={config.appName}
+            width={775}
+            height={575}
+            className="h-9 w-auto"
+          />
           <span className="font-display text-xl font-semibold text-[#2C2C2C]">{config.appName}</span>
         </Link>
         <p className="text-slate-500 text-sm">

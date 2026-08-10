@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
-import Logo from "@/components/common/Logo";
 import PasswordStrength, { validatePassword, passwordsMatch } from "@/components/ui/PasswordStrength";
 import { isDemoMode } from "@/src/lib/demo";
 
@@ -153,9 +153,8 @@ function SignUpContent() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
           {/* Logo */}
           <div className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-light mb-4 p-2">
-              <Logo size={32} variant="white" />
-            </div>
+            <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-12 h-12 rounded-xl mb-4 inline-block" />
+
 
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 text-slate-900">
               Créer un compte

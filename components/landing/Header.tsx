@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import config from "@/config";
 import { isDemoMode } from "@/src/lib/demo";
 
@@ -48,10 +49,15 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-100">
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between" aria-label="Navigation">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-lg bg-[#2C2C2C] flex items-center justify-center">
-            <span className="text-white font-display font-bold text-lg">B</span>
-          </div>
+        <Link href="/" className="flex items-center gap-2 group">
+          <Image
+            src="/brand/baobab-tree.png"
+            alt={config.appName}
+            width={775}
+            height={575}
+            className="h-9 w-auto"
+            priority
+          />
           <span className="font-display text-xl font-semibold text-[#2C2C2C]">{config.appName}</span>
         </Link>
 
