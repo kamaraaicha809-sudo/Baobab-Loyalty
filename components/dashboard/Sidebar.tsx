@@ -73,7 +73,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
         <div className="p-6 flex-1 overflow-y-auto">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 mb-8">
-            <Image src="/brand/baobab-tree.png" alt={config.appName} width={775} height={575} className="h-8 w-auto" />
+            <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold tracking-tight text-slate-900">{config.appName}</span>
           </Link>
 
@@ -165,7 +165,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
 
         {/* Logo centré */}
         <Link href="/" className="flex items-center gap-2 flex-1 justify-center">
-          <Image src="/brand/baobab-tree.png" alt={config.appName} width={775} height={575} className="h-7 w-auto" />
+          <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-7 h-7 rounded-lg" />
           <span className="font-bold text-lg text-slate-900">{config.appName}</span>
         </Link>
 
@@ -198,7 +198,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
               className="flex items-center gap-2 mb-8"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Image src="/brand/baobab-tree.png" alt={config.appName} width={775} height={575} className="h-8 w-auto" />
+              <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-8 h-8 rounded-lg" />
               <span className="text-xl font-bold tracking-tight text-slate-900">{config.appName}</span>
             </Link>
 
