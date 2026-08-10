@@ -30,24 +30,24 @@ export default function CGVPage() {
               <thead>
                 <tr className="bg-slate-50">
                   <th className="text-left p-3 border border-slate-200 font-medium text-slate-700">Plan</th>
-                  <th className="text-left p-3 border border-slate-200 font-medium text-slate-700">Prix / mois</th>
+                  <th className="text-left p-3 border border-slate-200 font-medium text-slate-700">Prix HT / mois</th>
                   <th className="text-left p-3 border border-slate-200 font-medium text-slate-700">Chambres</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium">Starter</td>
-                  <td className="p-3 border border-slate-200">39 000 FCFA</td>
+                  <td className="p-3 border border-slate-200">39 000 FCFA HT</td>
                   <td className="p-3 border border-slate-200">Jusqu&apos;à 30 chambres</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200 font-medium">Pro</td>
-                  <td className="p-3 border border-slate-200">69 000 FCFA</td>
+                  <td className="p-3 border border-slate-200">69 000 FCFA HT</td>
                   <td className="p-3 border border-slate-200">Jusqu&apos;à 100 chambres</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium">Premium</td>
-                  <td className="p-3 border border-slate-200">189 000 FCFA</td>
+                  <td className="p-3 border border-slate-200">189 000 FCFA HT</td>
                   <td className="p-3 border border-slate-200">Illimité</td>
                 </tr>
               </tbody>
@@ -55,7 +55,7 @@ export default function CGVPage() {
           </div>
 
           <p className="text-slate-500 text-sm mt-3">
-            Les tarifs sont indiqués toutes taxes comprises (TTC). Baobab Loyalty SAS se réserve le droit de modifier ses tarifs, avec préavis de 30 jours.
+            Les tarifs ci-dessus sont exprimés hors taxes (HT). Baobab Loyalty SAS bénéficie actuellement d&apos;un régime d&apos;exonération de TVA (régime de l&apos;entreprenant / microentreprise) : aucune TVA n&apos;est donc ajoutée à ce jour. Dès que ce régime évoluera vers un régime assujetti, la TVA sera ajoutée automatiquement au taux légal en vigueur et apparaîtra distinctement sur chaque facture, sans action requise de votre part. Baobab Loyalty SAS se réserve le droit de modifier ses tarifs, avec préavis de 30 jours.
           </p>
         </section>
 

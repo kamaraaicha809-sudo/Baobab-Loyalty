@@ -144,7 +144,7 @@ export default function AbonnementPage() {
                   <span className="text-2xl font-bold text-slate-900">
                     {plan.price.toLocaleString("fr-FR")}
                   </span>
-                  <span className="text-slate-400 text-sm ml-1">FCFA/mois</span>
+                  <span className="text-slate-400 text-sm ml-1">FCFA HT/mois</span>
                 </div>
                 <ul className="space-y-1.5 flex-1">
                   {PERKS[i].map((perk) => (
@@ -194,7 +194,7 @@ export default function AbonnementPage() {
                 <p className="text-3xl font-bold text-slate-900">
                   {currentPlan.price.toLocaleString("fr-FR")}
                 </p>
-                <p className="text-slate-400 text-sm">FCFA / mois</p>
+                <p className="text-slate-400 text-sm">FCFA HT / mois</p>
               </div>
             </div>
 
@@ -249,7 +249,7 @@ export default function AbonnementPage() {
                         </div>
                         <div className="text-right shrink-0">
                           <p className="font-bold text-slate-900 text-lg">{plan.price.toLocaleString("fr-FR")}</p>
-                          <p className="text-slate-400 text-xs">FCFA/mois</p>
+                          <p className="text-slate-400 text-xs">FCFA HT/mois</p>
                         </div>
                       </div>
                       <ul className="space-y-1.5">

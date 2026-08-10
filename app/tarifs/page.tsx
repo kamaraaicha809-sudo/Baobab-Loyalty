@@ -16,7 +16,7 @@ const plans = [
     name: "Starter",
     price: "39 000",
     priceRaw: "39000",
-    priceDetail: "FCFA / mois",
+    priceDetail: "FCFA HT / mois",
     rooms: "Jusqu'à 30 chambres",
     highlighted: false,
     features: [
@@ -32,7 +32,7 @@ const plans = [
     name: "Pro",
     price: "69 000",
     priceRaw: "69000",
-    priceDetail: "FCFA / mois",
+    priceDetail: "FCFA HT / mois",
     rooms: "Jusqu'à 100 chambres",
     highlighted: true,
     features: [
@@ -48,7 +48,7 @@ const plans = [
     name: "Premium",
     price: "189 000",
     priceRaw: "189000",
-    priceDetail: "FCFA / mois",
+    priceDetail: "FCFA HT / mois",
     rooms: "Chambres illimitées",
     highlighted: false,
     features: [
@@ -294,7 +294,7 @@ export default function TarifsPage() {
               ))}
             </div>
             <p className="text-center text-slate-400 text-xs mt-6">
-              Tous les prix sont en FCFA (XOF), hors taxes applicables. Facturation mensuelle.
+              Tous les prix sont en FCFA (XOF) et exprimés hors taxes (HT). Aucune TVA n&apos;est actuellement appliquée (régime d&apos;exonération) ; si ce régime évolue, la TVA sera ajoutée automatiquement au taux légal en vigueur. Facturation mensuelle.
             </p>
           </div>
         </section>

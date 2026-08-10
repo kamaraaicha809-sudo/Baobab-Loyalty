@@ -65,7 +65,7 @@ const Pricing = () => {
                 <p className="text-slate-400 text-sm mb-4">{plan.description}</p>
                 <div className="mb-6">
                   <span className={`text-3xl sm:text-4xl font-bold ${isFeatured ? "text-[#EBC161]" : "text-white"}`}>
-                    {String(plan.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} {config.billing.currency}
+                    {String(plan.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")} {config.billing.currency} HT
                   </span>
                   <span className="text-slate-400 text-sm ml-1">/mois</span>
                 </div>
@@ -114,6 +114,9 @@ const Pricing = () => {
             );
           })}
         </div>
+        <p className="text-center text-slate-500 text-xs mt-6">
+          Prix hors taxes (HT). Aucune TVA n&apos;est actuellement appliquée ; elle sera ajoutée automatiquement dès que ce régime deviendra applicable.
+        </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-8 text-slate-400 text-sm">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-[#EBC161] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
