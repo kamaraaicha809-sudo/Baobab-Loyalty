@@ -9,6 +9,7 @@
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { getServiceClient } from "../_shared/auth.ts";
+import { enqueueFneInvoice } from "../_shared/fne/enqueue.ts";
 
 async function verifySignature(body: string, signature: string, secret: string): Promise<boolean> {
   try {
@@ -86,6 +87,20 @@ Deno.serve(async (req) => {
           .eq("id", userId);
 
         if (error) throw error;
+
+        // FNE : best-effort, ne doit jamais faire echouer l'accuse de reception
+        // du webhook Moneroo (l'acces hotelier ci-dessus doit toujours passer).
+        try {
+          const monerooData = event.data as Record<string, unknown>;
+          await enqueueFneInvoice(supabase, {
+            userId,
+            planSlug: plan,
+            monerooPaymentId: typeof monerooData.id === "string" ? monerooData.id : null,
+            monerooMethod: typeof monerooData.method === "string" ? monerooData.method : undefined,
+          });
+        } catch (fneErr) {
+          console.error("[billing-webhook] Mise en file FNE echouee (non bloquant):", fneErr);
+        }
         break;
       }
 
