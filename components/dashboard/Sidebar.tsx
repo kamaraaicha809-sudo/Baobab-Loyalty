@@ -33,7 +33,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
 
   // Navigation principale
   const mainNavItems: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <Icons.Home />, href: '/dashboard' },
+    { id: 'dashboard', label: 'Tableau de bord', icon: <Icons.Home />, href: '/dashboard' },
     { id: 'configuration', label: 'Configuration', icon: <Icons.Settings />, href: '/dashboard/configuration' },
     { id: 'segments', label: 'Segments', icon: <Icons.Users />, href: '/dashboard/segments' },
     { id: 'templates', label: 'Templates', icon: <Icons.Template />, href: '/dashboard/templates' },
