@@ -10,6 +10,7 @@
 import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
+import { getMonthlyRelanceQuota, startOfCurrentMonthIso } from "../_shared/plan.ts";
 
 interface Client {
   id: string;
@@ -200,7 +201,7 @@ Deno.serve(async (req) => {
     // Fetch WhatsApp credentials — BSP path takes priority over legacy Meta direct path
     const { data: profile, error: profileError } = await db
       .from("profiles")
-      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status")
+      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status, price_id, has_access, trial_ends_at")
       .eq("id", profileId)
       .single();
 
@@ -211,6 +212,22 @@ Deno.serve(async (req) => {
 
     if (!hasBsp && !hasMeta) {
       return errors.badRequest("WhatsApp non configuré. Rendez-vous dans Configuration pour connecter votre compte WhatsApp.");
+    }
+
+    // Quota mensuel de relances (une relance = une campagne envoyée), non reporté d'un mois à l'autre
+    const relanceQuota = getMonthlyRelanceQuota(profile);
+    const { count: relancesUsed, error: quotaError } = await db
+      .from("campaigns")
+      .select("id", { count: "exact", head: true })
+      .eq("profile_id", profileId)
+      .gte("created_at", startOfCurrentMonthIso());
+
+    if (quotaError) return errors.internal(quotaError.message);
+
+    if ((relancesUsed ?? 0) >= relanceQuota) {
+      return errors.badRequest(
+        `Quota de relances atteint pour ce mois (${relanceQuota}/${relanceQuota}). Passez à un plan supérieur ou attendez le mois prochain.`
+      );
     }
 
     // Fetch all clients for this profile

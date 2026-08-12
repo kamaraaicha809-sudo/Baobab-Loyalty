@@ -88,10 +88,13 @@ const config = {
         name: "Starter",
         description: "Pour démarrer et tester",
         price: 39000,
+        monthlyRelances: 5,
+        // → Nombre de relances clients (campagnes WhatsApp) incluses par mois.
+        //   Non reportées d'un mois à l'autre. Appliqué côté serveur dans campaign-send.
         features: [
+          { name: "5 relances clients par mois" },
           { name: "Jusqu'à 30 chambres" },
           { name: "Segmentation clients (3, 6, 9 mois)" },
-          { name: "Campagnes WhatsApp ciblées" },
           { name: "Support par email" },
         ],
       },
@@ -100,10 +103,11 @@ const config = {
         name: "Pro",
         description: "Le meilleur rapport qualité/prix",
         price: 69000,
+        monthlyRelances: 10,
         features: [
+          { name: "10 relances clients par mois" },
           { name: "Jusqu'à 100 chambres" },
           { name: "Segmentation avancée" },
-          { name: "Campagnes illimitées" },
           { name: "IA génération de messages" },
           { name: "Support prioritaire" },
         ],
@@ -112,7 +116,9 @@ const config = {
         name: "Premium",
         description: "Pour les grands établissements",
         price: 189000,
+        monthlyRelances: 20,
         features: [
+          { name: "20 relances clients par mois" },
           { name: "Chambres illimitées" },
           { name: "API WhatsApp dédiée" },
           { name: "Accès multi-utilisateurs" },

@@ -16,11 +16,11 @@ const PLAN_SLUG_TO_INDEX: Record<string, number> = {
   pro: 1,
 };
 
-const PERKS: Record<number, string[]> = {
-  0: ["Jusqu'à 30 chambres", "Segmentation clients de base", "Campagnes WhatsApp", "Support par email"],
-  1: ["Jusqu'à 100 chambres", "Segmentation avancée", "Campagnes illimitées", "IA génération de messages", "Support prioritaire"],
-  2: ["Chambres illimitées", "Automatisation avancée", "Campagnes illimitées", "IA personnalisée", "Account Manager dédié", "Bonus : génération de posts LinkedIn (IA)"],
-};
+// Les fonctionnalités affichées viennent directement de config.js (source unique),
+// pas d'une liste dupliquée ici — évite que cette page se désynchronise des tarifs.
+const PERKS: Record<number, string[]> = Object.fromEntries(
+  PLANS.map((plan, i) => [i, plan.features.map((f) => f.name)])
+);
 
 export default function AbonnementPage() {
   const [upgradeLoading, setUpgradeLoading] = useState<number | null>(null);
