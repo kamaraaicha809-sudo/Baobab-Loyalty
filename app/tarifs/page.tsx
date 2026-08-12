@@ -14,53 +14,52 @@ export const metadata = getSEOTags({
 const plans = [
   {
     name: "Starter",
+    description: "Pour démarrer et tester",
     price: "39 000",
     priceRaw: "39000",
     priceDetail: "FCFA HT / mois",
     rooms: "Jusqu'à 30 chambres",
     highlighted: false,
-    features: [
-      "Importation CSV illimitée",
-      "Segmentation automatique (3, 6, 9 mois)",
-      "Campagnes WhatsApp ciblées",
-      "Tableau de bord réservations",
-      "Support par email en français",
-    ],
-    notIncluded: ["IA de génération de messages", "API WhatsApp dédiée"],
   },
   {
     name: "Pro",
+    description: "Le meilleur rapport qualité/prix",
     price: "69 000",
     priceRaw: "69000",
     priceDetail: "FCFA HT / mois",
     rooms: "Jusqu'à 100 chambres",
     highlighted: true,
-    features: [
-      "Tout Starter inclus",
-      "IA de génération de messages",
-      "Suivi des réservations en temps réel",
-      "Statistiques campagnes avancées",
-      "Support prioritaire",
-    ],
-    notIncluded: ["API WhatsApp dédiée"],
   },
   {
     name: "Premium",
+    description: "Pour les grands établissements",
     price: "189 000",
     priceRaw: "189000",
     priceDetail: "FCFA HT / mois",
     rooms: "Chambres illimitées",
     highlighted: false,
-    features: [
-      "Tout Pro inclus",
-      "API WhatsApp dédiée",
-      "Accès multi-utilisateurs",
-      "Onboarding personnalisé",
-      "Account manager dédié",
-      "Bonus : génération de posts LinkedIn (IA)",
-    ],
-    notIncluded: [],
   },
+];
+
+// Formate un nombre en "189 000" (espace insécable tous les 3 chiffres)
+const formatFCFA = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+// Une seule matrice de fonctionnalités, lue par colonne (Starter, Pro, Premium)
+// La ligne "Chambres" affiche un texte, les autres lignes un check/croix
+const featureRows: { label: string; values: [string | boolean, string | boolean, string | boolean] }[] = [
+  { label: "Chambres", values: ["Jusqu'à 30", "Jusqu'à 100", "Illimité"] },
+  { label: "Utilisateurs", values: ["1", "1", "Illimité"] },
+  { label: "Import CSV illimité", values: [true, true, true] },
+  { label: "Segmentation automatique (3, 6, 9 mois)", values: [true, true, true] },
+  { label: "Campagnes WhatsApp ciblées", values: [true, true, true] },
+  { label: "Tableau de bord réservations", values: [true, true, true] },
+  { label: "IA de génération de messages", values: [false, true, true] },
+  { label: "Statistiques campagnes avancées", values: [false, true, true] },
+  { label: "Support prioritaire", values: [false, true, true] },
+  { label: "API WhatsApp dédiée", values: [false, false, true] },
+  { label: "Accès multi-utilisateurs", values: [false, false, true] },
+  { label: "Account manager dédié", values: [false, false, true] },
+  { label: "Bonus : posts LinkedIn (IA)", values: [false, false, true] },
 ];
 
 const faqs = [
@@ -188,154 +187,67 @@ export default function TarifsPage() {
           </div>
         </section>
 
-        {/* Pricing cards */}
+        {/* Grille tarifaire unifiée (prix + comparatif dans un seul tableau) */}
         <section className="pb-16 sm:pb-20 bg-[#FDFDF9]" id="plans">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="grid sm:grid-cols-3 gap-6">
-              {plans.map((plan, i) => (
-                <div
-                  key={i}
-                  className={`rounded-2xl p-7 flex flex-col ${
-                    plan.highlighted
-                      ? "bg-[#1a2f2a] text-white ring-2 ring-[#EBC161]"
-                      : "bg-white border border-slate-100 shadow-sm"
-                  }`}
-                >
-                  {plan.highlighted && (
-                    <span className="text-[#EBC161] text-xs font-bold uppercase tracking-widest mb-3">
-                      Populaire
-                    </span>
-                  )}
-                  <h2
-                    className={`font-bold text-lg mb-1 ${
-                      plan.highlighted ? "text-white" : "text-[#2C2C2C]"
-                    }`}
-                  >
-                    {plan.name}
-                  </h2>
-                  <p
-                    className={`text-xs mb-4 ${
-                      plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
-                    }`}
-                  >
-                    {plan.rooms}
-                  </p>
-                  <div className="mb-5">
-                    <span
-                      className={`text-3xl font-bold ${
-                        plan.highlighted ? "text-[#EBC161]" : "text-[#2C2C2C]"
-                      }`}
-                    >
-                      {plan.price}
-                    </span>
-                    <span
-                      className={`text-sm ml-1 ${
-                        plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
-                      }`}
-                    >
-                      {plan.priceDetail}
-                    </span>
-                  </div>
-                  <ul className="space-y-2.5 mb-6 flex-1">
-                    {plan.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-2.5">
-                        <svg
-                          className={`w-4 h-4 mt-0.5 shrink-0 ${
-                            plan.highlighted ? "text-[#EBC161]" : "text-[#1a2f2a]"
-                          }`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                        <span
-                          className={`text-sm leading-snug ${
-                            plan.highlighted ? "text-[#d4e8df]" : "text-slate-600"
-                          }`}
-                        >
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                    {plan.notIncluded.map((feature, j) => (
-                      <li key={`no-${j}`} className="flex items-start gap-2.5 opacity-40">
-                        <svg
-                          className="w-4 h-4 mt-0.5 shrink-0"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span
-                          className={`text-sm leading-snug ${
-                            plan.highlighted ? "text-[#a3c4b5]" : "text-slate-500"
-                          }`}
-                        >
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/demo"
-                    className={`w-full text-center py-2.5 rounded-lg text-sm font-bold transition-colors ${
-                      plan.highlighted
-                        ? "bg-[#EBC161] text-[#1a2f2a] hover:bg-[#d4a94d]"
-                        : "border border-[#1a2f2a] text-[#1a2f2a] hover:bg-slate-50"
-                    }`}
-                  >
-                    Démarrer gratuitement
-                  </Link>
-                </div>
-              ))}
-            </div>
-            <p className="text-center text-slate-400 text-xs mt-6">
-              Tous les prix sont en FCFA (XOF) et exprimés hors taxes (HT). Aucune TVA n&apos;est actuellement appliquée (régime d&apos;exonération) ; si ce régime évolue, la TVA sera ajoutée automatiquement au taux légal en vigueur. Facturation mensuelle.
-            </p>
-          </div>
-        </section>
-
-        {/* What's included comparison */}
-        <section className="py-16 sm:py-20 bg-white">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-4">
-                Comparatif des fonctionnalités
-              </h2>
-            </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[720px] text-sm border-separate border-spacing-0">
                 <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-3 pr-6 text-slate-500 font-normal w-2/5">Fonctionnalité</th>
-                    <th className="text-center py-3 px-4 text-[#2C2C2C] font-semibold">Starter</th>
-                    <th className="text-center py-3 px-4 text-[#1a2f2a] font-bold">Pro</th>
-                    <th className="text-center py-3 px-4 text-[#2C2C2C] font-semibold">Premium</th>
+                  <tr>
+                    <th className="w-2/5" />
+                    {plans.map((plan, i) => (
+                      <th
+                        key={i}
+                        className={`align-bottom px-4 pt-6 pb-5 text-left ${
+                          plan.highlighted
+                            ? "bg-[#FCF6E4] border-t border-x border-[#EBC161] rounded-t-2xl"
+                            : ""
+                        }`}
+                      >
+                        {plan.highlighted ? (
+                          <span className="inline-block mb-3 px-3 py-1 rounded-full bg-[#EBC161] text-[#1a2f2a] text-[11px] font-bold uppercase tracking-wide">
+                            Le choix recommandé
+                          </span>
+                        ) : (
+                          <span className="block mb-3 h-[22px]" />
+                        )}
+                        <p className="font-bold text-base text-[#2C2C2C]">{plan.name}</p>
+                        <p className="mt-1">
+                          <span className="text-2xl font-bold text-[#1a2f2a]">{plan.price}</span>
+                          <span className="text-xs text-slate-400 ml-1">{plan.priceDetail}</span>
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          soit {formatFCFA(Number(plan.priceRaw) * 3)} FCFA / 3 mois
+                        </p>
+                        <p className="text-xs text-slate-500 mt-2 leading-snug max-w-[160px]">
+                          {plan.description}
+                        </p>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {[
-                    ["Import CSV illimité", true, true, true],
-                    ["Segmentation automatique", true, true, true],
-                    ["Campagnes WhatsApp", true, true, true],
-                    ["Tableau de bord réservations", true, true, true],
-                    ["IA de génération de messages", false, true, true],
-                    ["Statistiques avancées", false, true, true],
-                    ["Support prioritaire", false, true, true],
-                    ["API WhatsApp dédiée", false, false, true],
-                    ["Accès multi-utilisateurs", false, false, true],
-                    ["Account manager dédié", false, false, true],
-                    ["Bonus : posts LinkedIn (IA)", false, false, true],
-                  ].map(([label, ess, cro, pre], i) => (
-                    <tr key={i} className="hover:bg-slate-50/50">
-                      <td className="py-3 pr-6 text-slate-600">{label as string}</td>
-                      {[ess, cro, pre].map((has, j) => (
-                        <td key={j} className="text-center py-3 px-4">
-                          {has ? (
+                <tbody>
+                  {featureRows.map((row, i) => (
+                    <tr key={i}>
+                      <td className="py-3 pr-6 text-slate-600 border-b border-slate-100">
+                        {row.label}
+                      </td>
+                      {row.values.map((value, j) => (
+                        <td
+                          key={j}
+                          className={`text-center py-3 px-4 border-b border-slate-100 ${
+                            plans[j].highlighted ? "bg-[#FCF6E4] border-x border-[#EBC161]" : ""
+                          }`}
+                        >
+                          {typeof value === "string" ? (
+                            <span
+                              className={`text-sm ${
+                                plans[j].highlighted ? "font-semibold text-[#1a2f2a]" : "text-slate-600"
+                              }`}
+                            >
+                              {value}
+                            </span>
+                          ) : value ? (
                             <svg className="w-4 h-4 text-[#1a2f2a] mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                             </svg>
@@ -349,8 +261,37 @@ export default function TarifsPage() {
                     </tr>
                   ))}
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <td />
+                    {plans.map((plan, i) => (
+                      <td
+                        key={i}
+                        className={`px-4 pt-5 pb-6 ${
+                          plan.highlighted
+                            ? "bg-[#FCF6E4] border-b border-x border-[#EBC161] rounded-b-2xl"
+                            : ""
+                        }`}
+                      >
+                        <Link
+                          href="/demo"
+                          className={`block w-full text-center py-2.5 rounded-lg text-sm font-bold transition-colors ${
+                            plan.highlighted
+                              ? "bg-[#EBC161] text-[#1a2f2a] hover:bg-[#d4a94d]"
+                              : "border border-[#1a2f2a] text-[#1a2f2a] hover:bg-slate-50"
+                          }`}
+                        >
+                          Essayer gratuitement
+                        </Link>
+                      </td>
+                    ))}
+                  </tr>
+                </tfoot>
               </table>
             </div>
+            <p className="text-center text-slate-400 text-xs mt-6">
+              Tous les prix sont en FCFA (XOF) et exprimés hors taxes (HT). Aucune TVA n&apos;est actuellement appliquée (régime d&apos;exonération) ; si ce régime évolue, la TVA sera ajoutée automatiquement au taux légal en vigueur. Facturation mensuelle.
+            </p>
           </div>
         </section>
 
