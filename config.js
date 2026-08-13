@@ -117,6 +117,9 @@ const config = {
         description: "Pour les grands établissements",
         price: 189000,
         monthlyRelances: 30,
+        maxTeamMembers: 2,
+        // → Nombre de membres invités en plus du propriétaire.
+        //   Doit rester synchronisé avec supabase/functions/_shared/team.ts (MAX_TEAM_MEMBERS).
         features: [
           { name: "30 campagnes WhatsApp / mois" },
           { name: "Chambres illimitées" },

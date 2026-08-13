@@ -10,6 +10,7 @@
 import { requireAuth } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
+import { resolveProfile } from "../_shared/team.ts";
 
 const MONEROO_API_URL = "https://api.moneroo.io/v1";
 
@@ -32,12 +33,15 @@ Deno.serve(async (req) => {
       return errors.badRequest("Missing required fields: planSlug, amount, successUrl, cancelUrl");
     }
 
-    // Get user profile
-    const { data: profile } = await userClient
-      .from("profiles")
-      .select("email, name")
-      .eq("id", user.id)
-      .single();
+    // Seul le propriétaire du compte gère la facturation (pas les membres invités)
+    const { profile, teamRole } = await resolveProfile<{ id: string; email: string | null; name: string | null }>(
+      userClient,
+      user.id,
+      "id, email, name"
+    );
+    if (teamRole !== "owner") {
+      return errors.forbidden("Seul le propriétaire du compte peut gérer la facturation.");
+    }
 
     const email = profile?.email || user.email || "";
     const fullName = (profile?.name || email.split("@")[0] || "Client").trim();

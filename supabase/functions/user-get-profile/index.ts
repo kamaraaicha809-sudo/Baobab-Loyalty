@@ -9,6 +9,7 @@
 import { requireAuth } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
+import { resolveProfile } from "../_shared/team.ts";
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -38,29 +39,20 @@ Deno.serve(async (req) => {
       return errors.unauthorized(authError || "Authentication required");
     }
 
-    // Fetch profile
-    const { data: profile, error: dbError } = await userClient
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    // Fetch profile (own, or via team membership)
+    const { profile, teamRole } = await resolveProfile(userClient, user.id);
 
-    if (dbError) {
-      // Profile not found - return default
-      if (dbError.code === "PGRST116") {
-        return success({
-          id: user.id,
-          email: user.email,
-          has_access: false,
-          customer_id: null,
-          price_id: null,
-        });
-      }
-      
-      return errors.internal("Failed to fetch profile");
+    if (!profile) {
+      return success({
+        id: user.id,
+        email: user.email,
+        has_access: false,
+        customer_id: null,
+        price_id: null,
+      });
     }
 
-    return success(profile);
+    return success({ ...profile, team_role: teamRole });
   } catch (err) {
     return errors.internal(err instanceof Error ? err.message : "Profile fetch failed");
   }

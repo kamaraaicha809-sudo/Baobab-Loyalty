@@ -97,6 +97,26 @@ export const demoRoomTypes = [
 ];
 
 // ============================================
+// DONNÉES FICTIVES — ÉQUIPE
+// ============================================
+
+export const demoTeam = {
+  members: [
+    {
+      id: "demo-member-1",
+      user_id: "demo-member-1",
+      team_role: "member" as const,
+      email: "collegue@hotel-baobab.sn",
+      created_at: new Date().toISOString(),
+    },
+  ],
+  invitations: [],
+  maxMembers: 2,
+  callerRole: "owner" as const,
+  pricePlan: "premium",
+};
+
+// ============================================
 // DONNÉES FICTIVES — CAMPAGNES
 // ============================================
 

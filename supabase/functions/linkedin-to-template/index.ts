@@ -11,6 +11,7 @@ import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { hasActiveAccess } from "../_shared/access.ts";
+import { resolveProfile } from "../_shared/team.ts";
 
 const DEFAULT_MODEL = "openai/gpt-4o-mini";
 const AI_TIMEOUT_MS = 20000;
@@ -87,11 +88,12 @@ Deno.serve(async (req) => {
         return errors.unauthorized(authError || "Authentication required");
       }
 
-      const { data: profile } = await userClient
-        .from("profiles")
-        .select("has_access, price_id, trial_ends_at")
-        .eq("id", user.id)
-        .single();
+      const { profile } = await resolveProfile<{
+        id: string;
+        has_access?: boolean | null;
+        price_id: string | null;
+        trial_ends_at?: string | null;
+      }>(userClient, user.id, "id, has_access, price_id, trial_ends_at");
 
       if (!profile || !hasActiveAccess(profile)) {
         return errors.forbidden("Active subscription required");
@@ -101,7 +103,7 @@ Deno.serve(async (req) => {
         return errors.forbidden("Fonctionnalité réservée au plan Premium.");
       }
 
-      userId = user.id;
+      userId = profile.id;
     }
 
     const body = await req.json();

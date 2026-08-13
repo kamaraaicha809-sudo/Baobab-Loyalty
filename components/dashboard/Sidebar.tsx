@@ -49,6 +49,12 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
             ),
             href: '/dashboard/linkedin'
           },
+          {
+            id: 'equipe',
+            label: 'Équipe',
+            icon: <Icons.Users />,
+            href: '/dashboard/equipe',
+          },
         ]
       : []),
   ];

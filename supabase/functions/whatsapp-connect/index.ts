@@ -11,6 +11,7 @@
 import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
+import { resolveProfile } from "../_shared/team.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
@@ -29,9 +30,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { user, error: authError } = await requireAuth(req);
-    if (authError || !user) return errors.unauthorized(authError || "Auth required");
-    profileId = user.id;
+    const { user, userClient, error: authError } = await requireAuth(req);
+    if (authError || !user || !userClient) return errors.unauthorized(authError || "Auth required");
+
+    const { profile } = await resolveProfile<{ id: string }>(userClient, user.id, "id");
+    if (!profile) return errors.forbidden("Profil introuvable.");
+    profileId = profile.id;
 
     const body = await req.json();
     const { code, phone_number_id, waba_id } = body;

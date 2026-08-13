@@ -31,6 +31,7 @@ export { linkedin } from "./linkedin";
 export { newsletter } from "./newsletter";
 export { whatsapp } from "./whatsapp";
 export { email } from "./email";
+export { team } from "./team";
 
 // Re-export types
 export type { CreateCheckoutParams, CreateCheckoutResponse, CreatePortalParams, CreatePortalResponse } from "./billing";
@@ -40,6 +41,7 @@ export type { UploadResponse, DeleteResponse } from "./storage";
 export type { Prompt, CreatePromptParams, UpdatePromptParams } from "./prompts";
 export type { GenerateTemplateParams, GenerateTemplateResponse, MessageTemplate, SaveTemplateParams } from "./linkedin";
 export type { NewsletterSubscribeParams, NewsletterSubscribeResponse } from "./newsletter";
+export type { TeamMember, TeamInvitation, TeamListResponse, InviteParams } from "./team";
 
 // Re-export error class
 export { SdkError } from "./_core";

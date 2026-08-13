@@ -11,6 +11,7 @@ import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { hasActiveAccess } from "../_shared/access.ts";
+import { resolveProfile } from "../_shared/team.ts";
 
 const DEFAULT_MODEL = "openai/gpt-4o-mini";
 const DEFAULT_PROMPT_NAME = "campaign_whatsapp";
@@ -98,11 +99,19 @@ Deno.serve(async (req) => {
         return errors.unauthorized(authError || "Authentication required");
       }
 
-      const { data: profile } = await userClient
-        .from("profiles")
-        .select("has_access, price_id, trial_ends_at, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature")
-        .eq("id", user.id)
-        .single();
+      const { profile } = await resolveProfile<{
+        has_access?: boolean | null;
+        price_id: string | null;
+        trial_ends_at?: string | null;
+        ai_brand_voice?: string | null;
+        ai_keywords_use?: string | null;
+        ai_keywords_avoid?: string | null;
+        ai_signature?: string | null;
+      }>(
+        userClient,
+        user.id,
+        "has_access, price_id, trial_ends_at, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature"
+      );
 
       if (!profile || !hasActiveAccess(profile)) {
         return errors.forbidden("Active subscription required");
