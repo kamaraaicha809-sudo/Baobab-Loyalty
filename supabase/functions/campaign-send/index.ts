@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
 
     if ((relancesUsed ?? 0) >= relanceQuota) {
       return errors.badRequest(
-        `Quota de relances atteint pour ce mois (${relanceQuota}/${relanceQuota}). Passez à un plan supérieur ou attendez le mois prochain.`
+        `Quota de campagnes WhatsApp atteint pour ce mois (${relanceQuota}/${relanceQuota}). Passez à un plan supérieur ou attendez le mois prochain.`
       );
     }
 
