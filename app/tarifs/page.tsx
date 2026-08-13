@@ -88,7 +88,7 @@ const faqs = [
   },
   {
     q: "Comment fonctionne le support ?",
-    a: "Le support est assuré par email en français pour tous les plans. Le plan Pro bénéficie d'un support prioritaire avec réponse sous 4 heures. Le plan Premium inclut un account manager dédié.",
+    a: "Le support est assuré par email en français pour tous les plans, avec des délais de réponse selon le plan : sous 24 heures pour Starter, sous 16 heures pour Pro, et sous 4 à 12 heures pour Premium, qui inclut aussi un account manager dédié.",
   },
 ];
 
