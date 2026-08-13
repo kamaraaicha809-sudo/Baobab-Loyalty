@@ -51,6 +51,13 @@ interface ProfileForm {
   reception_email: string;
 }
 
+interface AiSettingsForm {
+  ai_brand_voice: string;
+  ai_keywords_use: string;
+  ai_keywords_avoid: string;
+  ai_signature: string;
+}
+
 interface WhatsAppStatus {
   connected: boolean;
   phone?: string;
@@ -71,6 +78,13 @@ const emptyForm: ProfileForm = {
   reception_email: "",
 };
 
+const emptyAiSettings: AiSettingsForm = {
+  ai_brand_voice: "",
+  ai_keywords_use: "",
+  ai_keywords_avoid: "",
+  ai_signature: "",
+};
+
 export default function ConfigurationPage() {
   const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [configComplete, setConfigComplete] = useState(false);
@@ -87,6 +101,12 @@ export default function ConfigurationPage() {
   const [counts, setCounts] = useState<Record<string, number>>({ "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>({ connected: false });
+  const [isPremium, setIsPremium] = useState(false);
+  const [aiSettings, setAiSettings] = useState<AiSettingsForm>(emptyAiSettings);
+  const [savingAiSettings, setSavingAiSettings] = useState(false);
+
+  const setAiField = (field: keyof AiSettingsForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setAiSettings((s) => ({ ...s, [field]: e.target.value }));
 
   const set = (field: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -97,6 +117,13 @@ export default function ConfigurationPage() {
       setForm({ ...emptyForm, hotel_name: demoProfile.hotel_name });
       setConfigComplete(demoProfile.config_complete);
       setCounts(demoSegmentCounts);
+      setIsPremium(demoProfile.price_id === "premium");
+      setAiSettings({
+        ai_brand_voice: demoProfile.ai_brand_voice || "",
+        ai_keywords_use: demoProfile.ai_keywords_use || "",
+        ai_keywords_avoid: demoProfile.ai_keywords_avoid || "",
+        ai_signature: demoProfile.ai_signature || "",
+      });
       setLoading(false);
       return;
     }
@@ -109,7 +136,7 @@ export default function ConfigurationPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, whatsapp_phone_number_id, whatsapp_access_token, whatsapp_display_phone, bsp_status, bsp_phone_number")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, whatsapp_phone_number_id, whatsapp_access_token, whatsapp_display_phone, bsp_status, bsp_phone_number, price_id, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature")
       .eq("id", user.id)
       .single();
 
@@ -129,6 +156,13 @@ export default function ConfigurationPage() {
         reception_email: (profile as Record<string, unknown>).reception_email as string || "",
       });
       setConfigComplete(profile.config_complete ?? false);
+      setIsPremium((profile as Record<string, unknown>).price_id === "premium");
+      setAiSettings({
+        ai_brand_voice: ((profile as Record<string, unknown>).ai_brand_voice as string) || "",
+        ai_keywords_use: ((profile as Record<string, unknown>).ai_keywords_use as string) || "",
+        ai_keywords_avoid: ((profile as Record<string, unknown>).ai_keywords_avoid as string) || "",
+        ai_signature: ((profile as Record<string, unknown>).ai_signature as string) || "",
+      });
       const p = profile as Record<string, unknown>;
       const waConnected =
         (!!profile.whatsapp_phone_number_id && !!profile.whatsapp_access_token) ||
@@ -234,6 +268,37 @@ export default function ConfigurationPage() {
       toast.error("Erreur lors de l'enregistrement");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveAiSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isDemoMode) {
+      toast.success("Réglages IA enregistrés (démo)");
+      return;
+    }
+    if (!profileId) return;
+
+    setSavingAiSettings(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          ai_brand_voice: aiSettings.ai_brand_voice.trim() || null,
+          ai_keywords_use: aiSettings.ai_keywords_use.trim() || null,
+          ai_keywords_avoid: aiSettings.ai_keywords_avoid.trim() || null,
+          ai_signature: aiSettings.ai_signature.trim() || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", profileId);
+
+      if (error) throw error;
+      toast.success("Réglages IA enregistrés");
+    } catch {
+      toast.error("Erreur lors de l'enregistrement");
+    } finally {
+      setSavingAiSettings(false);
     }
   };
 
@@ -549,6 +614,93 @@ export default function ConfigurationPage() {
             {saving ? "Enregistrement…" : "Enregistrer"}
           </button>
         </form>
+      </section>
+
+      {/* IA personnalisée — réservé au plan Premium */}
+      <section className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+            </svg>
+            IA personnalisée
+          </h2>
+          {!isPremium && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
+              Plan Premium
+            </span>
+          )}
+        </div>
+        <p className="text-slate-600 text-sm mb-6">
+          Donnez le ton de voix de votre établissement à l&apos;IA : vos messages générés (campagnes WhatsApp, LinkedIn) intégreront automatiquement ce contexte, sans que vous ayez à réécrire les prompts.
+        </p>
+
+        {isPremium ? (
+          <form onSubmit={handleSaveAiSettings} className="space-y-4">
+            <div>
+              <label htmlFor="ai_brand_voice" className={labelClass}>Ton de voix</label>
+              <input
+                id="ai_brand_voice"
+                type="text"
+                value={aiSettings.ai_brand_voice}
+                onChange={setAiField("ai_brand_voice")}
+                placeholder="Ex. Chaleureux et familial"
+                className={inputClass}
+              />
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="ai_keywords_use" className={labelClass}>Mots-clés à privilégier</label>
+                <input
+                  id="ai_keywords_use"
+                  type="text"
+                  value={aiSettings.ai_keywords_use}
+                  onChange={setAiField("ai_keywords_use")}
+                  placeholder="Ex. bienvenue, séjour inoubliable"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="ai_keywords_avoid" className={labelClass}>Mots-clés à éviter</label>
+                <input
+                  id="ai_keywords_avoid"
+                  type="text"
+                  value={aiSettings.ai_keywords_avoid}
+                  onChange={setAiField("ai_keywords_avoid")}
+                  placeholder="Ex. promo, soldes"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="ai_signature" className={labelClass}>Signature</label>
+              <input
+                id="ai_signature"
+                type="text"
+                value={aiSettings.ai_signature}
+                onChange={setAiField("ai_signature")}
+                placeholder="Ex. L'équipe de l'Hôtel Le Baobab"
+                className={inputClass}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={savingAiSettings}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-slate-900 font-semibold hover:opacity-90 disabled:opacity-70"
+            >
+              {savingAiSettings ? "Enregistrement…" : "Enregistrer"}
+            </button>
+          </form>
+        ) : (
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <p className="text-sm text-slate-600">
+              L&apos;IA personnalisée est réservée au plan Premium.{" "}
+              <Link href="/tarifs" className="text-primary font-semibold hover:underline">
+                Découvrir le plan Premium
+              </Link>
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Types de chambres */}

@@ -19,6 +19,10 @@ export interface UserProfile {
   config_complete?: boolean;
   onboarding_completed?: boolean;
   onboarding_step?: number;
+  ai_brand_voice?: string | null;
+  ai_keywords_use?: string | null;
+  ai_keywords_avoid?: string | null;
+  ai_signature?: string | null;
   created_at?: string;
   updated_at?: string;
 }

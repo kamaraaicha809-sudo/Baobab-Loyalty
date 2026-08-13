@@ -34,6 +34,23 @@ async function fetchPromptFromDb(name: string): Promise<string | null> {
   return null;
 }
 
+interface HotelAiProfile {
+  ai_brand_voice?: string | null;
+  ai_keywords_use?: string | null;
+  ai_keywords_avoid?: string | null;
+  ai_signature?: string | null;
+}
+
+function buildHotelAiContext(profile: HotelAiProfile): string | null {
+  const lines: string[] = [];
+  if (profile.ai_brand_voice?.trim()) lines.push(`Ton de voix : ${profile.ai_brand_voice.trim()}`);
+  if (profile.ai_keywords_use?.trim()) lines.push(`Mots-clés à privilégier : ${profile.ai_keywords_use.trim()}`);
+  if (profile.ai_keywords_avoid?.trim()) lines.push(`Mots-clés à éviter : ${profile.ai_keywords_avoid.trim()}`);
+  if (profile.ai_signature?.trim()) lines.push(`Signature à utiliser : ${profile.ai_signature.trim()}`);
+  if (lines.length === 0) return null;
+  return `[Contexte de l'établissement]\n${lines.join("\n")}`;
+}
+
 function mapAiError(raw: string): string {
   const lower = raw.toLowerCase();
   if (lower.includes("rate limit") || lower.includes("429")) {
@@ -73,6 +90,8 @@ Deno.serve(async (req) => {
       return errors.badRequest("Le prompt est requis.");
     }
 
+    let hotelAiContext: string | null = null;
+
     if (!isDemoMode) {
       const { user, userClient, error: authError } = await requireAuth(req);
       if (authError || !user || !userClient) {
@@ -81,7 +100,7 @@ Deno.serve(async (req) => {
 
       const { data: profile } = await userClient
         .from("profiles")
-        .select("has_access, price_id, trial_ends_at")
+        .select("has_access, price_id, trial_ends_at, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature")
         .eq("id", user.id)
         .single();
 
@@ -91,6 +110,10 @@ Deno.serve(async (req) => {
 
       if (promptName === "linkedin_post" && (profile.price_id || "").toLowerCase() !== "premium") {
         return errors.forbidden("Fonctionnalité réservée au plan Premium.");
+      }
+
+      if ((profile.price_id || "").toLowerCase() === "premium") {
+        hotelAiContext = buildHotelAiContext(profile);
       }
     }
 
@@ -113,6 +136,10 @@ Deno.serve(async (req) => {
           ? promptName
           : DEFAULT_PROMPT_NAME;
       resolvedSystem = await fetchPromptFromDb(nameToLoad);
+    }
+
+    if (hotelAiContext) {
+      resolvedSystem = resolvedSystem ? `${resolvedSystem}\n\n${hotelAiContext}` : hotelAiContext;
     }
 
     const messages: { role: string; content: string }[] = [];

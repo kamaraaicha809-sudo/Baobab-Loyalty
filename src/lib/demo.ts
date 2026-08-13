@@ -34,6 +34,10 @@ export const demoProfile = {
   config_complete: true,
   onboarding_completed: true,
   onboarding_step: 3,
+  ai_brand_voice: "Chaleureux et familial",
+  ai_keywords_use: "bienvenue, séjour inoubliable, à bientôt",
+  ai_keywords_avoid: "promo, soldes",
+  ai_signature: "L'équipe de l'Hôtel Le Baobab",
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
