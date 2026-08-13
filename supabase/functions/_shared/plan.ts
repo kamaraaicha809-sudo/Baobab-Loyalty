@@ -13,7 +13,7 @@ import { hasActiveAccess } from "./access.ts";
 const MONTHLY_RELANCE_QUOTAS: Record<string, number> = {
   starter: 5,
   pro: 10,
-  premium: 20,
+  premium: 30,
   // Anciens slugs, conservés pour les comptes créés avant le renommage
   essentiel: 5,
   croissance: 10,

@@ -33,7 +33,7 @@ const plans = [
     price: "69 000",
     priceRaw: "69000",
     priceDetail: "FCFA HT / mois",
-    rooms: "Jusqu'à 100 chambres",
+    rooms: "Jusqu'à 60 chambres",
     relances: 10,
     highlighted: true,
     features: [
@@ -51,7 +51,7 @@ const plans = [
     priceRaw: "189000",
     priceDetail: "FCFA HT / mois",
     rooms: "Chambres illimitées",
-    relances: 20,
+    relances: 30,
     highlighted: false,
     features: [
       "Tout Pro inclus",
@@ -76,7 +76,7 @@ const faqs = [
   },
   {
     q: "Qu'est-ce qu'une campagne WhatsApp, et que se passe-t-il si j'atteins ma limite ?",
-    a: "Une campagne WhatsApp correspond à l'envoi d'un message à un segment de clients (par exemple vos clients inactifs depuis 3 mois). Chaque plan inclut un nombre de campagnes WhatsApp par mois — 5 pour Starter, 10 pour Pro, 20 pour Premium — afin de maîtriser les coûts d'envoi. Les campagnes non utilisées ne sont pas reportées au mois suivant. Si vous avez besoin de plus de campagnes, vous pouvez passer à un plan supérieur à tout moment.",
+    a: "Une campagne WhatsApp correspond à l'envoi d'un message à un segment de clients (par exemple vos clients inactifs depuis 3 mois). Chaque plan inclut un nombre de campagnes WhatsApp par mois — 5 pour Starter, 10 pour Pro, 30 pour Premium — afin de maîtriser les coûts d'envoi. Les campagnes non utilisées ne sont pas reportées au mois suivant. Si vous avez besoin de plus de campagnes, vous pouvez passer à un plan supérieur à tout moment.",
   },
   {
     q: "Puis-je essayer avant de payer ?",

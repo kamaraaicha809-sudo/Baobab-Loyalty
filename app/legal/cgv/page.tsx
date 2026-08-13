@@ -43,7 +43,7 @@ export default function CGVPage() {
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200 font-medium">Pro</td>
                   <td className="p-3 border border-slate-200">69 000 FCFA HT</td>
-                  <td className="p-3 border border-slate-200">Jusqu&apos;à 100 chambres</td>
+                  <td className="p-3 border border-slate-200">Jusqu&apos;à 60 chambres</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium">Premium</td>

@@ -64,7 +64,7 @@ const faqSchema = {
       name: "Combien coûte un logiciel de fidélisation hôtel en Côte d'Ivoire ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Baobab Loyalty propose des formules adaptées aux hôtels ivoiriens à partir de 39 000 FCFA/mois pour les établissements jusqu'à 30 chambres. Le plan Pro (69 000 FCFA/mois) convient aux hôtels jusqu'à 100 chambres. Le plan Premium (189 000 FCFA/mois) est illimité. Pas d'engagement, résiliable à tout moment.",
+        text: "Baobab Loyalty propose des formules adaptées aux hôtels ivoiriens à partir de 39 000 FCFA/mois pour les établissements jusqu'à 30 chambres. Le plan Pro (69 000 FCFA/mois) convient aux hôtels jusqu'à 60 chambres. Le plan Premium (189 000 FCFA/mois) est illimité. Pas d'engagement, résiliable à tout moment.",
       },
     },
     {
@@ -101,7 +101,7 @@ const faqItems = [
   },
   {
     q: "Combien coûte un logiciel de fidélisation hôtel en Côte d'Ivoire ?",
-    a: "Baobab Loyalty propose des formules en FCFA à partir de 39 000 FCFA/mois pour les hôtels jusqu'à 30 chambres. Le plan Pro (69 000 FCFA/mois) couvre jusqu'à 100 chambres, et le plan Premium (189 000 FCFA/mois) est illimité. Sans engagement.",
+    a: "Baobab Loyalty propose des formules en FCFA à partir de 39 000 FCFA/mois pour les hôtels jusqu'à 30 chambres. Le plan Pro (69 000 FCFA/mois) couvre jusqu'à 60 chambres, et le plan Premium (189 000 FCFA/mois) est illimité. Sans engagement.",
   },
   {
     q: "Comment réduire les commissions Booking.com pour mon hôtel en Côte d'Ivoire ?",
@@ -203,7 +203,7 @@ const data: CountryPageData = {
       name: "Pro",
       price: "69 000 FCFA",
       priceDetail: "/ mois",
-      rooms: "Jusqu'à 100 chambres",
+      rooms: "Jusqu'à 60 chambres",
       highlighted: true,
       features: [
         "Tout Starter inclus",

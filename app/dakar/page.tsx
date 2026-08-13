@@ -138,7 +138,7 @@ const data: CountryPageData = {
       name: "Pro",
       price: "69 000 FCFA",
       priceDetail: "/ mois",
-      rooms: "Jusqu'à 100 chambres",
+      rooms: "Jusqu'à 60 chambres",
       highlighted: true,
       features: [
         "Tout Starter inclus",

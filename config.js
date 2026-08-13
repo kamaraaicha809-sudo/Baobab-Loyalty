@@ -106,7 +106,7 @@ const config = {
         monthlyRelances: 10,
         features: [
           { name: "10 campagnes WhatsApp par mois" },
-          { name: "Jusqu'à 100 chambres" },
+          { name: "Jusqu'à 60 chambres" },
           { name: "Segmentation avancée" },
           { name: "IA génération de messages" },
           { name: "Support prioritaire" },
@@ -116,9 +116,9 @@ const config = {
         name: "Premium",
         description: "Pour les grands établissements",
         price: 189000,
-        monthlyRelances: 20,
+        monthlyRelances: 30,
         features: [
-          { name: "20 campagnes WhatsApp par mois" },
+          { name: "30 campagnes WhatsApp par mois" },
           { name: "Chambres illimitées" },
           { name: "API WhatsApp dédiée" },
           { name: "Accès multi-utilisateurs" },
