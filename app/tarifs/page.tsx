@@ -75,8 +75,8 @@ const faqs = [
     a: "Oui, vous pouvez passer à un plan supérieur ou inférieur à tout moment. Le changement prend effet au prochain cycle de facturation.",
   },
   {
-    q: "Qu'est-ce qu'une relance client, et que se passe-t-il si j'atteins ma limite ?",
-    a: "Une relance correspond à l'envoi d'une campagne WhatsApp à un segment de clients (par exemple vos clients inactifs depuis 3 mois). Chaque plan inclut un nombre de relances par mois — 5 pour Starter, 10 pour Pro, 20 pour Premium — afin de maîtriser les coûts d'envoi. Les relances non utilisées ne sont pas reportées au mois suivant. Si vous avez besoin de plus de relances, vous pouvez passer à un plan supérieur à tout moment.",
+    q: "Qu'est-ce qu'une campagne WhatsApp, et que se passe-t-il si j'atteins ma limite ?",
+    a: "Une campagne WhatsApp correspond à l'envoi d'un message à un segment de clients (par exemple vos clients inactifs depuis 3 mois). Chaque plan inclut un nombre de campagnes WhatsApp par mois — 5 pour Starter, 10 pour Pro, 20 pour Premium — afin de maîtriser les coûts d'envoi. Les campagnes non utilisées ne sont pas reportées au mois suivant. Si vous avez besoin de plus de campagnes, vous pouvez passer à un plan supérieur à tout moment.",
   },
   {
     q: "Puis-je essayer avant de payer ?",
@@ -104,7 +104,7 @@ const pricingSchema = {
   offers: plans.map((plan) => ({
     "@type": "Offer",
     name: plan.name,
-    description: `Plan ${plan.name} — ${plan.rooms}, ${plan.relances} relances clients/mois`,
+    description: `Plan ${plan.name} — ${plan.rooms}, ${plan.relances} campagnes WhatsApp/mois`,
     price: plan.priceRaw,
     priceCurrency: "XOF",
     priceSpecification: {
@@ -239,7 +239,7 @@ export default function TarifsPage() {
                     </span>
                   </div>
 
-                  {/* Quota de relances — mis en avant, distinct de la liste de fonctionnalités */}
+                  {/* Quota de campagnes WhatsApp — mis en avant, distinct de la liste de fonctionnalités */}
                   <div
                     className={`mb-5 px-4 py-3 rounded-xl flex items-center justify-between ${
                       plan.highlighted ? "bg-white/10" : "bg-[#1a2f2a]/5"
@@ -254,7 +254,7 @@ export default function TarifsPage() {
                         {plan.relances}
                       </p>
                       <p className={`text-xs mt-1 ${plan.highlighted ? "text-[#d4e8df]" : "text-slate-500"}`}>
-                        relances clients / mois
+                        campagnes WhatsApp / mois
                       </p>
                     </div>
                     <svg
@@ -317,7 +317,7 @@ export default function TarifsPage() {
                       plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
                     }`}
                   >
-                    Relances non reportées d&apos;un mois à l&apos;autre.
+                    Campagnes non reportées d&apos;un mois à l&apos;autre.
                   </p>
                   <Link
                     href="/demo"
@@ -358,7 +358,7 @@ export default function TarifsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   <tr className="bg-[#1a2f2a]/[0.03]">
-                    <td className="py-3 pr-6 text-[#1a2f2a] font-semibold">Relances clients / mois</td>
+                    <td className="py-3 pr-6 text-[#1a2f2a] font-semibold">Campagnes WhatsApp / mois</td>
                     {plans.map((plan, j) => (
                       <td key={j} className="text-center py-3 px-4 text-[#1a2f2a] font-bold">
                         {plan.relances}
