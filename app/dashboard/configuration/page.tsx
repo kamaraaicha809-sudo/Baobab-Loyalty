@@ -7,6 +7,7 @@ import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients } from "@/src/sdk/clients";
+import { whatsapp } from "@/src/sdk/whatsapp";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/demo";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
 
@@ -136,7 +137,7 @@ export default function ConfigurationPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, whatsapp_phone_number_id, whatsapp_access_token, whatsapp_display_phone, bsp_status, bsp_phone_number, price_id, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, price_id, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature")
       .eq("id", user.id)
       .single();
 
@@ -163,16 +164,13 @@ export default function ConfigurationPage() {
         ai_keywords_avoid: ((profile as Record<string, unknown>).ai_keywords_avoid as string) || "",
         ai_signature: ((profile as Record<string, unknown>).ai_signature as string) || "",
       });
-      const p = profile as Record<string, unknown>;
-      const waConnected =
-        (!!profile.whatsapp_phone_number_id && !!profile.whatsapp_access_token) ||
-        p.bsp_status === "active";
-      setWaStatus({
-        connected: waConnected,
-        phone: (p.bsp_phone_number as string | undefined)
-          || (p.whatsapp_display_phone as string | undefined)
-          || profile.whatsapp_phone_number_id || undefined,
-      });
+    }
+
+    try {
+      const status = await whatsapp.status();
+      setWaStatus({ connected: status.connected, phone: status.phone || undefined });
+    } catch {
+      setWaStatus({ connected: false });
     }
 
     const { data: existingRooms } = await supabase
