@@ -7,9 +7,9 @@ Marché cible : Afrique francophone (prix en FCFA).
 
 ## Stack
 
-- **Next.js 15** App Router + React 19 + TypeScript
+- **Next.js 16** App Router + React 19 + TypeScript
 - **Supabase** (Auth + PostgreSQL + Edge Functions Deno + Realtime + Vault)
-- **Stripe** (Paiements - plans en FCFA)
+- **Moneroo** (Paiements - plans en FCFA)
 - **OpenRouter** (AI - génération de messages)
 - **Resend** (Emails transactionnels)
 - **TailwindCSS 4**
@@ -55,13 +55,13 @@ app/
 │   ├── configuration/      # Setup hôtel + import CSV
 │   └── templates/          # Templates messages IA
 ├── offre/                  # Page publique (client final WhatsApp)
-└── checkout/               # Stripe checkout
+└── checkout/               # Checkout Moneroo
 
 src/sdk/
 ├── clients.ts              # Import CSV, segmentation, counts
 ├── reservations.ts         # Analytics (chart, stats)
 ├── ai.ts                   # Génération messages OpenRouter
-├── billing.ts              # Stripe checkout + portal
+├── billing.ts              # Checkout + portail Moneroo
 ├── prompts.ts              # Gestion prompts IA admin
 ├── email.ts                # Resend
 └── user.ts                 # Profil utilisateur
@@ -69,14 +69,14 @@ src/sdk/
 supabase/
 ├── functions/              # Edge Functions Deno
 │   └── _shared/            # auth.ts, cors.ts, response.ts
-└── migrations/             # 015 migrations SQL avec RLS
+└── migrations/             # ~40 migrations SQL avec RLS
 
 config.js                   # Branding, couleurs, pricing plans
 ```
 
 ---
 
-## Base de Données (15 migrations)
+## Base de Données (~40 migrations)
 
 ### Tables principales
 
@@ -93,12 +93,14 @@ config.js                   # Branding, couleurs, pricing plans
 | `sent_messages` | Log d'envoi (campaign_id, client_id, channel, status) |
 | `redemptions` | Tracking clics (clicked/pending/booked/cancelled) |
 
-### Fonctions SQL clés (migration 015)
+### Fonctions SQL clés (migration 015, sécurisées en 038)
 
 ```sql
 get_segment_counts(p_profile_id)   -- Nombre clients par segment
 get_reservations_chart(p_profile_id) -- Données graphique 7 jours
 ```
+
+Les deux vérifient `is_team_member(p_profile_id)` (migration 038) avant de renvoyer des données — sans ça, n'importe qui connaissant un `profile_id` pouvait lire les stats d'un autre hôtel.
 
 ### Relations critiques
 
@@ -143,11 +145,13 @@ segments → campaigns, segment_offers
 
 ## Pricing (FCFA)
 
-| Plan | Prix | Chambres |
-|------|------|----------|
-| Essentiel | 29 000 FCFA/mo | ≤ 30 |
-| Croissance | 49 000 FCFA/mo | ≤ 100 |
-| Premium | 69 000 FCFA/mo | Illimité |
+Source de vérité : `config.js` (`billing.plans`).
+
+| Plan | Prix | Chambres | Campagnes WhatsApp/mois |
+|------|------|----------|--------------------------|
+| Starter | 39 000 FCFA/mo | ≤ 30 | 5 |
+| Pro | 69 000 FCFA/mo | ≤ 60 | 10 |
+| Premium | 189 000 FCFA/mo | Illimité | 30 (+ multi-utilisateurs, IA perso, posts LinkedIn) |
 
 ---
 
@@ -164,10 +168,14 @@ SUPABASE_SERVICE_ROLE_KEY=    # Pour /offre API (public)
 
 ### Supabase Vault (Edge Functions)
 ```
-STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET
+MONEROO_API_KEY
+MONEROO_WEBHOOK_SECRET
 RESEND_API_KEY
 OPENROUTER_API_KEY
+UNIPILE_API_KEY
+UNIPILE_DSN
+META_APP_ID
+META_APP_SECRET
 EMAIL_FROM
 DEMO_MODE
 ```
@@ -178,7 +186,6 @@ DEMO_MODE
 
 - **Supabase MCP** : Migrations, tables, Edge Functions, RLS
 - **GitHub MCP** : Repos, issues, PRs
-- **Stripe MCP** : Customers, subscriptions, invoices
 - **Resend MCP** : Emails, templates
 
 ---

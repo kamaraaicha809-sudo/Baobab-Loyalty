@@ -15,10 +15,9 @@ Cochez chaque étape au fur et à mesure :
 - [ ] Edge Functions déployées
 - [ ] Secrets configurés dans Vault
 
-### Stripe
-- [ ] Compte Stripe configuré
-- [ ] Produits et prix créés
-- [ ] priceId ajoutés dans config.js
+### Moneroo
+- [ ] Compte Moneroo configuré
+- [ ] Plans (nom, prix FCFA) définis dans `config.js` (`billing.plans`)
 - [ ] Webhook créé et configuré
 
 ### Vercel
@@ -85,10 +84,12 @@ Dans Supabase Dashboard > Settings > Vault :
 
 | Secret | Description |
 |--------|-------------|
-| `STRIPE_SECRET_KEY` | Clé secrète Stripe (sk_live_...) |
-| `STRIPE_WEBHOOK_SECRET` | Secret du webhook Stripe |
+| `MONEROO_API_KEY` | Clé API Moneroo |
+| `MONEROO_WEBHOOK_SECRET` | Secret du webhook Moneroo (vérifie l'en-tête `x-moneroo-signature`) |
 | `RESEND_API_KEY` | Clé API Resend (optionnel) |
 | `OPENROUTER_API_KEY` | Clé OpenRouter pour IA (optionnel) |
+| `UNIPILE_API_KEY` / `UNIPILE_DSN` | Récupération de posts LinkedIn (fonctionnalité Premium) |
+| `META_APP_ID` / `META_APP_SECRET` | Connexion WhatsApp Business (Meta Embedded Signup) |
 | `EMAIL_FROM` | Adresse email d'envoi |
 
 ### Déployer les Edge Functions
@@ -111,42 +112,48 @@ supabase functions deploy billing-create-checkout
 
 | Fonction | Description |
 |----------|-------------|
-| `billing-create-checkout` | Créer session Stripe Checkout |
-| `billing-create-portal` | Créer session Customer Portal |
-| `billing-webhook` | Gérer webhooks Stripe |
+| `billing-create-checkout` | Créer un paiement Moneroo |
+| `billing-create-portal` | Portail de gestion d'abonnement |
+| `billing-webhook` | Gérer les webhooks Moneroo (signature HMAC) |
 | `user-get-profile` | Récupérer profil utilisateur |
-| `ai-generate` | Générer contenu IA |
-| `email-send` | Envoyer email |
-| `prompts-list` | Lister les prompts |
-| `prompts-create` | Créer un prompt |
-| `prompts-update` | Modifier un prompt |
-| `prompts-delete` | Supprimer un prompt |
-| `config-get` | Lire configuration |
-| `config-update` | Modifier configuration |
+| `ai-generate` | Générer un message de campagne (IA) |
+| `linkedin-to-template` | Convertir un post LinkedIn en template WhatsApp (IA, plan Premium) |
+| `email-send` / `email-welcome` | Envoyer un email transactionnel |
+| `newsletter-subscribe` | Inscription newsletter (formulaire public) |
+| `prompts-list` / `prompts-create` / `prompts-update` / `prompts-delete` | Gestion des prompts IA (admin) |
+| `config-get` / `config-update` | Lire/modifier la configuration `app_config` |
+| `campaign-send` | Envoyer une campagne WhatsApp |
+| `whatsapp-connect` / `whatsapp-disconnect` / `whatsapp-status` | Connexion WhatsApp Business (Meta Embedded Signup) |
+| `storage-upload` / `storage-delete` | Upload/suppression de fichiers |
+| `clients-email-sync` | Synchronisation clients par email |
+| `team-invite` / `team-accept-invite` / `team-remove-member` / `team-list` | Gestion multi-utilisateurs (plan Premium) |
+| `fne-worker` | Traitement asynchrone de la facturation électronique (FNE) |
+
+> La liste faisant foi est celle renvoyée par `mcp_supabase_list_edge_functions` — ce tableau peut prendre du retard si des fonctions sont ajoutées sans mise à jour de ce document.
 
 ---
 
-## 2. Stripe
+## 2. Moneroo
 
 ### Configuration
 
-1. Créez un compte sur [stripe.com](https://stripe.com)
-2. Obtenez vos clés API dans Dashboard > Developers > API keys
+1. Créez un compte sur [moneroo.io](https://moneroo.io)
+2. Obtenez votre clé API dans le dashboard Moneroo
+3. Copiez-la dans Supabase Vault (`MONEROO_API_KEY`)
 
-### Créer les produits
+### Définir les plans
 
-1. Dashboard Stripe > Products
-2. Créez vos produits et prix
-3. Copiez les `price_id` dans `config.js`
+Contrairement à Stripe, Moneroo n'exige pas de créer des produits/prix à l'avance : `billing-create-checkout` initialise un paiement directement avec un montant (`amount`, en FCFA/XOF) envoyé à l'appel. Les plans (nom, prix, quotas) sont donc définis uniquement côté application, dans `config.js` :
 
 ```javascript
 // config.js
-stripe: {
+billing: {
+  currency: "FCFA",
   plans: [
     {
-      priceId: "price_xxxxx", // Votre price_id Stripe
       name: "Starter",
-      price: 79,
+      price: 39000,       // FCFA — envoyé tel quel à Moneroo
+      monthlyRelances: 5, // Quota appliqué côté serveur dans campaign-send
       // ...
     }
   ]
@@ -155,15 +162,11 @@ stripe: {
 
 ### Configurer le webhook
 
-1. Dashboard Stripe > Developers > Webhooks
+1. Dashboard Moneroo > Webhooks
 2. Créez un endpoint :
    - **URL** : `https://[votre-projet].supabase.co/functions/v1/billing-webhook`
-   - **Events** :
-     - `checkout.session.completed`
-     - `customer.subscription.deleted`
-     - `invoice.paid`
-     - `invoice.payment_failed`
-3. Copiez le signing secret dans Supabase Vault (`STRIPE_WEBHOOK_SECRET`)
+3. Copiez le secret de signature dans Supabase Vault (`MONEROO_WEBHOOK_SECRET`)
+   — `billing-webhook` vérifie une signature HMAC-SHA256 dans l'en-tête `x-moneroo-signature`, avec une protection anti-rejeu de 5 minutes.
 
 ---
 
@@ -188,7 +191,7 @@ SITE_URL=https://votre-domaine.com
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | All | Clé publique Supabase |
 | `SITE_URL` | Production | URL de votre site |
 
-> **Note** : Les secrets Stripe sont dans Supabase Vault, pas dans Vercel.
+> **Note** : Les secrets Moneroo sont dans Supabase Vault, pas dans Vercel.
 
 ---
 
@@ -241,10 +244,12 @@ Pour un domaine personnalisé pour l'auth :
 
 | Secret | Requis | Utilisé par |
 |--------|--------|-------------|
-| `STRIPE_SECRET_KEY` | ✅ | billing-* |
-| `STRIPE_WEBHOOK_SECRET` | ✅ | billing-webhook |
-| `RESEND_API_KEY` | ❌ | email-send |
-| `OPENROUTER_API_KEY` | ❌ | ai-generate |
+| `MONEROO_API_KEY` | ✅ | billing-create-checkout |
+| `MONEROO_WEBHOOK_SECRET` | ✅ | billing-webhook |
+| `RESEND_API_KEY` | ❌ | email-send, email-welcome, newsletter-subscribe |
+| `OPENROUTER_API_KEY` | ❌ | ai-generate, linkedin-to-template |
+| `UNIPILE_API_KEY` / `UNIPILE_DSN` | ❌ | linkedin-to-template |
+| `META_APP_ID` / `META_APP_SECRET` | ❌ | whatsapp-connect |
 | `EMAIL_FROM` | ❌ | email-send |
 
 ---
@@ -253,8 +258,8 @@ Pour un domaine personnalisé pour l'auth :
 
 ### Avant le lancement
 
-- [ ] Clés Stripe en mode live (sk_live_...)
-- [ ] Webhook Stripe en mode live
+- [ ] Clé Moneroo en mode live
+- [ ] Webhook Moneroo en mode live
 - [ ] OAuth en mode production
 - [ ] Emails de domaine vérifiés (Resend)
 - [ ] RLS activé sur toutes les tables
@@ -265,7 +270,7 @@ Pour un domaine personnalisé pour l'auth :
 ### Après le lancement
 
 - [ ] Monitorer les logs (Supabase, Vercel)
-- [ ] Vérifier les webhooks Stripe
+- [ ] Vérifier les webhooks Moneroo
 - [ ] Tester un achat réel
 - [ ] Configurer les alertes (optionnel)
 
@@ -286,7 +291,7 @@ Ou via MCP :
 
 ### "Webhook signature verification failed"
 
-Vérifiez que `STRIPE_WEBHOOK_SECRET` dans Supabase Vault correspond au signing secret du webhook Stripe.
+Vérifiez que `MONEROO_WEBHOOK_SECRET` dans Supabase Vault correspond au secret de signature configuré dans le dashboard Moneroo.
 
 ### "Invalid Supabase URL"
 
