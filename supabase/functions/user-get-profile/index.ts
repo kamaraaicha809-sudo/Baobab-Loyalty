@@ -40,7 +40,16 @@ Deno.serve(async (req) => {
     }
 
     // Fetch profile (own, or via team membership)
-    const { profile, teamRole } = await resolveProfile(userClient, user.id);
+    // Selection explicite : ne jamais renvoyer whatsapp_access_token / bsp_api_key
+    // au frontend (secrets d'integration, utilises uniquement cote serveur).
+    const { profile, teamRole } = await resolveProfile(
+      userClient,
+      user.id,
+      "id, email, has_access, trial_ends_at, customer_id, price_id, role, hotel_name, " +
+        "config_complete, onboarding_completed, onboarding_step, " +
+        "ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature, " +
+        "created_at, updated_at"
+    );
 
     if (!profile) {
       return success({
