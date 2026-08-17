@@ -53,7 +53,12 @@ Deno.serve(async (req) => {
         { onConflict: "profile_id,user_id" }
       );
 
-    if (memberError) return errors.internal("Échec de l'ajout à l'équipe.");
+    if (memberError) {
+      if (memberError.code === "23505") {
+        return errors.badRequest("Vous faites déjà partie d'une autre équipe. Un compte ne peut rejoindre qu'un seul hôtel.");
+      }
+      return errors.internal("Échec de l'ajout à l'équipe.");
+    }
 
     await serviceClient
       .from("team_invitations")
