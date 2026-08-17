@@ -25,8 +25,11 @@ Deno.serve(async (req) => {
     const { user, userClient, error: authError } = await requireAuth(req);
     if (authError || !user || !userClient) return errors.unauthorized(authError || "Auth required");
 
-    const { profile } = await resolveProfile<{ id: string }>(userClient, user.id, "id");
+    const { profile, teamRole } = await resolveProfile<{ id: string }>(userClient, user.id, "id");
     if (!profile) return errors.forbidden("Profil introuvable.");
+    if (teamRole !== "owner" && teamRole !== "admin") {
+      return errors.forbidden("Seul le propriétaire ou un administrateur peut déconnecter WhatsApp.");
+    }
 
     const db = getServiceClient();
 

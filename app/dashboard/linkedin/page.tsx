@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ai } from "@/src/sdk";
 import { usePremiumAccess } from "@/src/hooks/usePremiumAccess";
+import { isDemoMode, demoLinkedInPostGenerated } from "@/src/lib/demo";
 import LinkedInLoading from "./loading";
 
 const TONES = [
@@ -60,13 +61,18 @@ export default function LinkedInPage() {
     setGeneratedPost("");
 
     try {
-      const result = await ai.generateLinkedInPost({
-        subject: topic,
-        hotelName: hotelName || undefined,
-        tone: tone as "professionnel" | "chaleureux" | "inspirant",
-        offer: offer || undefined,
-      });
-      setGeneratedPost(result.content);
+      if (isDemoMode) {
+        await new Promise((r) => setTimeout(r, 800));
+        setGeneratedPost(demoLinkedInPostGenerated.content);
+      } else {
+        const result = await ai.generateLinkedInPost({
+          subject: topic,
+          hotelName: hotelName || undefined,
+          tone: tone as "professionnel" | "chaleureux" | "inspirant",
+          offer: offer || undefined,
+        });
+        setGeneratedPost(result.content);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur lors de la génération.");
     } finally {

@@ -41,8 +41,16 @@ function SendingContent() {
       setProgress((p) => Math.min(85, p + step));
     }, interval);
 
-    campaigns
-      .sendCampaign({ segmentCode, message, templateId, avantage, customMonths })
+    // En mode démo, aucune session Supabase réelle n'existe : callEdgeFunction
+    // rejetterait l'appel avant même d'atteindre campaign-send. On simule donc
+    // ici le même résultat que la branche démo de l'Edge Function.
+    const sendPromise = isDemoMode
+      ? new Promise<{ sent: number; failed: number; total: number; campaignId: string | null }>((resolve) =>
+          setTimeout(() => resolve({ sent: 3, failed: 0, total: 3, campaignId: null }), 1500)
+        )
+      : campaigns.sendCampaign({ segmentCode, message, templateId, avantage, customMonths });
+
+    sendPromise
       .then((result) => {
         clearInterval(timer);
         setProgress(100);
