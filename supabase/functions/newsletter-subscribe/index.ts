@@ -11,7 +11,7 @@
 
 import { getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
-import { success, errors } from "../_shared/response.ts";
+import { success, error, errors } from "../_shared/response.ts";
 
 interface SubscribeBody {
   email: string;
@@ -19,8 +19,19 @@ interface SubscribeBody {
   source?: string;
 }
 
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME_LENGTH = 200;
+const MAX_SOURCE_LENGTH = 50;
+
+function parseSubscribeBody(body: unknown): SubscribeBody | null {
+  if (typeof body !== "object" || body === null) return null;
+  const { email, name, source } = body as Record<string, unknown>;
+
+  if (typeof email !== "string" || !EMAIL_RE.test(email.trim())) return null;
+  if (name !== undefined && (typeof name !== "string" || name.length > MAX_NAME_LENGTH)) return null;
+  if (source !== undefined && (typeof source !== "string" || source.length > MAX_SOURCE_LENGTH)) return null;
+
+  return { email: email.trim(), name, source };
 }
 
 function buildWelcomeEmail(name: string | undefined): string {
@@ -126,7 +137,8 @@ async function sendWelcomeEmail(
   name: string | undefined,
   resendApiKey: string
 ): Promise<void> {
-  const res = await fetch("https://api.resend.com/emails", {
+  // Non-blocking — l'appelant ignore le résultat, un échec d'envoi ne doit pas bloquer l'inscription.
+  await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendApiKey}`,
@@ -139,15 +151,6 @@ async function sendWelcomeEmail(
       html: buildWelcomeEmail(name),
     }),
   });
-
-  if (!res.ok) {
-    // Do not throw — email failure must not block the subscription
-    const body = await res.text();
-    // Log only in non-production to avoid leaking PII in logs
-    if (Deno.env.get("ENVIRONMENT") !== "production") {
-      const _ = body; // referenced to avoid unused-var lint
-    }
-  }
 }
 
 Deno.serve(async (req) => {
@@ -160,19 +163,13 @@ Deno.serve(async (req) => {
   try {
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
 
-    const body: SubscribeBody = await req.json();
-    const { email, name, source = "website" } = body;
-
-    // Validate email
-    if (!email || typeof email !== "string") {
-      return errors.badRequest("Email requis", { code: "MISSING_EMAIL" });
-    }
-
-    const trimmedEmail = email.trim().toLowerCase();
-
-    if (!isValidEmail(trimmedEmail)) {
+    const rawBody = await req.json();
+    const parsed = parseSubscribeBody(rawBody);
+    if (!parsed) {
       return errors.validationError("Adresse email invalide", { code: "INVALID_EMAIL" });
     }
+    const { email, name, source = "website" } = parsed;
+    const trimmedEmail = email.toLowerCase();
 
     // Demo mode: skip DB insert, return mock success
     if (isDemoMode) {
@@ -180,6 +177,18 @@ Deno.serve(async (req) => {
     }
 
     const db = getServiceClient();
+
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0].trim()
+      || req.headers.get("x-real-ip")
+      || "unknown";
+    const { data: allowed } = await db.rpc("check_rate_limit", {
+      p_key: `newsletter:${clientIp}`,
+      p_max_hits: 5,
+      p_window_seconds: 600,
+    });
+    if (allowed === false) {
+      return error(429, "RATE_LIMITED", "Trop de requêtes. Réessayez plus tard.");
+    }
 
     // Insert subscriber — handle unique constraint violation
     const { error: insertError } = await db
@@ -194,25 +203,7 @@ Deno.serve(async (req) => {
     if (insertError) {
       // Unique constraint violation → already subscribed
       if (insertError.code === "23505") {
-        return new Response(
-          JSON.stringify({
-            ok: false,
-            error: {
-              code: "ALREADY_SUBSCRIBED",
-              message: "Cette adresse email est déjà inscrite à la newsletter.",
-            },
-          }),
-          {
-            status: 409,
-            headers: {
-              "Access-Control-Allow-Origin": "*",
-              "Access-Control-Allow-Headers":
-                "authorization, x-client-info, apikey, content-type, x-http-method",
-              "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        return error(409, "ALREADY_SUBSCRIBED", "Cette adresse email est déjà inscrite à la newsletter.");
       }
 
       return errors.internal(insertError.message);

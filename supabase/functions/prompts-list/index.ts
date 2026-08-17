@@ -6,8 +6,7 @@
  * Method: GET
  */
 
-import { createClient } from "../_shared/deps.ts";
-import { requireAdmin } from "../_shared/auth.ts";
+import { requireAdmin, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 
@@ -25,12 +24,7 @@ Deno.serve(async (req) => {
       if (authError) return errors.unauthorized(authError);
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false },
-    });
+    const supabase = getServiceClient();
 
     const { data, error: dbError } = await supabase
       .from("ai_prompts")

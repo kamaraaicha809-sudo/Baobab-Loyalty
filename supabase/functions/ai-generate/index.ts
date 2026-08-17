@@ -91,39 +91,50 @@ Deno.serve(async (req) => {
       return errors.badRequest("Le prompt est requis.");
     }
 
+    if (isDemoMode) {
+      // Simulation en mode démo — aucun appel réel (ni facturé) à OpenRouter.
+      // Ce endpoint est accessible sans authentification en mode démo ; un
+      // vrai appel IA ici serait exploitable par n'importe qui pour
+      // consommer le quota payant OpenRouter de l'équipe.
+      await new Promise((r) => setTimeout(r, 800));
+      return success({
+        content: "[Démo] Contenu généré simulé — aucun appel réel à l'IA n'est effectué en mode démo.",
+        model: "demo",
+        usage: null,
+      });
+    }
+
     let hotelAiContext: string | null = null;
 
-    if (!isDemoMode) {
-      const { user, userClient, error: authError } = await requireAuth(req);
-      if (authError || !user || !userClient) {
-        return errors.unauthorized(authError || "Authentication required");
-      }
+    const { user, userClient, error: authError } = await requireAuth(req);
+    if (authError || !user || !userClient) {
+      return errors.unauthorized(authError || "Authentication required");
+    }
 
-      const { profile } = await resolveProfile<{
-        has_access?: boolean | null;
-        price_id: string | null;
-        trial_ends_at?: string | null;
-        ai_brand_voice?: string | null;
-        ai_keywords_use?: string | null;
-        ai_keywords_avoid?: string | null;
-        ai_signature?: string | null;
-      }>(
-        userClient,
-        user.id,
-        "has_access, price_id, trial_ends_at, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature"
-      );
+    const { profile } = await resolveProfile<{
+      has_access?: boolean | null;
+      price_id: string | null;
+      trial_ends_at?: string | null;
+      ai_brand_voice?: string | null;
+      ai_keywords_use?: string | null;
+      ai_keywords_avoid?: string | null;
+      ai_signature?: string | null;
+    }>(
+      userClient,
+      user.id,
+      "has_access, price_id, trial_ends_at, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature"
+    );
 
-      if (!profile || !hasActiveAccess(profile)) {
-        return errors.forbidden("Active subscription required");
-      }
+    if (!profile || !hasActiveAccess(profile)) {
+      return errors.forbidden("Active subscription required");
+    }
 
-      if (promptName === "linkedin_post" && (profile.price_id || "").toLowerCase() !== "premium") {
-        return errors.forbidden("Fonctionnalité réservée au plan Premium.");
-      }
+    if (promptName === "linkedin_post" && (profile.price_id || "").toLowerCase() !== "premium") {
+      return errors.forbidden("Fonctionnalité réservée au plan Premium.");
+    }
 
-      if ((profile.price_id || "").toLowerCase() === "premium") {
-        hotelAiContext = buildHotelAiContext(profile);
-      }
+    if ((profile.price_id || "").toLowerCase() === "premium") {
+      hotelAiContext = buildHotelAiContext(profile);
     }
 
     if (prompt.length > 4000) {

@@ -78,34 +78,6 @@ Deno.serve(async (req) => {
   try {
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
 
-    let userId: string;
-
-    if (isDemoMode) {
-      userId = "demo-user-id";
-    } else {
-      const { user, userClient, error: authError } = await requireAuth(req);
-      if (authError || !user || !userClient) {
-        return errors.unauthorized(authError || "Authentication required");
-      }
-
-      const { profile } = await resolveProfile<{
-        id: string;
-        has_access?: boolean | null;
-        price_id: string | null;
-        trial_ends_at?: string | null;
-      }>(userClient, user.id, "id, has_access, price_id, trial_ends_at");
-
-      if (!profile || !hasActiveAccess(profile)) {
-        return errors.forbidden("Active subscription required");
-      }
-
-      if ((profile.price_id || "").toLowerCase() !== "premium") {
-        return errors.forbidden("Fonctionnalité réservée au plan Premium.");
-      }
-
-      userId = profile.id;
-    }
-
     const body = await req.json();
     const { url } = body;
 
@@ -121,6 +93,40 @@ Deno.serve(async (req) => {
 
     if (!url.includes("linkedin.com")) {
       return errors.badRequest("L'URL doit être un lien LinkedIn valide.");
+    }
+
+    if (isDemoMode) {
+      // Simulation en mode démo — aucun appel réel (ni facturé) à Unipile/OpenRouter.
+      // Ce endpoint est accessible sans authentification en mode démo ; de vrais
+      // appels ici seraient exploitables par n'importe qui pour consommer les
+      // quotas payants Unipile et OpenRouter de l'équipe.
+      await new Promise((r) => setTimeout(r, 1000));
+      return success({
+        content:
+          "Cher(e) {{client_name}},\n\n[Démo] Ceci est un template WhatsApp simulé généré à partir d'un post LinkedIn. Découvrez notre offre {{offer_discount}} chez {{hotel_name}}, valable jusqu'au {{valid_until}}. Réservez dès maintenant !",
+        variables_found: ["client_name", "hotel_name", "offer_discount", "valid_until"],
+        post_preview: "[Démo] Aperçu simulé du post LinkedIn source...",
+      });
+    }
+
+    const { user, userClient, error: authError } = await requireAuth(req);
+    if (authError || !user || !userClient) {
+      return errors.unauthorized(authError || "Authentication required");
+    }
+
+    const { profile } = await resolveProfile<{
+      id: string;
+      has_access?: boolean | null;
+      price_id: string | null;
+      trial_ends_at?: string | null;
+    }>(userClient, user.id, "id, has_access, price_id, trial_ends_at");
+
+    if (!profile || !hasActiveAccess(profile)) {
+      return errors.forbidden("Active subscription required");
+    }
+
+    if ((profile.price_id || "").toLowerCase() !== "premium") {
+      return errors.forbidden("Fonctionnalité réservée au plan Premium.");
     }
 
     const postId = extractLinkedinPostId(url);

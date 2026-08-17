@@ -4,32 +4,53 @@
  */
 
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { createAdminClient } from "@/libs/supabase/admin";
+import { checkRateLimit, getClientIp } from "@/libs/rate-limit";
+import config from "@/config";
 
-interface ReservationBody {
-  profile_id: string;
-  hotel_name?: string;
-  checkin_date?: string;
-  nights?: number;
-  client_name?: string;
-  client_phone?: string;
-  avantage?: string;
+const reservationSchema = z.object({
+  profile_id: z.string().uuid(),
+  hotel_name: z.string().max(200).optional(),
+  checkin_date: z.string().max(10).optional(),
+  nights: z.coerce.number().int().min(1).max(30).optional(),
+  client_name: z.string().max(200).optional(),
+  client_phone: z.string().max(30).optional(),
+  avantage: z.string().max(500).optional(),
+});
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 export async function POST(request: Request) {
   try {
-    const body: ReservationBody = await request.json();
-    const { profile_id, hotel_name, checkin_date, nights, client_name, client_phone, avantage } = body;
-
-    if (!profile_id) {
-      return NextResponse.json({ error: "profile_id requis" }, { status: 400 });
+    const json = await request.json();
+    const parsed = reservationSchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
     }
+    const { profile_id, hotel_name, checkin_date, nights, client_name, client_phone, avantage } = parsed.data;
 
     const supabase = createAdminClient();
     if (!supabase) {
       return NextResponse.json(
         { error: "Service non configuré pour créer des réservations" },
         { status: 503 }
+      );
+    }
+
+    const ip = getClientIp(request);
+    const allowed = await checkRateLimit(supabase, `reservations:${ip}`, 5, 600);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Trop de demandes. Réessayez dans quelques minutes." },
+        { status: 429 }
       );
     }
 
@@ -103,23 +124,28 @@ Durée : ${nightCount} nuit${nightCount > 1 ? "s" : ""}
 ACTION REQUISE : Appelez le client pour confirmer la disponibilité et valider la réservation.
     `.trim();
 
+    const hotelLabelHtml = escapeHtml(hotelLabel);
+    const clientLabelHtml = escapeHtml(clientLabel);
+    const clientPhoneHtml = escapeHtml(client_phone || "Non renseigné");
+    const offerLabelHtml = escapeHtml(offerLabel);
+
     const htmlBody = `
 <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1e293b;">
   <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Nouvelle demande de réservation</h2>
-  <p style="color: #64748b; font-size: 14px; margin-top: 0;">via Baobab Loyalty — ${hotelLabel}</p>
+  <p style="color: #64748b; font-size: 14px; margin-top: 0;">via Baobab Loyalty — ${hotelLabelHtml}</p>
 
   <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
     <tr style="border-bottom: 1px solid #e2e8f0;">
       <td style="padding: 10px 0; color: #64748b; width: 40%;">Client</td>
-      <td style="padding: 10px 0; font-weight: 600;">${clientLabel}</td>
+      <td style="padding: 10px 0; font-weight: 600;">${clientLabelHtml}</td>
     </tr>
     <tr style="border-bottom: 1px solid #e2e8f0;">
       <td style="padding: 10px 0; color: #64748b;">Téléphone</td>
-      <td style="padding: 10px 0; font-weight: 600;">${client_phone || "Non renseigné"}</td>
+      <td style="padding: 10px 0; font-weight: 600;">${clientPhoneHtml}</td>
     </tr>
     <tr style="border-bottom: 1px solid #e2e8f0;">
       <td style="padding: 10px 0; color: #64748b;">Offre demandée</td>
-      <td style="padding: 10px 0;">${offerLabel}</td>
+      <td style="padding: 10px 0;">${offerLabelHtml}</td>
     </tr>
     <tr style="border-bottom: 1px solid #e2e8f0;">
       <td style="padding: 10px 0; color: #64748b;">Arrivée</td>
@@ -156,7 +182,7 @@ ACTION REQUISE : Appelez le client pour confirmer la disponibilité et valider l
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              from: "Baobab Loyalty <notifications@baobab-loyalty.com>",
+              from: config.resend.fromNoReply,
               to: [profile.reception_email],
               subject: `Nouvelle réservation à valider — ${clientLabel} (${checkinFormatted})`,
               text: emailBody,
