@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, Suspense, useEffect } from "react";
+import { useState, Suspense, useEffect, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
@@ -17,7 +17,7 @@ function SignInContent() {
   const emailParam = searchParams.get("email");
 
   useEffect(() => {
-    if (emailParam) setEmail(decodeURIComponent(emailParam));
+    if (emailParam) startTransition(() => setEmail(decodeURIComponent(emailParam)));
   }, [emailParam]);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

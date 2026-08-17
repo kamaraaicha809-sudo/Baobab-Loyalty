@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, startTransition } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { team, SdkError } from "@/src/sdk";
@@ -47,11 +47,13 @@ export default function EquipePage() {
 
   const loadTeam = useCallback(async () => {
     if (isDemoMode) {
-      setData(demoTeam);
-      setLoading(false);
+      startTransition(() => {
+        setData(demoTeam);
+        setLoading(false);
+      });
       return;
     }
-    setLoading(true);
+    startTransition(() => setLoading(true));
     try {
       const result = await team.list();
       setData(result);
@@ -63,7 +65,7 @@ export default function EquipePage() {
   }, []);
 
   useEffect(() => {
-    if (isPremium) loadTeam();
+    if (isPremium) startTransition(() => loadTeam());
   }, [isPremium, loadTeam]);
 
   const canManage = data?.callerRole === "owner" || data?.callerRole === "admin";

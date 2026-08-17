@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 
 const COOKIE_KEY = "cookies_accepted";
@@ -11,7 +11,7 @@ const CookieBanner = () => {
   useEffect(() => {
     const stored = localStorage.getItem(COOKIE_KEY);
     if (!stored) {
-      setVisible(true);
+      startTransition(() => setVisible(true));
     }
   }, []);
 

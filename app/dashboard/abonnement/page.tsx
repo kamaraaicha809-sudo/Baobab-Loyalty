@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 import config from "@/config";
 import { billing, user as userSdk } from "@/src/sdk";
@@ -28,11 +28,20 @@ export default function AbonnementPage() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [currentPlanIndex, setCurrentPlanIndex] = useState<number | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [upgradeRedirectUrl, setUpgradeRedirectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (upgradeRedirectUrl) {
+      window.location.href = upgradeRedirectUrl;
+    }
+  }, [upgradeRedirectUrl]);
 
   useEffect(() => {
     if (isDemoMode) {
-      setHasAccess(true);
-      setCurrentPlanIndex(1);
+      startTransition(() => {
+        setHasAccess(true);
+        setCurrentPlanIndex(1);
+      });
       return;
     }
     userSdk
@@ -67,7 +76,7 @@ export default function AbonnementPage() {
         successUrl: `${window.location.origin}/dashboard/abonnement`,
         cancelUrl: `${window.location.origin}/dashboard/abonnement`,
       });
-      window.location.href = url;
+      setUpgradeRedirectUrl(url);
     } catch {
       setUpgradeLoading(null);
     }
@@ -297,7 +306,7 @@ export default function AbonnementPage() {
               <div className="bg-red-50 border border-red-200 rounded-xl p-5 space-y-3">
                 <p className="text-sm font-semibold text-red-800">Confirmer la résiliation ?</p>
                 <p className="text-xs text-red-600">
-                  Votre abonnement restera actif jusqu'à la fin de la période en cours. Vous perdrez l'accès aux fonctionnalités premium ensuite.
+                  Votre abonnement restera actif jusqu&apos;à la fin de la période en cours. Vous perdrez l&apos;accès aux fonctionnalités premium ensuite.
                 </p>
                 <div className="flex items-center gap-3">
                   <button

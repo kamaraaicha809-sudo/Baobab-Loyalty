@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 
 // ─── Données de la démo ──────────────────────────────────────────────────────
@@ -141,8 +141,10 @@ export default function DemoPage() {
   // Envoi : progression automatique
   useEffect(() => {
     if (step !== 4) return;
-    setSendProgress(0);
-    setNotifVisible(false);
+    startTransition(() => {
+      setSendProgress(0);
+      setNotifVisible(false);
+    });
     const duration = 3000;
     const interval = 40;
     const stepVal = (100 / duration) * interval;

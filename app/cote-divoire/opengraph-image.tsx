@@ -45,7 +45,7 @@ export default function OgImage() {
           }}
         >
           <span style={{ color: "#EBC161", fontWeight: 700, fontSize: 15, letterSpacing: 2 }}>
-            BAOBAB LOYALTY · CÔTE D'IVOIRE
+            BAOBAB LOYALTY · CÔTE D&apos;IVOIRE
           </span>
         </div>
 

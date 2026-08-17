@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,7 +24,7 @@ function VerifyContent() {
   useEffect(() => {
     const storedEmail = sessionStorage.getItem("verify_email");
     if (storedEmail) {
-      setEmail(storedEmail);
+      startTransition(() => setEmail(storedEmail));
     } else if (!isDemoMode) {
       // Redirect to appropriate page if no email
       router.push(type === "recovery" ? "/auth/reset-password" : "/signup");

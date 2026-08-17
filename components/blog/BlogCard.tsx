@@ -33,7 +33,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
           <div className="flex items-center justify-between mt-auto">
             <time className="text-white/30 text-xs">{publishedDate}</time>
             <span className="text-[#EBC161] text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
-              Lire l'article &rarr;
+              Lire l&apos;article &rarr;
             </span>
           </div>
         </article>

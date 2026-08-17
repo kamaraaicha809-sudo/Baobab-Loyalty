@@ -75,7 +75,7 @@ function AuthConfirmContent() {
               </svg>
             </div>
             <h1 className="text-xl font-bold text-slate-900 mb-2">
-              Erreur d'authentification
+              Erreur d&apos;authentification
             </h1>
             <p className="text-slate-600 mb-6">{error}</p>
             <button

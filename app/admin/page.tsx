@@ -70,7 +70,7 @@ export default function AdminDashboard() {
           Administration
         </h1>
         <p className="text-slate-500 text-sm">
-          Vue d'ensemble de la configuration IA
+          Vue d&apos;ensemble de la configuration IA
         </p>
       </header>
 
@@ -175,9 +175,9 @@ export default function AdminDashboard() {
           <div className="text-sm text-blue-800">
             <p className="font-medium mb-1">À propos des prompts</p>
             <p className="text-blue-700">
-              Les prompts système sont utilisés pour personnaliser le comportement de l'IA 
-              dans vos automatisations. Vous pouvez créer plusieurs prompts pour différents 
-              cas d'usage (génération de contenu, résumé, traduction, etc.).
+              Les prompts système sont utilisés pour personnaliser le comportement de l&apos;IA
+              dans vos automatisations. Vous pouvez créer plusieurs prompts pour différents
+              cas d&apos;usage (génération de contenu, résumé, traduction, etc.).
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useEffect, useRef } from "react";
+import { useState, Suspense, useEffect, useRef, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Icons } from "@/components/common/Icons";
@@ -200,18 +200,19 @@ function OffresTab({
       if (!draft.templateId) return;
       const template = TEMPLATES.find((t) => t.id === draft.templateId);
       if (!template) return;
-      setSelectedId(draft.templateId);
-      setAvantage(draft.avantage || template.description || "");
-      setGeneratedMessage(draft.message ?? null);
-      if (draft.feteName && template.id === "evenements" && "fetes" in template) {
-        const fete = (template.fetes as Fete[]).find((f) => f.name === draft.feteName) ?? null;
-        setSelectedFete(fete);
-      }
-      if (draft.eligibleDays) setEligibleDays(draft.eligibleDays);
+      startTransition(() => {
+        setSelectedId(draft.templateId);
+        setAvantage(draft.avantage || template.description || "");
+        setGeneratedMessage(draft.message ?? null);
+        if (draft.feteName && template.id === "evenements" && "fetes" in template) {
+          const fete = (template.fetes as Fete[]).find((f) => f.name === draft.feteName) ?? null;
+          setSelectedFete(fete);
+        }
+        if (draft.eligibleDays) setEligibleDays(draft.eligibleDays);
+      });
     } catch {
       // ignore malformed draft
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelectTemplate = (id: string) => {
@@ -230,7 +231,7 @@ function OffresTab({
 
   useEffect(() => {
     if (selectedId === "sondage") {
-      setAvantage(`${discountPct}% de réduction sur votre prochain séjour`);
+      startTransition(() => setAvantage(`${discountPct}% de réduction sur votre prochain séjour`));
     }
   }, [discountPct, selectedId]);
 
@@ -1305,7 +1306,7 @@ function TemplatesContent() {
   // ou n'est pas encore resolu, on retombe sur l'onglet Offres.
   useEffect(() => {
     if (!isPremium && (activeTab === "linkedin" || activeTab === "linkedin-post")) {
-      setActiveTab("offres");
+      startTransition(() => setActiveTab("offres"));
     }
   }, [isPremium, activeTab]);
 

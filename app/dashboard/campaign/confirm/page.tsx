@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useEffect } from "react";
+import { useState, Suspense, useEffect, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
@@ -39,7 +39,7 @@ function ConfirmContent() {
 
   useEffect(() => {
     const img = sessionStorage.getItem("campaign_image");
-    if (img) setCampaignImage(img);
+    if (img) startTransition(() => setCampaignImage(img));
   }, []);
 
   useEffect(() => {
@@ -158,6 +158,7 @@ function ConfirmContent() {
           {campaignImage && (
             <div className="border-t border-slate-200 pt-4">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Pièce jointe</p>
+              {/* eslint-disable-next-line @next/next/no-img-element -- data URI de taille inconnue (upload utilisateur), next/image nécessite des dimensions fixes */}
               <img
                 src={campaignImage}
                 alt="Pièce jointe"

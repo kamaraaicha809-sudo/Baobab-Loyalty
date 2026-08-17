@@ -14,7 +14,7 @@ export default function Custom404() {
         </h1>
         
         <p className="text-slate-500 text-sm mb-8">
-          Cette page n'existe pas ou a été déplacée.
+          Cette page n&apos;existe pas ou a été déplacée.
         </p>
 
         <div className="flex flex-wrap gap-3 justify-center">

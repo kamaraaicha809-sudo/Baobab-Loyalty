@@ -52,22 +52,8 @@ interface CheckIconProps {
   checked: boolean | null;
 }
 
-/**
- * PasswordStrength Component
- * Real-time password validation feedback
- */
-export default function PasswordStrength({ 
-  password, 
-  confirmPassword, 
-  showMatch = true 
-}: PasswordStrengthProps) {
-  const validation = useMemo(() => validatePassword(password || ""), [password]);
-  const match = useMemo(
-    () => (showMatch && confirmPassword !== undefined ? passwordsMatch(password || "", confirmPassword) : null),
-    [password, confirmPassword, showMatch]
-  );
-
-  const CheckIcon = ({ checked }: CheckIconProps) => (
+function CheckIcon({ checked }: CheckIconProps) {
+  return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
@@ -88,6 +74,22 @@ export default function PasswordStrength({
         />
       )}
     </svg>
+  );
+}
+
+/**
+ * PasswordStrength Component
+ * Real-time password validation feedback
+ */
+export default function PasswordStrength({
+  password,
+  confirmPassword,
+  showMatch = true
+}: PasswordStrengthProps) {
+  const validation = useMemo(() => validatePassword(password || ""), [password]);
+  const match = useMemo(
+    () => (showMatch && confirmPassword !== undefined ? passwordsMatch(password || "", confirmPassword) : null),
+    [password, confirmPassword, showMatch]
   );
 
   // Don't show anything if password is empty

@@ -175,9 +175,9 @@ export default function FonctionnalitesPage() {
               <span className="text-[#1a2f2a]">pour fidéliser</span>
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-              De l'import de votre base clients à l'envoi de campagnes WhatsApp ciblées —
+              De l&apos;import de votre base clients à l&apos;envoi de campagnes WhatsApp ciblées —
               Baobab Loyalty regroupe toutes les fonctionnalités pensées pour les hôtels
-              d'Afrique, sans complexité inutile.
+              d&apos;Afrique, sans complexité inutile.
             </p>
             <Link
               href="/demo"
@@ -229,7 +229,7 @@ export default function FonctionnalitesPage() {
                 Avant et après Baobab Loyalty
               </h2>
               <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto">
-                Ce que change concrètement l'utilisation de Baobab Loyalty au quotidien.
+                Ce que change concrètement l&apos;utilisation de Baobab Loyalty au quotidien.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 gap-6">

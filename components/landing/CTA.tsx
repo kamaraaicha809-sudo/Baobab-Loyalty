@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { isDemoMode } from "@/src/lib/demo";
 
 const CTA = () => {
@@ -11,14 +11,16 @@ const CTA = () => {
   useEffect(() => {
     if (isDemoMode) {
       const demoLoggedIn = typeof window !== "undefined" && sessionStorage.getItem("demo_logged_in") === "1";
-      setIsLoggedIn(demoLoggedIn);
-      setIsLoading(false);
+      startTransition(() => {
+        setIsLoggedIn(demoLoggedIn);
+        setIsLoading(false);
+      });
       return;
     }
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!supabaseUrl || !supabaseKey) {
-      setIsLoading(false);
+      startTransition(() => setIsLoading(false));
       return;
     }
     const checkAuth = async () => {

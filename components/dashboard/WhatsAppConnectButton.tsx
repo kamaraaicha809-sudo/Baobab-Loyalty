@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, startTransition } from "react";
 import toast from "react-hot-toast";
 import config from "@/config";
 import { whatsapp } from "@/src/sdk/whatsapp";
@@ -86,7 +86,7 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
       script.defer = true;
       document.body.appendChild(script);
     } else if (window.FB) {
-      setFbReady(true);
+      startTransition(() => setFbReady(true));
     }
 
     return () => window.removeEventListener("message", handleMessage);

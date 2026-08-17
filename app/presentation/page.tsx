@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, startTransition } from "react";
 import Link from "next/link";
 import config from "@/config";
 
@@ -15,7 +15,7 @@ function PresentationContent() {
   const appParams = searchParams.get("appParams") || "solution";
 
   useEffect(() => {
-    setMounted(true);
+    startTransition(() => setMounted(true));
   }, []);
 
   if (!mounted) {

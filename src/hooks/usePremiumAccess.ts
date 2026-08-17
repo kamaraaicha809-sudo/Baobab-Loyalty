@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { user as userSdk } from "@/src/sdk";
 import { isDemoMode, demoProfile } from "@/src/lib/demo";
 import { isPremiumPlan } from "@/src/lib/plan";
@@ -14,7 +14,7 @@ export function usePremiumAccess(): boolean | null {
 
   useEffect(() => {
     if (isDemoMode) {
-      setIsPremium(isPremiumPlan(demoProfile.price_id));
+      startTransition(() => setIsPremium(isPremiumPlan(demoProfile.price_id)));
       return;
     }
     userSdk

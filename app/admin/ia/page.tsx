@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { prompts as promptsApi } from "@/src/sdk";
 import toast from "react-hot-toast";
 import { isDemoMode, demoPrompts, demoAdminStats } from "@/src/lib/demo";
@@ -29,12 +29,6 @@ export default function IAConfigPage() {
     content: "",
   });
   const [saving, setSaving] = useState(false);
-
-  // Load prompts on mount
-  useEffect(() => {
-    loadPrompts();
-    loadModel();
-  }, []);
 
   const loadModel = async () => {
     if (isDemoMode) {
@@ -68,6 +62,14 @@ export default function IAConfigPage() {
       setLoadingPrompts(false);
     }
   };
+
+  // Load prompts on mount
+  useEffect(() => {
+    startTransition(() => {
+      loadPrompts();
+      loadModel();
+    });
+  }, []);
 
   const handleSaveModel = async () => {
     if (isDemoMode) {
@@ -359,7 +361,7 @@ export default function IAConfigPage() {
           <div className="text-center py-12 text-slate-500">
             <p className="text-4xl mb-3">💬</p>
             <p className="font-medium">Aucun prompt</p>
-            <p className="text-sm mt-1">Cliquez sur "Ajouter" pour créer votre premier prompt.</p>
+            <p className="text-sm mt-1">Cliquez sur &quot;Ajouter&quot; pour créer votre premier prompt.</p>
           </div>
         ) : (
           <div className="space-y-3">

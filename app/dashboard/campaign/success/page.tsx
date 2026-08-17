@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, demoUser, demoProfile } from "@/src/lib/demo";
@@ -20,7 +20,7 @@ function SuccessContent() {
 
   useEffect(() => {
     const img = sessionStorage.getItem("campaign_image");
-    if (img) setCampaignImage(img);
+    if (img) startTransition(() => setCampaignImage(img));
   }, []);
 
   useEffect(() => {
@@ -148,6 +148,7 @@ function SuccessContent() {
               <div className="flex justify-end">
                 <div className="max-w-[85%] rounded-lg rounded-tr-none bg-white shadow-sm px-3 py-2.5 relative">
                   {campaignImage && (
+                    // eslint-disable-next-line @next/next/no-img-element -- data URI de taille inconnue (upload utilisateur), next/image nécessite des dimensions fixes
                     <img
                       src={campaignImage}
                       alt="Pièce jointe"

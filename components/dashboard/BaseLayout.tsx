@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode, useCallback, useEffect, Suspense } from "react";
+import { useState, ReactNode, useCallback, useEffect, Suspense, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/dashboard/Sidebar";
 import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
@@ -16,7 +16,7 @@ function DemoAuthGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isDemoMode) {
-      setChecked(true);
+      startTransition(() => setChecked(true));
       return;
     }
     if (typeof window === "undefined") return;
@@ -32,7 +32,7 @@ function DemoAuthGuard({ children }: { children: ReactNode }) {
       router.replace("/signin");
       return;
     }
-    setChecked(true);
+    startTransition(() => setChecked(true));
   }, [router, searchParams]);
 
   if (!checked) {
@@ -80,8 +80,8 @@ export default function BaseLayout({
       if (requireAdmin && demoProfile.role !== "admin") {
         return;
       }
-      
-      setUser(demoUserData);
+
+      startTransition(() => setUser(demoUserData));
     } else {
       // Récupérer l'utilisateur pour l'affichage dans la Sidebar
       // L'auth a déjà été vérifiée côté serveur, donc on peut utiliser getSession() (rapide)

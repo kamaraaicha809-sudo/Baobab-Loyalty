@@ -105,7 +105,7 @@ export default function Dashboard() {
     return () => {
       if (typeof cleanup === "function") cleanup();
     };
-  }, [profile?.id, isDemoMode]);
+  }, [profile?.id]);
 
   const handleManageSubscription = async () => {
     if (isDemoMode) {

@@ -77,7 +77,7 @@ const TOS = () => {
           Retour
         </Link>
         <h1 className="text-3xl font-extrabold pb-6">
-          Conditions d'Utilisation - {config.appName}
+          Conditions d&apos;Utilisation - {config.appName}
         </h1>
 
         <pre

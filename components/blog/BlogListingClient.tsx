@@ -60,7 +60,7 @@ export function BlogListingClient({ posts, featuredPosts, categories }: BlogList
 
       {filteredPosts.length === 0 && (
         <p className="text-slate-500 text-center py-12">
-          Aucun article dans cette catégorie pour l'instant.
+          Aucun article dans cette catégorie pour l&apos;instant.
         </p>
       )}
     </>

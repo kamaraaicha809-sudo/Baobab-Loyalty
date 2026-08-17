@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, startTransition } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
@@ -114,18 +114,20 @@ export default function ConfigurationPage() {
 
   const loadProfile = useCallback(async () => {
     if (isDemoMode) {
-      setProfileId(demoUser.id);
-      setForm({ ...emptyForm, hotel_name: demoProfile.hotel_name });
-      setConfigComplete(demoProfile.config_complete);
-      setCounts(demoSegmentCounts);
-      setIsPremium(demoProfile.price_id === "premium");
-      setAiSettings({
-        ai_brand_voice: demoProfile.ai_brand_voice || "",
-        ai_keywords_use: demoProfile.ai_keywords_use || "",
-        ai_keywords_avoid: demoProfile.ai_keywords_avoid || "",
-        ai_signature: demoProfile.ai_signature || "",
+      startTransition(() => {
+        setProfileId(demoUser.id);
+        setForm({ ...emptyForm, hotel_name: demoProfile.hotel_name });
+        setConfigComplete(demoProfile.config_complete);
+        setCounts(demoSegmentCounts);
+        setIsPremium(demoProfile.price_id === "premium");
+        setAiSettings({
+          ai_brand_voice: demoProfile.ai_brand_voice || "",
+          ai_keywords_use: demoProfile.ai_keywords_use || "",
+          ai_keywords_avoid: demoProfile.ai_keywords_avoid || "",
+          ai_signature: demoProfile.ai_signature || "",
+        });
+        setLoading(false);
       });
-      setLoading(false);
       return;
     }
 
@@ -202,7 +204,9 @@ export default function ConfigurationPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadProfile(); }, [loadProfile]);
+  useEffect(() => {
+    startTransition(() => loadProfile());
+  }, [loadProfile]);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {

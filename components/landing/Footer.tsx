@@ -23,7 +23,7 @@ const Footer = () => {
           <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Marchés</span>
           <span className="text-slate-300 text-xs">·</span>
           <Link href="/cote-divoire" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
-            Côte d'Ivoire
+            Côte d&apos;Ivoire
           </Link>
           <span className="text-slate-300 text-xs">·</span>
           <Link href="/senegal" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">

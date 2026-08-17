@@ -160,7 +160,7 @@ export default function CommentCaMarchePage() {
               en 10 minutes
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
-              Pas de complexité technique, pas d'intégration longue. Importez votre base
+              Pas de complexité technique, pas d&apos;intégration longue. Importez votre base
               clients, segmentez et envoyez — en moins de 10 minutes, vos anciens clients
               reçoivent une offre personnalisée sur WhatsApp.
             </p>
@@ -262,7 +262,7 @@ export default function CommentCaMarchePage() {
               Prêt à lancer votre première campagne ?
             </h2>
             <p className="text-slate-500 text-base sm:text-lg mb-8 leading-relaxed">
-              Rejoignez les hôteliers d'Afrique qui fidélisent leurs clients via WhatsApp.
+              Rejoignez les hôteliers d&apos;Afrique qui fidélisent leurs clients via WhatsApp.
               Démarrez gratuitement, sans engagement.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">

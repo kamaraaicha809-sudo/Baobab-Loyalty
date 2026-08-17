@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
@@ -146,7 +146,7 @@ export default function SegmentsPage() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("baobab_custom_segments");
-      if (saved) setCustomSegments(JSON.parse(saved));
+      if (saved) startTransition(() => setCustomSegments(JSON.parse(saved)));
     } catch {
       // ignore
     }

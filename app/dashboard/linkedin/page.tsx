@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ai } from "@/src/sdk";
 import { usePremiumAccess } from "@/src/hooks/usePremiumAccess";
@@ -45,11 +45,7 @@ export default function LinkedInPage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [charCount, setCharCount] = useState(0);
-
-  useEffect(() => {
-    setCharCount(generatedPost.length);
-  }, [generatedPost]);
+  const charCount = generatedPost.length;
 
   const handleGenerate = async () => {
     if (!topic.trim()) {

@@ -425,7 +425,7 @@ export default function TarifsPage() {
         <section className="py-16 sm:py-20 bg-[#1a2f2a]">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-snug">
-              Commencez gratuitement aujourd'hui
+              Commencez gratuitement aujourd&apos;hui
             </h2>
             <p className="text-[#a3c4b5] text-base sm:text-lg mb-8 leading-relaxed">
               Aucune carte bancaire requise. Fonctionnel en 10 minutes.
