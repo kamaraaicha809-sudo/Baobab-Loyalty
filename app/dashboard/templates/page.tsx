@@ -720,18 +720,34 @@ function LinkedInTab() {
   const [saving, setSaving] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState<MessageTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [profileId, setProfileId] = useState<string | null>(config.isDemoMode ? demoProfile.id : null);
 
-  const profileId = config.isDemoMode ? "demo-user-id" : demoProfile.id;
+  // Charge le vrai profil connecté (hors mode démo)
+  useEffect(() => {
+    if (config.isDemoMode) return;
+    const loadProfileId = async () => {
+      try {
+        const { createClient } = await import("@/libs/supabase/client");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) setProfileId(user.id);
+      } catch {
+        // silent
+      }
+    };
+    loadProfileId();
+  }, []);
 
   // Charger les templates sauvegardés
   useEffect(() => {
+    if (!config.isDemoMode && !profileId) return;
     const loadTemplates = async () => {
       setLoadingTemplates(true);
       try {
         if (config.isDemoMode) {
           setSavedTemplates(demoMessageTemplates as MessageTemplate[]);
         } else {
-          const templates = await linkedin.getTemplates(profileId);
+          const templates = await linkedin.getTemplates(profileId!);
           setSavedTemplates(templates);
         }
       } catch {
@@ -787,6 +803,10 @@ function LinkedInTab() {
       toast.error("Donnez un nom à votre template avant de sauvegarder.");
       return;
     }
+    if (!config.isDemoMode && !profileId) {
+      toast.error("Profil non chargé, réessayez dans un instant.");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -807,7 +827,7 @@ function LinkedInTab() {
         toast.success("Template sauvegardé !");
       } else {
         const saved = await linkedin.saveTemplate({
-          profileId,
+          profileId: profileId!,
           name: templateName.trim(),
           content: generatedContent,
           variables: variablesFound,
@@ -1078,8 +1098,30 @@ function LinkedInPostTab() {
   const [loading, setLoading] = useState(false);
   const [generatedPost, setGeneratedPost] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
 
-  const hotelName = demoProfile.hotel_name || "";
+  // Charge le vrai nom d'hôtel connecté (hors mode démo)
+  useEffect(() => {
+    if (config.isDemoMode) return;
+    const loadHotelName = async () => {
+      try {
+        const { createClient } = await import("@/libs/supabase/client");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("hotel_name")
+          .eq("id", user.id)
+          .single();
+        if (profile?.hotel_name) setHotelName(profile.hotel_name);
+      } catch {
+        // silent
+      }
+    };
+    loadHotelName();
+  }, []);
+
   const charCount = generatedPost?.length ?? 0;
 
   const handleGenerate = async () => {
