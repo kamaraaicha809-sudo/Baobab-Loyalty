@@ -1,14 +1,18 @@
 /**
  * Access helpers shared across the frontend
- * A profile has active access if it has paid (has_access) or its
- * 30-day trial (trial_ends_at) has not expired yet.
+ * A profile has active access if it has paid for the current period
+ * (has_access ET access_until dans le futur) ou si son essai de 30 jours
+ * (trial_ends_at) n'est pas encore expire.
  */
 
 export function hasActiveAccess(profile: {
   has_access?: boolean | null;
+  access_until?: string | null;
   trial_ends_at?: string | null;
 }): boolean {
-  if (profile.has_access) return true;
+  if (profile.has_access && profile.access_until) {
+    return new Date(profile.access_until).getTime() > Date.now();
+  }
   if (!profile.trial_ends_at) return false;
   return new Date(profile.trial_ends_at).getTime() > Date.now();
 }

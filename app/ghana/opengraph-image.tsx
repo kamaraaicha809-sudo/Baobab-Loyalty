@@ -81,8 +81,8 @@ export default function OgImage() {
 
         <div style={{ display: "flex", gap: 16 }}>
           {[
-            { value: "90%+", label: "WhatsApp open rate" },
-            { value: "3×", label: "direct bookings" },
+            { value: "0%", label: "OTA commission" },
+            { value: "GHS", label: "local currency" },
             { value: "10 min", label: "first campaign" },
           ].map((stat) => (
             <div

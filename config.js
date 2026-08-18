@@ -9,7 +9,7 @@
  * ÉTAPES DE PERSONNALISATION :
  * 1. Changez appName, appDescription, domainName
  * 2. Modifiez colors (main, dark, light) — le CSS est généré automatiquement
- * 3. Remplacez les priceId Stripe par les vôtres
+ * 3. Configurez les plans de facturation Moneroo (billing.plans)
  * 4. Configurez les emails dans resend
  */
 
@@ -91,6 +91,10 @@ const config = {
         monthlyRelances: 5,
         // → Nombre de campagnes WhatsApp incluses par mois.
         //   Non reportées d'un mois à l'autre. Appliqué côté serveur dans campaign-send.
+        maxRooms: 30,
+        // → Doit rester synchronisé avec le trigger SQL enforce_room_types_limit()
+        //   (supabase/migrations/048_room_types_plan_limit.sql), seule source de vérité
+        //   appliquée réellement — cette valeur ici n'est qu'informative pour l'UI.
         features: [
           { name: "5 campagnes WhatsApp / mois" },
           { name: "Jusqu'à 30 chambres" },
@@ -104,6 +108,7 @@ const config = {
         description: "Le meilleur rapport qualité/prix",
         price: 69000,
         monthlyRelances: 10,
+        maxRooms: 60,
         features: [
           { name: "10 campagnes WhatsApp / mois" },
           { name: "Jusqu'à 60 chambres" },
@@ -117,6 +122,8 @@ const config = {
         description: "Pour les grands établissements",
         price: 189000,
         monthlyRelances: 30,
+        maxRooms: null,
+        // → null = illimité
         maxTeamMembers: 2,
         // → Nombre de membres invités en plus du propriétaire.
         //   Doit rester synchronisé avec supabase/functions/_shared/team.ts (MAX_TEAM_MEMBERS).

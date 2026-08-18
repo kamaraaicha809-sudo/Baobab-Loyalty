@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Fidélisation hôtelière au Cameroun — Baobab Loyalty",
-  description: "Hôtels de Douala et Yaoundé : campagnes WhatsApp ciblées, −30% commissions OTA, prix en FCFA. 12 réservations en 1 semaine. Essai gratuit.",
+  description: "Hôtels de Douala et Yaoundé : campagnes WhatsApp ciblées, zéro commission OTA, prix en FCFA. Essai gratuit, opérationnel en 10 min.",
   canonicalUrlRelative: "/cameroun",
 });
 
@@ -30,22 +30,6 @@ const localBusinessSchema = {
   priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "35",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Jean-Paul N." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "Baobab Loyalty nous a permis de recontacter des clients perdus depuis 9 mois. La campagne de réactivation a généré 12 réservations en une semaine. Pour notre hôtel à Douala, c'est un vrai changement de stratégie.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -59,13 +43,10 @@ const data: CountryPageData = {
     "Douala et Yaoundé sont les deux moteurs hôteliers du Cameroun. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans aucune commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
-    {
-      value: "88%",
-      label: "des voyageurs d'affaires à Douala utilisent WhatsApp quotidiennement",
-    },
-    { value: "−30%", label: "de commissions OTA économisées après 3 mois" },
+    { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
-    { value: "3×", label: "plus de réservations directes en moyenne" },
+    { value: "FCFA", label: "facturation en devise locale" },
+    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels camerounais dépendent trop des intermédiaires",
   problemSubtitle:
@@ -104,14 +85,10 @@ const data: CountryPageData = {
       desc: "Rédigez votre message ou utilisez l'IA. Sélectionnez votre segment, validez et envoyez. Chaque client reçoit une offre personnalisée directement sur son WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "Baobab Loyalty nous a permis de recontacter des clients perdus depuis 9 mois. La campagne de réactivation a généré 12 réservations en une semaine. Pour notre hôtel à Douala, c'est un vrai changement de stratégie.",
-    author: "Jean-Paul N.",
-    role: "Directeur d'exploitation",
-    hotel: "Hôtel Le Wouri",
-    city: "Douala",
-    initials: "JN",
+  guarantee: {
+    title: "Pourquoi on peut se permettre de garantir des résultats",
+    text: "Baobab Loyalty est encore jeune au Cameroun — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels camerounais",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

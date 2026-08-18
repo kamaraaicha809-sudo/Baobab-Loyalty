@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Fidélisation hôtelière à Dakar — Baobab Loyalty",
-  description: "Hôtels à Dakar : 8 réservations en 48h grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Opérationnel en 10 min. Essai gratuit.",
+  description: "Hôtels à Dakar : relancez vos clients inactifs grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Opérationnel en 10 min. Essai gratuit.",
   canonicalUrlRelative: "/dakar",
 });
 
@@ -34,22 +34,6 @@ const localBusinessSchema = {
   priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "38",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Moussa D." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "Grâce à Baobab Loyalty, on a relancé des clients inactifs depuis 6 mois avec une offre de weekend. En une semaine, 18 réservations directes supplémentaires. C'est le meilleur investissement marketing qu'on ait fait.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -63,13 +47,10 @@ const data: CountryPageData = {
     "Dakar est le hub économique et touristique du Sénégal, avec une clientèle d'affaires en forte Pro. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans aucune commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
-    {
-      value: "89%",
-      label: "des voyageurs d'affaires à Dakar utilisent WhatsApp quotidiennement",
-    },
-    { value: "−35%", label: "de commissions OTA économisées après 3 mois" },
+    { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
-    { value: "3×", label: "plus de réservations directes en moyenne" },
+    { value: "FCFA", label: "facturation en devise locale" },
+    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels dakarois perdent des revenus chaque mois",
   problemSubtitle:
@@ -108,14 +89,10 @@ const data: CountryPageData = {
       desc: "Rédigez votre message ou utilisez l'IA. Sélectionnez votre segment, validez et envoyez. Chaque client reçoit une offre personnalisée directement sur son WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "Grâce à Baobab Loyalty, on a relancé des clients inactifs depuis 6 mois avec une offre de weekend. En une semaine, 18 réservations directes supplémentaires. C'est le meilleur investissement marketing qu'on ait fait.",
-    author: "Moussa D.",
-    role: "Directeur d'exploitation",
-    hotel: "Le Lagon Boutique Hotel",
-    city: "Dakar",
-    initials: "MD",
+  guarantee: {
+    title: "Pourquoi on peut se permettre de garantir des résultats",
+    text: "Baobab Loyalty est encore jeune à Dakar — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels dakarois",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

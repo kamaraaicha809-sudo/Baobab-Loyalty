@@ -4,7 +4,7 @@ import config from "@/config";
 export const metadata: Metadata = {
   title: "Fidélisation clients hôtel au Cameroun — Baobab Loyalty",
   description:
-    "Hôtels Douala et Yaoundé : 3× plus de réservations directes, zéro commission OTA. Segmentation automatique + WhatsApp IA en 10 min. Essai gratuit sans engagement.",
+    "Hôtels Douala et Yaoundé : relancez vos clients inactifs via WhatsApp, zéro commission OTA. Segmentation automatique + WhatsApp IA en 10 min. Essai gratuit sans engagement.",
   keywords: [
     "fidélisation hôtel Cameroun",
     "marketing hôtel Douala",

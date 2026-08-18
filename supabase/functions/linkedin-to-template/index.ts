@@ -12,6 +12,7 @@ import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { hasActiveAccess } from "../_shared/access.ts";
 import { resolveProfile } from "../_shared/team.ts";
+import { checkRateLimit } from "../_shared/rate-limit.ts";
 
 const DEFAULT_MODEL = "openai/gpt-4o-mini";
 const AI_TIMEOUT_MS = 20000;
@@ -118,8 +119,9 @@ Deno.serve(async (req) => {
       id: string;
       has_access?: boolean | null;
       price_id: string | null;
+      access_until?: string | null;
       trial_ends_at?: string | null;
-    }>(userClient, user.id, "id, has_access, price_id, trial_ends_at");
+    }>(userClient, user.id, "id, has_access, price_id, access_until, trial_ends_at");
 
     if (!profile || !hasActiveAccess(profile)) {
       return errors.forbidden("Active subscription required");
@@ -127,6 +129,15 @@ Deno.serve(async (req) => {
 
     if ((profile.price_id || "").toLowerCase() !== "premium") {
       return errors.forbidden("Fonctionnalité réservée au plan Premium.");
+    }
+
+    // Aucune limite de fréquence n'existait jusqu'ici : appelle à la fois
+    // Unipile et OpenRouter, donc deux fois plus coûteux à faire boucler que
+    // ai-generate — quota plus serré.
+    const serviceClientForRateLimit = getServiceClient();
+    const withinRateLimit = await checkRateLimit(serviceClientForRateLimit, `linkedin-to-template:${user.id}`, 10, 600);
+    if (!withinRateLimit) {
+      return errors.badRequest("Trop de générations en peu de temps. Réessayez dans quelques minutes.");
     }
 
     const postId = extractLinkedinPostId(url);

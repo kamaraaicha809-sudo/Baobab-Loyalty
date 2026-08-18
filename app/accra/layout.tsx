@@ -4,7 +4,7 @@ import config from "@/config";
 export const metadata: Metadata = {
   title: "Hotel Loyalty Software for Accra, Ghana — Baobab Loyalty",
   description:
-    "Accra hotels: automate guest re-engagement via WhatsApp. Cut OTA commissions 35%, launch campaigns in 10 min. Built for Ghana's hospitality market.",
+    "Accra hotels: automate guest re-engagement via WhatsApp. Zero OTA commission, launch campaigns in 10 min. Built for Ghana's hospitality market.",
   keywords: [
     "hotel loyalty software Accra",
     "WhatsApp marketing hotel Accra",

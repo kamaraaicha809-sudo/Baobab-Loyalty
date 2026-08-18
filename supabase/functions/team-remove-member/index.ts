@@ -43,6 +43,12 @@ Deno.serve(async (req) => {
 
     const serviceClient = getServiceClient();
 
+    // Pas de fenêtre d'accès résiduelle aux données : is_team_member() (utilisée
+    // par toutes les policies RLS) interroge team_members à chaque requête, donc
+    // la suppression ci-dessous coupe l'accès aux données dès la ligne supprimée.
+    // Seul le jeton JWT du membre retiré reste valide jusqu'à son expiration
+    // (~1h, durée par défaut Supabase Auth) : il reste "connecté" mais toute
+    // requête vers les données de cet hôtel renvoie déjà 0 résultat.
     if (memberId) {
       const { error } = await serviceClient
         .from("team_members")

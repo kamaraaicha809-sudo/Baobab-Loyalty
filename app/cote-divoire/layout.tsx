@@ -4,7 +4,7 @@ import config from "@/config";
 export const metadata: Metadata = {
   title: "Logiciel fidélisation hôtel Côte d'Ivoire — Baobab Loyalty",
   description:
-    "Logiciel de fidélisation hôtel pour la Côte d'Ivoire : 3× plus de réservations directes, zéro commission Booking.com. WhatsApp IA, FCFA, opérationnel en 10 min.",
+    "Logiciel de fidélisation hôtel pour la Côte d'Ivoire : relancez vos clients inactifs via WhatsApp, zéro commission Booking.com. WhatsApp IA, FCFA, opérationnel en 10 min.",
   keywords: [
     "fidélisation hôtel Côte d'Ivoire",
     "marketing hôtel Abidjan",

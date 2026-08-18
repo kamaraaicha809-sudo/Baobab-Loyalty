@@ -134,13 +134,6 @@ export const renderSchemaTags = () => {
           dateModified: new Date().toISOString().split("T")[0],
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: "5.0",
-            ratingCount: "12",
-            bestRating: "5",
-            worstRating: "1",
-          },
           offers: featuredPlan
             ? {
                 "@type": "Offer",

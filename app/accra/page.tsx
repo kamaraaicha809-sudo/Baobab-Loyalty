@@ -11,7 +11,7 @@ import {
 export const metadata = getSEOTags({
   title: "Hotel Loyalty Software for Accra — Baobab Loyalty",
   description:
-    "Accra hotels: win back past guests with targeted WhatsApp campaigns. Cut OTA fees 35%, AI-generated messages, GHS pricing. Start free in 10 minutes.",
+    "Accra hotels: win back past guests with targeted WhatsApp campaigns. Zero OTA commission, AI-generated messages, GHS pricing. Start free in 10 minutes.",
   canonicalUrlRelative: "/accra",
 });
 
@@ -36,30 +36,6 @@ const localBusinessSchema = {
   priceRange: "GHS 299 - GHS 699/month",
   currenciesAccepted: "GHS",
   knowsLanguage: "en",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "31",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Ama S." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "We used to lose guests after checkout with no way to bring them back. Baobab Loyalty changed that completely. Within 6 weeks of using it, we recovered 18 guests who hadn't returned in over 4 months.",
-      datePublished: "2026-04-20",
-    },
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Kofi M." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "The WhatsApp campaigns work incredibly well in Accra. Our guests respond fast and we see bookings come in the same day. We cut our Booking.com dependency by 30% in 3 months.",
-      datePublished: "2026-03-15",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -73,13 +49,10 @@ const data: CountryPageData = {
     "Accra's hospitality market is booming — but most hotels still lose guests after checkout. Baobab Loyalty helps Accra hotels re-engage past guests via WhatsApp and convert them into repeat direct bookings.",
   heroCta: "Start for free",
   statsItems: [
-    {
-      value: "89%",
-      label: "of Accra hotel guests use WhatsApp as their main messaging app",
-    },
-    { value: "−35%", label: "OTA commission dependency after 3 months" },
-    { value: "18 days", label: "average time to first recovered guest" },
-    { value: "3×", label: "more direct bookings on average" },
+    { value: "0%", label: "commission on your direct bookings" },
+    { value: "10 min", label: "to launch your first WhatsApp campaign" },
+    { value: "GHS", label: "billed in your local currency" },
+    { value: "30 days", label: "guaranteed or next month is free" },
   ],
   problemTitle: "Accra hotels are leaving money on the table",
   problemSubtitle:
@@ -118,14 +91,10 @@ const data: CountryPageData = {
       desc: "Write your message or let the AI draft it. Choose your segment, confirm and send. Each guest receives a personalized offer directly on WhatsApp — with a link to book directly.",
     },
   ],
-  testimonial: {
-    quote:
-      "We used to lose guests after checkout with no way to bring them back. Baobab Loyalty changed that completely. Within 6 weeks we recovered 18 guests who hadn't returned in over 4 months.",
-    author: "Ama S.",
-    role: "General Manager",
-    hotel: "The East Legon Suites",
-    city: "Accra",
-    initials: "AS",
+  guarantee: {
+    title: "Why we can afford to guarantee results",
+    text: "Baobab Loyalty is still new in Accra — we don't have hundreds of reviews to show you. So instead, we prove it differently: if you don't recover at least 2 extra nights in your first month, we give you the next month free.",
+    points: ["No commitment", "Your data stays 100% yours", "30-day personal support included"],
   },
   pricingTitle: "Pricing built for Accra hotels",
   pricingSubtitle: "Billed in GHS. No long-term commitment. Cancel anytime.",

@@ -112,6 +112,11 @@ function ConfirmContent() {
             Votre campagne est configurée. Nous allons envoyer ce message à{" "}
             <strong className="text-slate-900">{clientCount} clients</strong> via WhatsApp.
           </p>
+          {clientCount === 0 && (
+            <p className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
+              Ce segment ne contient aucun client pour le moment. L&apos;envoi est désactivé pour ne pas consommer un quota de campagne inutilement.
+            </p>
+          )}
         </div>
 
         {/* Récap campagne */}
@@ -172,8 +177,8 @@ function ConfirmContent() {
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button
             onClick={handleConfirmerEnvoi}
-            disabled={sending}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors disabled:opacity-70"
+            disabled={sending || clientCount === 0}
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {sending ? (
               <>

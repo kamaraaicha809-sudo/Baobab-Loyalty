@@ -86,6 +86,12 @@ function SignUpContent() {
       });
 
       if (error) {
+        // Révéler ici qu'un email est déjà pris est un choix volontaire, différent
+        // de /auth/reset-password qui masque cette information : à l'inscription,
+        // le bénéfice UX (rediriger vers signin plutôt que faire échouer sans
+        // explication) dépasse le faible risque d'énumération, alors que sur la
+        // réinitialisation de mot de passe ce même détail est un vecteur d'énumération
+        // sans aucun bénéfice UX comparable — donc masqué.
         if (error.message.includes("already registered")) {
           toast.error("Cet email est déjà utilisé. Connectez-vous !");
           router.push(`/signin?email=${encodeURIComponent(email)}`);

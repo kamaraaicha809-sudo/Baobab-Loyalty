@@ -24,6 +24,7 @@ Deno.serve(async (req) => {
         id: "demo-user-id",
         email: "demo@baobabloyalty.com",
         has_access: true,
+        access_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         trial_ends_at: null,
         role: "admin",
         hotel_name: "Hôtel Demo",
@@ -45,7 +46,7 @@ Deno.serve(async (req) => {
     const { profile, teamRole } = await resolveProfile(
       userClient,
       user.id,
-      "id, email, has_access, trial_ends_at, customer_id, price_id, role, hotel_name, " +
+      "id, email, has_access, access_until, trial_ends_at, customer_id, price_id, role, hotel_name, " +
         "config_complete, onboarding_completed, onboarding_step, " +
         "ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature, " +
         "created_at, updated_at"

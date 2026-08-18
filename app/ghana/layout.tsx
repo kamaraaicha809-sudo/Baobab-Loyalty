@@ -4,7 +4,7 @@ import config from "@/config";
 export const metadata: Metadata = {
   title: "Hotel Guest Loyalty in Ghana — Baobab Loyalty",
   description:
-    "Ghana hotels: 3× more direct bookings, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min — free trial.",
+    "Ghana hotels: win back inactive guests via WhatsApp, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min — free trial.",
   keywords: [
     "hotel loyalty Ghana",
     "WhatsApp marketing hotel Accra",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Hotel Guest Loyalty in Ghana — Baobab Loyalty",
     description:
-      "Ghana hotels: 3× more direct bookings, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min.",
+      "Ghana hotels: win back inactive guests via WhatsApp, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min.",
     url: `https://${config.domainName}/ghana`,
     type: "website",
   },

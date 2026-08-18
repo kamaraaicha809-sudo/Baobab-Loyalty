@@ -4,7 +4,7 @@ import config from "@/config";
 export const metadata: Metadata = {
   title: "Fidélisation clients hôtel au Sénégal — Baobab Loyalty",
   description:
-    "Hôtels Dakar : 3× plus de réservations directes, zéro commission Booking.com. Campagnes WhatsApp IA, segmentation auto. Démarrez en 10 min — essai gratuit.",
+    "Hôtels Dakar : relancez vos clients inactifs via WhatsApp, zéro commission Booking.com. Campagnes WhatsApp IA, segmentation auto. Démarrez en 10 min — essai gratuit.",
   keywords: [
     "fidélisation hôtel Sénégal",
     "marketing hôtel Dakar",

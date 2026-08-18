@@ -205,7 +205,7 @@ Deno.serve(async (req) => {
     // Fetch WhatsApp credentials — BSP path takes priority over legacy Meta direct path
     const { data: profile, error: profileError } = await db
       .from("profiles")
-      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status, price_id, has_access, trial_ends_at")
+      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status, price_id, has_access, access_until, trial_ends_at")
       .eq("id", profileId)
       .single();
 
@@ -250,6 +250,24 @@ Deno.serve(async (req) => {
       ? segmentCode
       : "tous";
 
+    // Garde anti double-envoi : un double-clic ou un rafraîchissement de la
+    // page d'envoi relance cette fonction depuis zéro. Sans ce contrôle, le
+    // même segment est réenvoyé et consomme deux fois le quota mensuel.
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString();
+    const { data: recentDuplicate } = await db
+      .from("campaigns")
+      .select("id")
+      .eq("profile_id", profileId)
+      .eq("segment_code", dbSegmentCode)
+      .eq("status", "sending")
+      .gte("created_at", thirtySecondsAgo)
+      .limit(1)
+      .maybeSingle();
+
+    if (recentDuplicate) {
+      return errors.badRequest("Un envoi identique est déjà en cours. Patientez quelques instants avant de réessayer.");
+    }
+
     const { data: campaign } = await db
       .from("campaigns")
       .insert({
@@ -266,78 +284,81 @@ Deno.serve(async (req) => {
 
     let sent = 0;
     let failed = 0;
-    const sentRows: object[] = [];
 
-    for (const client of targets) {
-      const rawNumber = client.whatsapp || client.telephone;
-      if (!rawNumber) {
-        failed++;
-        continue;
-      }
+    // Chaque sent_messages est inséré immédiatement (pas en un seul lot à la
+    // fin) : si la fonction plante ou est tuée par un timeout au milieu de
+    // l'envoi (beaucoup de destinataires), les messages déjà traités restent
+    // journalisés au lieu d'être perdus.
+    try {
+      for (const client of targets) {
+        const rawNumber = client.whatsapp || client.telephone;
+        if (!rawNumber) {
+          failed++;
+          continue;
+        }
 
-      const e164 = formatE164(rawNumber);
-      if (!e164) {
-        failed++;
-        sentRows.push({
+        const e164 = formatE164(rawNumber);
+        if (!e164) {
+          failed++;
+          await db.from("sent_messages").insert({
+            campaign_id: campaignId,
+            client_id: client.id,
+            profile_id: profileId,
+            channel: "whatsapp",
+            message_content: message,
+            template_id: templateId || null,
+            status: "failed",
+          });
+          continue;
+        }
+
+        const result = hasBsp
+          ? await sendViaBsp(
+              profile.bsp_api_key!,
+              e164,
+              client.nom,
+              "baobab_offre_hotel",
+              message,
+            )
+          : await sendViaMeta(
+              profile.whatsapp_phone_number_id!,
+              profile.whatsapp_access_token!,
+              e164,
+              client.nom,
+              "baobab_offre_hotel",
+              message,
+            );
+
+        await db.from("sent_messages").insert({
           campaign_id: campaignId,
           client_id: client.id,
           profile_id: profileId,
           channel: "whatsapp",
           message_content: message,
           template_id: templateId || null,
-          status: "failed",
+          status: result.ok ? "sent" : "failed",
         });
-        continue;
+
+        if (result.ok) {
+          sent++;
+        } else {
+          failed++;
+        }
       }
-
-      const result = hasBsp
-        ? await sendViaBsp(
-            profile.bsp_api_key!,
-            e164,
-            client.nom,
-            "baobab_offre_hotel",
-            message,
-          )
-        : await sendViaMeta(
-            profile.whatsapp_phone_number_id!,
-            profile.whatsapp_access_token!,
-            e164,
-            client.nom,
-            "baobab_offre_hotel",
-            message,
-          );
-
-      sentRows.push({
-        campaign_id: campaignId,
-        client_id: client.id,
-        profile_id: profileId,
-        channel: "whatsapp",
-        message_content: message,
-        template_id: templateId || null,
-        status: result.ok ? "sent" : "failed",
-      });
-
-      if (result.ok) {
-        sent++;
-      } else {
-        failed++;
+    } finally {
+      // Toujours mettre à jour le statut de la campagne, même si la boucle
+      // ci-dessus a été interrompue par une exception : une campagne ne doit
+      // jamais rester bloquée sur "sending" indéfiniment. Le statut reflète
+      // désormais un échec partiel plutôt que de dire "completed" quand la
+      // majorité des envois a échoué.
+      if (campaignId) {
+        const status =
+          failed === 0 ? "completed" : sent === 0 ? "failed" : "completed_with_errors";
+        await db
+          .from("campaigns")
+          .update({ status, ended_at: new Date().toISOString() })
+          .eq("id", campaignId);
       }
-    }
-
-    // Bulk insert sent_messages logs
-    if (sentRows.length > 0) {
-      await db.from("sent_messages").insert(sentRows);
-    }
-
-    // Update campaign status
-    if (campaignId) {
-      await db
-        .from("campaigns")
-        .update({
-          status: failed === targets.length ? "failed" : "completed",
-          ended_at: new Date().toISOString(),
-        })
-        .eq("id", campaignId);
     }
 
     return success({ sent, failed, total: targets.length, campaignId });

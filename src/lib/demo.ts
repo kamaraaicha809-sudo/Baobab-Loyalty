@@ -28,6 +28,7 @@ export const demoProfile = {
   customer_id: null,
   price_id: "premium",
   has_access: true,
+  access_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
   trial_ends_at: null,
   role: "admin",
   hotel_name: "Hôtel Le Baobab",
@@ -119,6 +120,14 @@ export const demoTeam = {
 // ============================================
 // DONNÉES FICTIVES — CAMPAGNES
 // ============================================
+
+// Résultat simulé d'un envoi de campagne en mode démo. En démo, il n'y a pas
+// de session Supabase réelle : callEdgeFunction rejetterait l'appel avant
+// même d'atteindre campaign-send, donc le frontend simule ici le même
+// résultat que la branche démo de l'Edge Function (source unique, au lieu de
+// dupliquer les mêmes valeurs à chaque endroit qui simule un envoi).
+export const demoCampaignSendResult = { sent: 3, failed: 0, total: 3, campaignId: null as string | null };
+export const demoCampaignSendDelayMs = 1500;
 
 export const demoCampaigns = [
   { id: "camp1", name: "Remise printemps", segment_code: "6-9mois", offer_id: "o1", status: "completed", recipient_count: 64, started_at: "2026-02-24T10:00:00Z", ended_at: "2026-02-24T10:05:00Z" },

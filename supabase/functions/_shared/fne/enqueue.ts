@@ -11,14 +11,7 @@
 import type { SupabaseClient } from "../deps.ts";
 import { buildInvoicePayload, resolveTaxCode, resolveTemplate } from "./mapper.ts";
 import type { PaymentMethod } from "./types.ts";
-
-// Doit rester synchronise avec config.js (billing.plans) - config.js n'est pas
-// importable depuis une Edge Function Deno (fichier frontend, pas un module partage).
-const PLAN_PRICES_XOF: Record<string, number> = {
-  starter: 39000,
-  pro: 69000,
-  premium: 189000,
-};
+import { PLAN_PRICES_XOF } from "../plan.ts";
 
 function mapMonerooPaymentMethod(raw: string | undefined | null): PaymentMethod {
   const m = (raw ?? "").toLowerCase();

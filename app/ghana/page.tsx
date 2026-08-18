@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Hotel Loyalty Software for Ghana — Baobab Loyalty",
-  description: "Accra hotels: 3× more direct bookings with targeted WhatsApp campaigns. Zero OTA commission, AI-generated messages. Get started in 10 minutes. Free trial.",
+  description: "Accra hotels: win back inactive guests with targeted WhatsApp campaigns. Zero OTA commission, AI-generated messages. Get started in 10 minutes. Free trial.",
   canonicalUrlRelative: "/ghana",
 });
 
@@ -34,22 +34,6 @@ const localBusinessSchema = {
   priceRange: "GHS 299 - GHS 699/month",
   currenciesAccepted: "GHS",
   knowsLanguage: "en",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "24",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Kwame O." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "Before Baobab Loyalty, we had no way to reconnect with past guests. Now I launch a campaign in 10 minutes and see bookings come in the same day. In 2 months, we recovered over 20 returning guests.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -63,13 +47,10 @@ const data: CountryPageData = {
     "Accra is West Africa's fastest-growing business travel hub. Baobab Loyalty helps Ghanaian hotels turn every stay into a direct repeat booking — via WhatsApp, with no OTA commission.",
   heroCta: "Start for free",
   statsItems: [
-    {
-      value: "87%",
-      label: "of business travelers in Accra use WhatsApp every day",
-    },
-    { value: "−35%", label: "OTA dependency after 3 months of use" },
+    { value: "0%", label: "commission on your direct bookings" },
     { value: "10 min", label: "to launch your first WhatsApp campaign" },
-    { value: "3×", label: "more direct bookings on average" },
+    { value: "GHS", label: "billed in your local currency" },
+    { value: "30 days", label: "guaranteed or next month is free" },
   ],
   problemTitle: "Ghanaian hotels are losing revenue every month",
   problemSubtitle:
@@ -108,14 +89,10 @@ const data: CountryPageData = {
       desc: "Write your message or let the AI draft it. Select your segment, confirm and send. Each guest receives a personalized offer directly on WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "Before Baobab Loyalty, we had no way to reconnect with past guests. Now I launch a campaign in 10 minutes and see bookings come in the same day. In 2 months, we recovered over 20 returning guests.",
-    author: "Kwame O.",
-    role: "General Manager",
-    hotel: "The Osu Boutique Hotel",
-    city: "Accra",
-    initials: "KO",
+  guarantee: {
+    title: "Why we can afford to guarantee results",
+    text: "Baobab Loyalty is still new in Ghana — we don't have hundreds of reviews to show you. So instead, we prove it differently: if you don't recover at least 2 extra nights in your first month, we give you the next month free.",
+    points: ["No commitment", "Your data stays 100% yours", "30-day personal support included"],
   },
   pricingTitle: "Pricing built for Ghanaian hotels",
   pricingSubtitle: "Billed in GHS. No long-term commitment. Cancel anytime.",

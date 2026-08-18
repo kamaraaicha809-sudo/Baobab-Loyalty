@@ -19,9 +19,23 @@ const MONTHLY_RELANCE_QUOTAS: Record<string, number> = {
   croissance: 10,
 };
 
+/**
+ * Prix FCFA par plan — source de vérité unique côté serveur.
+ * Doit rester synchronisé avec config.js (billing.plans), qui n'est pas
+ * importable depuis une Edge Function Deno (fichier frontend).
+ * Utilisé pour recalculer le montant du checkout côté serveur : on ne fait
+ * jamais confiance au montant envoyé par le client.
+ */
+export const PLAN_PRICES_XOF: Record<string, number> = {
+  starter: 39000,
+  pro: 69000,
+  premium: 189000,
+};
+
 export function getMonthlyRelanceQuota(profile: {
   price_id?: string | null;
   has_access?: boolean | null;
+  access_until?: string | null;
   trial_ends_at?: string | null;
 }): number {
   const slug = profile.price_id?.toLowerCase();

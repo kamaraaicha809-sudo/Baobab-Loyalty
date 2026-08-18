@@ -215,15 +215,15 @@ export default function CommentCaMarchePage() {
                 Ce que vous obtenez concrètement
               </h2>
               <p className="text-[#a3c4b5] text-base sm:text-lg max-w-2xl mx-auto">
-                Résultats constatés chez les hôteliers qui utilisent Baobab Loyalty.
+                Ce que la plateforme vous permet de faire, concrètement.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
               {[
                 { value: "10 min", label: "Pour lancer votre première campagne" },
-                { value: "3×", label: "Plus de réservations directes en moyenne" },
-                { value: "−35%", label: "De dépendance aux OTAs après 3 mois" },
-                { value: "90%+", label: "Taux d'ouverture des messages WhatsApp" },
+                { value: "0%", label: "Commission sur vos réservations directes" },
+                { value: "30 jours", label: "Garantis ou le mois suivant est offert" },
+                { value: "98%", label: "Taux d'ouverture moyen de WhatsApp (Meta)" },
               ].map((stat, i) => (
                 <div key={i}>
                   <p className="text-3xl font-bold text-[#EBC161] mb-1">{stat.value}</p>

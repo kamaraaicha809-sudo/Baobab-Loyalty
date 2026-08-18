@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Fidélisation hôtelière au Sénégal — Baobab Loyalty",
-  description: "Hôtels au Sénégal : reconquérez vos clients inactifs via WhatsApp en 10 min. −30% dépendance Booking.com, prix en FCFA. Essai gratuit sans carte bancaire.",
+  description: "Hôtels au Sénégal : reconquérez vos clients inactifs via WhatsApp en 10 min. Zéro commission Booking.com, prix en FCFA. Essai gratuit sans carte bancaire.",
   canonicalUrlRelative: "/senegal",
 });
 
@@ -29,22 +29,6 @@ const localBusinessSchema = {
   priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "44",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Aminata D." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "Avec Baobab Loyalty, j'ai pu recontacter des clients que je n'avais pas vus depuis 6 mois. Le premier envoi a généré 8 nouvelles réservations en 48 heures. C'est exactement ce dont nous avions besoin à Dakar.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -58,13 +42,10 @@ const data: CountryPageData = {
     "Dakar, porte d'entrée de l'Afrique de l'Ouest, attire une clientèle hôtelière diverse. Baobab Loyalty transforme chaque séjour en relation durable — via WhatsApp, en FCFA, sans commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
-    {
-      value: "90%",
-      label: "des voyageurs d'affaires à Dakar utilisent WhatsApp quotidiennement",
-    },
-    { value: "−30%", label: "de dépendance aux OTAs constatée après 3 mois" },
+    { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
-    { value: "2,5×", label: "plus de réservations directes en moyenne" },
+    { value: "FCFA", label: "facturation en devise locale" },
+    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels sénégalais laissent des revenus sur la table",
   problemSubtitle:
@@ -103,14 +84,10 @@ const data: CountryPageData = {
       desc: "Rédigez votre message ou laissez l'IA le créer. Sélectionnez votre segment, validez et envoyez. Chaque client reçoit une offre personnalisée sur son WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "Avec Baobab Loyalty, j'ai pu recontacter des clients que je n'avais pas vus depuis 6 mois. Le premier envoi a généré 8 nouvelles réservations en 48 heures. C'est exactement ce dont nous avions besoin à Dakar.",
-    author: "Aminata D.",
-    role: "Directrice commerciale",
-    hotel: "Résidence du Lac",
-    city: "Dakar",
-    initials: "AD",
+  guarantee: {
+    title: "Pourquoi on peut se permettre de garantir des résultats",
+    text: "Baobab Loyalty est encore jeune au Sénégal — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels sénégalais",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

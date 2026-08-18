@@ -15,6 +15,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
   try {
+    // Exception volontaire, voir prompts-update/index.ts : ai_prompts est une
+    // table globale partagée, pas une donnée par hôtel.
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
     if (isDemoMode) return errors.forbidden("Prompt deletion is disabled in demo mode");
 

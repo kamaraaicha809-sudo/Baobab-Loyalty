@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Fidélisation hôtelière à Abidjan — Baobab Loyalty",
-  description: "Hôtels à Abidjan : 3× plus de réservations directes, zéro commission Booking.com. Campagnes WhatsApp en 10 min, segmentation automatique. Essai gratuit.",
+  description: "Hôtels à Abidjan : relancez vos clients inactifs via WhatsApp, zéro commission Booking.com. Campagnes en 10 min, segmentation automatique. Essai gratuit.",
   canonicalUrlRelative: "/abidjan",
 });
 
@@ -34,22 +34,6 @@ const localBusinessSchema = {
   priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "52",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Konan A." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "Avant Baobab Loyalty, on perdait tous nos clients après le check-out. Maintenant, je lance une campagne en 10 minutes et je vois des réservations arriver le même jour. En 2 mois, on a récupéré plus de 25 clients habitués.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -63,13 +47,10 @@ const data: CountryPageData = {
     "Abidjan est la capitale économique de l'Afrique de l'Ouest et la ville la plus active en matière de voyages d'affaires. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans aucune commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
-    {
-      value: "91%",
-      label: "des voyageurs d'affaires à Abidjan utilisent WhatsApp quotidiennement",
-    },
-    { value: "−35%", label: "de commissions OTA économisées après 3 mois" },
+    { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
-    { value: "3×", label: "plus de réservations directes en moyenne" },
+    { value: "FCFA", label: "facturation en devise locale" },
+    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels abidjanais perdent des revenus chaque mois",
   problemSubtitle:
@@ -108,14 +89,10 @@ const data: CountryPageData = {
       desc: "Rédigez votre message ou utilisez l'IA. Sélectionnez votre segment, validez et envoyez. Chaque client reçoit une offre personnalisée directement sur son WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "Avant Baobab Loyalty, on perdait tous nos clients après le check-out. Maintenant, je lance une campagne en 10 minutes et je vois des réservations arriver le même jour. En 2 mois, on a récupéré plus de 25 clients habitués.",
-    author: "Konan A.",
-    role: "Directeur général",
-    hotel: "Hôtel Le Plateau",
-    city: "Abidjan",
-    initials: "KA",
+  guarantee: {
+    title: "Pourquoi on peut se permettre de garantir des résultats",
+    text: "Baobab Loyalty est encore jeune à Abidjan — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels abidjanais",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

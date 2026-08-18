@@ -56,26 +56,72 @@ export async function getClients(profileId: string, limit = 1000): Promise<Clien
   return (data || []) as Client[];
 }
 
+export interface ImportClientRow {
+  nom: string;
+  email?: string;
+  telephone?: string;
+  whatsapp?: string;
+  derniere_visite: string;
+}
+
+/**
+ * Un numéro sans indicatif pays (pas de "+" ni de "00" au début) passe cette
+ * vérification mais échoue silencieusement plus tard à l'envoi WhatsApp
+ * (formatE164 dans campaign-send ne peut pas deviner le pays). On le
+ * signale donc dès l'import plutôt qu'au moment de l'envoi.
+ */
+function looksLikeMissingCountryCode(phone: string): boolean {
+  const trimmed = phone.trim();
+  if (!trimmed) return false;
+  return !trimmed.startsWith("+") && !trimmed.startsWith("00");
+}
+
 /**
  * Importe des clients depuis des lignes CSV parsées
  * Format attendu : nom, email, telephone, whatsapp?, derniere_visite (YYYY-MM-DD)
- * Bulk insert optimisé (batch de 100)
+ *
+ * Dédoublonne par téléphone au sein d'un même hôtel (un ré-import du même
+ * fichier met à jour les clients existants au lieu de les dupliquer).
+ * Les lignes qui échouent sont renvoyées telles quelles dans failedRows,
+ * pour permettre de les corriger et de ré-importer seulement celles-là au
+ * lieu de tout recommencer.
  */
 export async function importClients(
   profileId: string,
-  rows: { nom: string; email?: string; telephone?: string; whatsapp?: string; derniere_visite: string }[]
-): Promise<{ inserted: number; errors: string[] }> {
+  rows: ImportClientRow[]
+): Promise<{ inserted: number; errors: string[]; warnings: string[]; failedRows: ImportClientRow[] }> {
   const supabase = createClient();
   const errors: string[] = [];
-  const validRows: { profile_id: string; nom: string; email: string | null; telephone: string | null; whatsapp: string | null; derniere_visite: string }[] = [];
+  const warnings: string[] = [];
+  const failedRows: ImportClientRow[] = [];
+
+  interface ValidRow {
+    source: ImportClientRow;
+    profile_id: string;
+    nom: string;
+    email: string | null;
+    telephone: string | null;
+    whatsapp: string | null;
+    derniere_visite: string;
+  }
+
+  const validRows: ValidRow[] = [];
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     if (!row.nom?.trim() || !row.derniere_visite) {
       errors.push(`Ligne ${i + 2} : nom et dernière visite requis`);
+      failedRows.push(row);
       continue;
     }
+
+    const contactNumber = row.whatsapp?.trim() || row.telephone?.trim();
+    if (contactNumber && looksLikeMissingCountryCode(contactNumber)) {
+      warnings.push(`${row.nom} : le numéro "${contactNumber}" ne semble pas avoir d'indicatif pays (ex: +221) — les campagnes WhatsApp échoueront pour ce client.`);
+    }
+
     validRows.push({
+      source: row,
       profile_id: profileId,
       nom: row.nom.trim(),
       email: row.email?.trim() || null,
@@ -85,21 +131,61 @@ export async function importClients(
     });
   }
 
+  const phones = [...new Set(validRows.map((r) => r.telephone).filter((t): t is string => !!t))];
+  const existingByPhone = new Map<string, string>();
+
+  if (phones.length > 0) {
+    const { data: existing } = await supabase
+      .from("clients")
+      .select("id, telephone")
+      .eq("profile_id", profileId)
+      .in("telephone", phones);
+    for (const c of existing ?? []) {
+      if (c.telephone) existingByPhone.set(c.telephone, c.id);
+    }
+  }
+
+  const toInsert: ValidRow[] = [];
+  const toUpdate: { id: string; row: ValidRow }[] = [];
+
+  for (const row of validRows) {
+    const existingId = row.telephone ? existingByPhone.get(row.telephone) : undefined;
+    if (existingId) toUpdate.push({ id: existingId, row });
+    else toInsert.push(row);
+  }
+
   const BATCH = 100;
   let inserted = 0;
 
-  for (let i = 0; i < validRows.length; i += BATCH) {
-    const batch = validRows.slice(i, i + BATCH);
-    const { data, error } = await supabase.from("clients").insert(batch).select("id");
+  for (let i = 0; i < toInsert.length; i += BATCH) {
+    const batch = toInsert.slice(i, i + BATCH);
+    const { data, error } = await supabase
+      .from("clients")
+      .insert(batch.map(({ source: _source, ...r }) => r))
+      .select("id");
 
     if (error) {
       errors.push(`Lot ${Math.floor(i / BATCH) + 1} : ${error.message}`);
+      failedRows.push(...batch.map((r) => r.source));
     } else {
       inserted += data?.length ?? 0;
     }
   }
 
-  return { inserted, errors };
+  for (const { id, row } of toUpdate) {
+    const { error } = await supabase
+      .from("clients")
+      .update({ nom: row.nom, email: row.email, whatsapp: row.whatsapp, derniere_visite: row.derniere_visite })
+      .eq("id", id);
+    if (error) {
+      errors.push(`${row.nom} : ${error.message}`);
+      failedRows.push(row.source);
+    } else {
+      inserted++;
+    }
+  }
+
+  return { inserted, errors, warnings, failedRows };
 }
 
 /**

@@ -11,7 +11,7 @@ import { getSEOTags, renderSchemaTags, renderOrganizationSchema, renderFAQSchema
 
 export const metadata = getSEOTags({
   title: "Baobab Loyalty — Remplissez vos chambres vides sans Booking.com",
-  description: "Vos clients oublient votre hôtel ? Relancez-les via WhatsApp en 2 min — 3× plus de réservations directes, 0% commission. Essai gratuit, résultats dès la 1ère campagne.",
+  description: "Vos clients oublient votre hôtel ? Relancez-les via WhatsApp en 2 min — 0% commission sur vos réservations directes. Essai gratuit, résultats dès la 1ère campagne.",
   canonicalUrlRelative: "/",
 });
 

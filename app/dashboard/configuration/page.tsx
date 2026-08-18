@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
-import { clients } from "@/src/sdk/clients";
+import { clients, type ImportClientRow } from "@/src/sdk/clients";
 import { whatsapp } from "@/src/sdk/whatsapp";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/demo";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
@@ -99,6 +99,7 @@ export default function ConfigurationPage() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [importStatus, setImportStatus] = useState<string>("");
+  const [failedImportRows, setFailedImportRows] = useState<ImportClientRow[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({ "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>({ connected: false });
@@ -324,9 +325,11 @@ export default function ConfigurationPage() {
         };
 
         if (room.id) {
-          await supabase.from("room_types").update(payload).eq("id", room.id);
+          const { error } = await supabase.from("room_types").update(payload).eq("id", room.id);
+          if (error) throw new Error(error.message);
         } else {
-          const { data } = await supabase.from("room_types").insert(payload).select("id").single();
+          const { data, error } = await supabase.from("room_types").insert(payload).select("id").single();
+          if (error) throw new Error(error.message);
           if (data) {
             setRoomTypes((prev) =>
               prev.map((r) => (r.name === room.name ? { ...r, id: data.id } : r))
@@ -335,8 +338,9 @@ export default function ConfigurationPage() {
         }
       }
       toast.success("Types de chambres enregistrés");
-    } catch {
-      toast.error("Erreur lors de l'enregistrement des chambres");
+    } catch (err) {
+      // Message du trigger SQL enforce_room_types_limit() si la limite du plan est atteinte
+      toast.error(err instanceof Error ? err.message : "Erreur lors de l'enregistrement des chambres");
     } finally {
       setSavingRooms(false);
     }
@@ -354,6 +358,7 @@ export default function ConfigurationPage() {
 
     setImporting(true);
     setImportStatus("Lecture du fichier CSV...");
+    setFailedImportRows([]);
     try {
       const text = await csvFile.text();
       const rows = clients.parseClientsCSV(text);
@@ -364,10 +369,12 @@ export default function ConfigurationPage() {
         return;
       }
       setImportStatus(`Importation de ${rows.length} client(s) détecté(s)...`);
-      const { inserted, errors } = await clients.importClients(profileId, rows);
+      const { inserted, errors, warnings, failedRows } = await clients.importClients(profileId, rows);
+      setFailedImportRows(failedRows);
       if (inserted > 0) {
         toast.success(`${inserted} client(s) importé(s)`);
-        if (errors.length > 0) toast.error(`${errors.length} erreur(s)`);
+        if (errors.length > 0) toast.error(`${errors.length} ligne(s) en échec — téléchargez-les pour les corriger et réessayer`);
+        if (warnings.length > 0) toast.error(`${warnings.length} numéro(s) sans indicatif pays détecté(s)`);
         setImportStatus(`${inserted} client(s) importé(s) avec succès`);
         const seg = await clients.getSegmentCounts(profileId);
         setCounts(seg);
@@ -382,6 +389,22 @@ export default function ConfigurationPage() {
     } finally {
       setImporting(false);
     }
+  };
+
+  const handleDownloadFailedRows = () => {
+    if (failedImportRows.length === 0) return;
+    const header = "nom,email,telephone,whatsapp,derniere_visite";
+    const lines = failedImportRows.map((r) =>
+      [r.nom, r.email || "", r.telephone || "", r.whatsapp || "", r.derniere_visite].join(",")
+    );
+    const csv = [header, ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "clients-echecs-import.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -860,6 +883,18 @@ export default function ConfigurationPage() {
               </svg>
             )}
             <span className={importing ? "" : "text-green-700 font-medium"}>{importStatus}</span>
+          </div>
+        )}
+        {!importing && failedImportRows.length > 0 && (
+          <div className="mt-3 flex items-center gap-3 text-sm bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
+            <span className="text-amber-800">{failedImportRows.length} ligne(s) n&apos;ont pas pu être importées.</span>
+            <button
+              type="button"
+              onClick={handleDownloadFailedRows}
+              className="text-amber-900 font-semibold underline underline-offset-2 hover:text-amber-700"
+            >
+              Télécharger ces lignes pour les corriger et réessayer
+            </button>
           </div>
         )}
 

@@ -89,11 +89,15 @@ export default function AbonnementPage() {
     }
     setCancelLoading(true);
     try {
-      const { url } = await billing.createPortal({
+      await billing.createPortal({
         returnUrl: `${window.location.origin}/dashboard/abonnement`,
       });
-      window.location.href = url;
+      setShowCancelConfirm(false);
+      setHasAccess(false);
+      setCurrentPlanIndex(null);
     } catch {
+      // handled by finally
+    } finally {
       setCancelLoading(false);
     }
   };
@@ -225,7 +229,7 @@ export default function AbonnementPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {isDemoMode ? "Renouvellement le 10 mai 2026" : "Prochain renouvellement selon votre abonnement"}
+              {isDemoMode ? "Renouvellement le 10 mai 2026" : "Aucun renouvellement automatique — repayez votre plan avant la fin de la période pour garder l'accès"}
             </div>
           </div>
 
@@ -306,7 +310,7 @@ export default function AbonnementPage() {
               <div className="bg-red-50 border border-red-200 rounded-xl p-5 space-y-3">
                 <p className="text-sm font-semibold text-red-800">Confirmer la résiliation ?</p>
                 <p className="text-xs text-red-600">
-                  Votre abonnement restera actif jusqu&apos;à la fin de la période en cours. Vous perdrez l&apos;accès aux fonctionnalités premium ensuite.
+                  Vous perdrez immédiatement l&apos;accès aux fonctionnalités premium. Vous pourrez vous réabonner à tout moment.
                 </p>
                 <div className="flex items-center gap-3">
                   <button

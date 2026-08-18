@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Logiciel fidélisation hôtel Côte d'Ivoire — Baobab Loyalty",
-  description: "Logiciel fidélisation hôtel Côte d'Ivoire : 3× plus de réservations directes, −35% commissions OTA. Campagnes WhatsApp IA en FCFA, opérationnel en 10 min. Essai gratuit.",
+  description: "Logiciel fidélisation hôtel Côte d'Ivoire : relancez vos clients inactifs, zéro commission OTA. Campagnes WhatsApp IA en FCFA, opérationnel en 10 min. Essai gratuit.",
   canonicalUrlRelative: "/cote-divoire",
 });
 
@@ -29,22 +29,6 @@ const localBusinessSchema = {
   priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "61",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Kouamé A." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "Avant Baobab Loyalty, je n'avais aucun moyen de recontacter mes anciens clients. Maintenant je lance une campagne en 10 minutes et je vois des réservations arriver dans la journée. En 2 mois, j'ai récupéré plus de 15 clients réguliers.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const faqSchema = {
@@ -72,7 +56,7 @@ const faqSchema = {
       name: "Comment réduire les commissions Booking.com pour un hôtel en Côte d'Ivoire ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "La méthode la plus efficace est de reconnecter directement avec vos anciens clients via WhatsApp, sans passer par les OTAs. Avec Baobab Loyalty, les hôtels ivoiriens observent une réduction de 35% de leur dépendance aux OTAs après 3 mois : chaque réservation directe vous fait économiser 15 à 20% de commission Booking.com.",
+        text: "La méthode la plus efficace est de reconnecter directement avec vos anciens clients via WhatsApp, sans passer par les OTAs. Chaque réservation obtenue directement via Baobab Loyalty vous fait économiser les 15 à 20% de commission que Booking.com aurait prélevés.",
       },
     },
     {
@@ -105,7 +89,7 @@ const faqItems = [
   },
   {
     q: "Comment réduire les commissions Booking.com pour mon hôtel en Côte d'Ivoire ?",
-    a: "En relançant directement vos anciens clients via WhatsApp, vous les faites réserver sans passer par les OTAs. Les hôtels ivoiriens utilisant Baobab Loyalty observent −35% de dépendance aux OTAs en 3 mois, économisant 15 à 20% de commission sur chaque réservation directe.",
+    a: "En relançant directement vos anciens clients via WhatsApp, vous les faites réserver sans passer par les OTAs. Chaque réservation directe vous fait économiser 15 à 20% de commission qui serait autrement partie chez Booking.com.",
   },
   {
     q: "En combien de temps peut-on lancer une campagne WhatsApp ?",
@@ -128,13 +112,10 @@ const data: CountryPageData = {
     "Abidjan concentre les plus grands hôtels d'affaires d'Afrique de l'Ouest. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
-    {
-      value: "85%",
-      label: "des voyageurs d'affaires à Abidjan utilisent WhatsApp quotidiennement",
-    },
-    { value: "−35%", label: "de dépendance aux OTAs constatée après 3 mois" },
+    { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
-    { value: "3×", label: "plus de réservations directes en moyenne" },
+    { value: "FCFA", label: "facturation en devise locale" },
+    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels ivoiriens perdent des revenus chaque mois",
   problemSubtitle:
@@ -173,14 +154,10 @@ const data: CountryPageData = {
       desc: "Rédigez votre message ou laissez l'IA le générer. Choisissez votre segment, confirmez et envoyez. Vos clients reçoivent une offre personnalisée directement sur WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "Avant Baobab Loyalty, je n'avais aucun moyen de recontacter mes anciens clients. Maintenant je lance une campagne en 10 minutes et je vois des réservations arriver dans la journée. En 2 mois, j'ai récupéré plus de 15 clients réguliers.",
-    author: "Kouamé A.",
-    role: "Directeur général",
-    hotel: "Hôtel Les Flamboyants",
-    city: "Abidjan",
-    initials: "KA",
+  guarantee: {
+    title: "Pourquoi on peut se permettre de garantir des résultats",
+    text: "Baobab Loyalty est encore jeune en Côte d'Ivoire — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels ivoiriens",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

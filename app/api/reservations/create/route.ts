@@ -46,10 +46,22 @@ export async function POST(request: Request) {
     }
 
     const ip = getClientIp(request);
-    const allowed = await checkRateLimit(supabase, `reservations:${ip}`, 5, 600);
-    if (!allowed) {
+    // Rate limit par IP : freine un attaquant depuis une seule source.
+    const allowedByIp = await checkRateLimit(supabase, `reservations:ip:${ip}`, 5, 600);
+    if (!allowedByIp) {
       return NextResponse.json(
         { error: "Trop de demandes. Réessayez dans quelques minutes." },
+        { status: 429 }
+      );
+    }
+    // Rate limit par hôtel : le lien /offre?pid=... est visible dans l'URL et
+    // peut être capturé et rejoué depuis des IP différentes. Ce second plafond
+    // borne le nombre de fausses demandes qu'un hôtel peut recevoir, quelle
+    // que soit la diversité des IP utilisées par l'attaquant.
+    const allowedByProfile = await checkRateLimit(supabase, `reservations:profile:${profile_id}`, 30, 3600);
+    if (!allowedByProfile) {
+      return NextResponse.json(
+        { error: "Trop de demandes pour cet hôtel. Réessayez plus tard." },
         { status: 429 }
       );
     }
@@ -70,6 +82,30 @@ export async function POST(request: Request) {
 
     if (!profile) {
       return NextResponse.json({ error: "Profil non trouvé" }, { status: 404 });
+    }
+
+    // Déduplication : un double-clic, un rechargement de page ou un lien
+    // rejoué juste après ne doit pas créer plusieurs réservations en double
+    // pour le même client et la même date d'arrivée.
+    if (client_phone || client_name) {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      let dedupQuery = supabase
+        .from("reservations")
+        .select("id")
+        .eq("profile_id", profile_id)
+        .eq("check_in_date", checkIn)
+        .eq("status", "pending_validation")
+        .gte("created_at", tenMinutesAgo)
+        .limit(1);
+
+      dedupQuery = client_phone
+        ? dedupQuery.eq("client_phone", client_phone)
+        : dedupQuery.eq("client_name", client_name!);
+
+      const { data: existing } = await dedupQuery.maybeSingle();
+      if (existing) {
+        return NextResponse.json({ success: true });
+      }
     }
 
     const insertPayload: Record<string, unknown> = {

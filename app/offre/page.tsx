@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-type Step = "offre" | "date-form" | "traitement" | "attente";
+type Step = "offre" | "date-form" | "traitement" | "attente" | "erreur";
 
 function getTomorrow(): string {
   const d = new Date();
@@ -33,7 +33,7 @@ function OffreContent() {
   const handleConfirmerReservation = async () => {
     setStep("traitement");
     try {
-      await fetch("/api/reservations/create", {
+      const res = await fetch("/api/reservations/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,8 +46,18 @@ function OffreContent() {
           avantage,
         }),
       });
+      if (!res.ok) {
+        setStep("erreur");
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      if (!data?.success) {
+        setStep("erreur");
+        return;
+      }
     } catch {
-      // Continuer même en cas d'erreur réseau
+      setStep("erreur");
+      return;
     }
     setStep("attente");
   };
@@ -120,6 +130,36 @@ function OffreContent() {
               type="button"
               onClick={() => { window.location.href = "/"; }}
               className="w-full max-w-xs py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 active:bg-slate-700 transition-colors"
+            >
+              Fermer
+            </button>
+          </div>
+        )}
+
+        {step === "erreur" && (
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white min-h-[calc(100vh-140px)] w-full">
+            <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-4">
+              Votre demande n&apos;a pas pu être envoyée
+            </h1>
+            <p className="text-slate-600 text-base text-center mb-8 max-w-sm">
+              Une erreur est survenue. Réessayez, ou contactez directement <strong>{hotel}</strong> pour réserver.
+            </p>
+            <button
+              type="button"
+              onClick={() => setStep("date-form")}
+              className="w-full max-w-xs py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 active:bg-slate-700 transition-colors mb-3"
+            >
+              Réessayer
+            </button>
+            <button
+              type="button"
+              onClick={() => { window.location.href = "/"; }}
+              className="w-full max-w-xs py-3 text-sm text-slate-500 hover:text-slate-700"
             >
               Fermer
             </button>

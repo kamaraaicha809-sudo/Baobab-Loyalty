@@ -46,6 +46,22 @@ Deno.serve(async (req) => {
       return errors.forbidden("Cette invitation a été envoyée à une autre adresse email.");
     }
 
+    // Un compte qui exploite déjà son propre hôtel ne peut pas rejoindre une
+    // autre équipe : is_team_member() autorise à la fois "id = auth.uid()"
+    // (son propre profil) ET les lignes team_members — cumuler les deux
+    // donnerait un accès RLS simultané aux données de deux hôtels distincts.
+    const { data: ownProfile } = await serviceClient
+      .from("profiles")
+      .select("config_complete")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (ownProfile?.config_complete) {
+      return errors.forbidden(
+        "Votre compte gère déjà son propre hôtel. Utilisez un compte dédié (ex: une adresse email pour votre réceptionniste) pour rejoindre une autre équipe."
+      );
+    }
+
     const { error: memberError } = await serviceClient
       .from("team_members")
       .upsert(

@@ -11,8 +11,17 @@ import { requireAuth } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { resolveProfile } from "../_shared/team.ts";
+import { PLAN_PRICES_XOF } from "../_shared/plan.ts";
+import { v } from "../_shared/deps.ts";
 
 const MONEROO_API_URL = "https://api.moneroo.io/v1";
+
+const CheckoutBodySchema = v.object({
+  planSlug: v.pipe(v.string(), v.minLength(1), v.maxLength(50)),
+  planName: v.optional(v.pipe(v.string(), v.maxLength(100))),
+  successUrl: v.pipe(v.string(), v.url()),
+  cancelUrl: v.pipe(v.string(), v.url()),
+});
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
@@ -26,11 +35,20 @@ Deno.serve(async (req) => {
       return errors.unauthorized(authError || "Authentication required");
     }
 
-    const body = await req.json();
-    const { planSlug, amount, planName, currency = "XOF", successUrl, cancelUrl } = body;
+    const rawBody = await req.json();
+    const parsed = v.safeParse(CheckoutBodySchema, rawBody);
+    if (!parsed.success) {
+      return errors.badRequest("Missing or invalid required fields: planSlug, successUrl, cancelUrl");
+    }
+    const { planSlug, planName, successUrl, cancelUrl } = parsed.output;
 
-    if (!planSlug || !amount || !successUrl || !cancelUrl) {
-      return errors.badRequest("Missing required fields: planSlug, amount, successUrl, cancelUrl");
+    // Le montant n'est JAMAIS pris depuis le client : on le recalcule ici a
+    // partir du plan. Sinon n'importe quel appelant peut poster son propre
+    // prix (ex: 1 XOF pour le plan Premium) et l'obtenir a ce tarif.
+    const amount = PLAN_PRICES_XOF[String(planSlug).toLowerCase()];
+    const currency = "XOF";
+    if (!amount) {
+      return errors.badRequest(`Plan inconnu : "${planSlug}"`);
     }
 
     // Seul le propriétaire du compte gère la facturation (pas les membres invités)

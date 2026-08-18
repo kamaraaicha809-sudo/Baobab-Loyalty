@@ -11,6 +11,7 @@ import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { resolveProfile, MAX_TEAM_MEMBERS } from "../_shared/team.ts";
+import { checkRateLimit } from "../_shared/rate-limit.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
@@ -28,7 +29,8 @@ Deno.serve(async (req) => {
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const teamRole = body.teamRole === "admin" ? "admin" : "member";
 
-    if (!email || !email.includes("@")) {
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !EMAIL_RE.test(email)) {
       return errors.badRequest("Email invalide.");
     }
 
@@ -64,6 +66,15 @@ Deno.serve(async (req) => {
 
     if ((memberCount || 0) + (pendingCount || 0) >= MAX_TEAM_MEMBERS) {
       return errors.forbidden(`Limite de ${MAX_TEAM_MEMBERS} membres invités atteinte pour le plan Premium.`);
+    }
+
+    // MAX_TEAM_MEMBERS borne le nombre d'invitations simultanées mais pas la
+    // fréquence de renvoi vers la même adresse (l'upsert ci-dessous remplace
+    // et relance l'email à chaque appel) : sans ce frein, un owner/admin
+    // pouvait boucler des invitations vers un même email sans cooldown.
+    const withinRateLimit = await checkRateLimit(serviceClient, `team-invite:${profile.id}:${email}`, 1, 120);
+    if (!withinRateLimit) {
+      return errors.badRequest("Invitation déjà envoyée à cette adresse récemment. Réessayez dans 2 minutes.");
     }
 
     const { data: invitation, error: insertError } = await serviceClient

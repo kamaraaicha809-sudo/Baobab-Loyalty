@@ -10,6 +10,7 @@
 
 import { getServiceClient } from "../_shared/auth.ts";
 import type { SupabaseClient } from "../_shared/deps.ts";
+import { v } from "../_shared/deps.ts";
 import { success, errors } from "../_shared/response.ts";
 
 interface ResendAttachmentMeta {
@@ -18,6 +19,24 @@ interface ResendAttachmentMeta {
   content_type: string;
   download_url?: string;
 }
+
+const AttachmentMetaSchema = v.object({
+  id: v.string(),
+  filename: v.string(),
+  content_type: v.string(),
+  download_url: v.optional(v.string()),
+});
+
+const WebhookBodySchema = v.object({
+  type: v.optional(v.string()),
+  data: v.optional(
+    v.object({
+      email_id: v.optional(v.string()),
+      to: v.optional(v.array(v.string())),
+      attachments: v.optional(v.array(AttachmentMetaSchema)),
+    })
+  ),
+});
 
 interface ClientRow {
   profile_id: string;
@@ -90,7 +109,7 @@ function extractProfileId(toAddresses: string[]): string | null {
 async function fetchEmailFull(
   emailId: string,
   apiKey: string
-): Promise<{ text: string; to: string[] }> {
+): Promise<{ text: string; to: string[]; from: string }> {
   const res = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
@@ -98,7 +117,17 @@ async function fetchEmailFull(
   return {
     text: String(data.text ?? ""),
     to: Array.isArray(data.to) ? data.to : [String(data.to ?? "")],
+    from: String(data.from ?? ""),
   };
+}
+
+/**
+ * Extrait l'adresse email pure d'un champ "from" pouvant contenir un nom
+ * affiché, ex. "Jean Dupont <jean@hotel.com>" -> "jean@hotel.com".
+ */
+function extractEmailAddress(raw: string): string {
+  const match = raw.match(/<([^>]+)>/);
+  return (match ? match[1] : raw).trim().toLowerCase();
 }
 
 async function fetchCsvFromAttachments(
@@ -133,24 +162,70 @@ async function fetchCsvFromAttachments(
 
 // --- DB Helpers ---
 
+/**
+ * Insère ou met à jour les clients par lot de CSV reçu par email.
+ *
+ * La table clients n'a pas de contrainte UNIQUE sur (profile_id, telephone)
+ * (l'import CSV manuel du dashboard insère volontairement sans dédoublonner).
+ * Un .upsert({ onConflict: "profile_id,telephone" }) échouerait donc
+ * silencieusement à chaque appel (Postgres exige une contrainte unique ou un
+ * index correspondant à la cible ON CONFLICT). On fait le dédoublonnage nous-
+ * mêmes : on cherche les clients existants par téléphone, on les met à jour,
+ * et on insère les nouveaux.
+ */
 async function upsertClients(
   db: SupabaseClient,
   profileId: string,
   rows: Omit<ClientRow, "profile_id">[]
 ): Promise<{ inserted: number; errorCount: number }> {
   const validRows: ClientRow[] = rows.map((r) => ({ ...r, profile_id: profileId }));
+
+  const phones = [...new Set(validRows.map((r) => r.telephone).filter((t): t is string => !!t))];
+  const existingByPhone = new Map<string, string>();
+
+  if (phones.length > 0) {
+    const { data: existing } = await db
+      .from("clients")
+      .select("id, telephone")
+      .eq("profile_id", profileId)
+      .in("telephone", phones);
+    for (const c of existing ?? []) {
+      if (c.telephone) existingByPhone.set(c.telephone, c.id);
+    }
+  }
+
+  const toInsert: ClientRow[] = [];
+  const toUpdate: { id: string; row: ClientRow }[] = [];
+
+  for (const row of validRows) {
+    const existingId = row.telephone ? existingByPhone.get(row.telephone) : undefined;
+    if (existingId) toUpdate.push({ id: existingId, row });
+    else toInsert.push(row);
+  }
+
   const BATCH = 100;
   let inserted = 0;
   let errorCount = 0;
 
-  for (let i = 0; i < validRows.length; i += BATCH) {
-    const batch = validRows.slice(i, i + BATCH);
-    const { data, error } = await db
-      .from("clients")
-      .upsert(batch, { onConflict: "profile_id,telephone", ignoreDuplicates: false })
-      .select("id");
+  for (let i = 0; i < toInsert.length; i += BATCH) {
+    const batch = toInsert.slice(i, i + BATCH);
+    const { data, error } = await db.from("clients").insert(batch).select("id");
     if (error) errorCount += batch.length;
     else inserted += data?.length ?? 0;
+  }
+
+  for (const { id, row } of toUpdate) {
+    const { error } = await db
+      .from("clients")
+      .update({
+        nom: row.nom,
+        email: row.email,
+        whatsapp: row.whatsapp,
+        derniere_visite: row.derniere_visite,
+      })
+      .eq("id", id);
+    if (error) errorCount++;
+    else inserted++;
   }
 
   return { inserted, errorCount };
@@ -213,14 +288,12 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   try {
-    const body = await req.json() as {
-      type?: string;
-      data?: {
-        email_id?: string;
-        to?: string[];
-        attachments?: ResendAttachmentMeta[];
-      };
-    };
+    const rawBody = await req.json();
+    const parsedBody = v.safeParse(WebhookBodySchema, rawBody);
+    if (!parsedBody.success) {
+      return errors.badRequest("Payload webhook invalide");
+    }
+    const body = parsedBody.output;
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) return errors.internal("RESEND_API_KEY manquante");
@@ -231,7 +304,7 @@ Deno.serve(async (req) => {
     const webhookTo = body.data?.to ?? [];
     const webhookAttachments: ResendAttachmentMeta[] = body.data?.attachments ?? [];
 
-    const { text: emailText, to: fullTo } = await fetchEmailFull(emailId, resendApiKey);
+    const { text: emailText, to: fullTo, from: senderRaw } = await fetchEmailFull(emailId, resendApiKey);
     const toAddresses = fullTo.length > 0 ? fullTo : webhookTo;
 
     const profileId = extractProfileId(toAddresses);
@@ -246,6 +319,18 @@ Deno.serve(async (req) => {
       .single();
 
     if (profileError || !profile) return errors.notFound("Profil introuvable");
+
+    // profileId est un UUID visible dans les liens publics /offre?pid=... :
+    // n'importe qui peut le connaître et tenter d'envoyer un CSV à
+    // sync+{profileId}@... pour un hôtel qui n'est pas le sien. On
+    // n'accepte la synchronisation que si l'expéditeur réel de l'email
+    // correspond à l'adresse email principale enregistrée pour cet hôtel.
+    const senderEmail = extractEmailAddress(senderRaw);
+    const registeredEmail = (profile.email_principal || "").trim().toLowerCase();
+    if (!registeredEmail || senderEmail !== registeredEmail) {
+      await logSync(db, profileId, "error", 0, 0, `Expéditeur non autorisé pour cet hôtel : ${senderEmail || "inconnu"}`);
+      return errors.forbidden("Expéditeur non autorisé pour cet hôtel.");
+    }
 
     let csvText = "";
 
@@ -269,7 +354,15 @@ Deno.serve(async (req) => {
     }
 
     const { inserted, errorCount } = await upsertClients(db, profileId, rows);
-    await logSync(db, profileId, "success", inserted, errorCount, null);
+    const allFailed = inserted === 0 && errorCount > 0;
+    await logSync(
+      db,
+      profileId,
+      allFailed ? "error" : "success",
+      inserted,
+      errorCount,
+      allFailed ? "Toutes les lignes ont échoué" : null
+    );
 
     const fromEmail = Deno.env.get("EMAIL_FROM") ?? "Baobab Loyalty <noreply@baobab-loyalty.com>";
     if (profile.email_principal) {

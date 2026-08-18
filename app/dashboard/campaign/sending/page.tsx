@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { campaigns } from "@/src/sdk/campaigns";
-import { isDemoMode } from "@/src/lib/demo";
+import { isDemoMode, demoCampaignSendResult, demoCampaignSendDelayMs } from "@/src/lib/demo";
 
 function SendingContent() {
   const searchParams = useSearchParams();
@@ -46,7 +46,7 @@ function SendingContent() {
     // ici le même résultat que la branche démo de l'Edge Function.
     const sendPromise = isDemoMode
       ? new Promise<{ sent: number; failed: number; total: number; campaignId: string | null }>((resolve) =>
-          setTimeout(() => resolve({ sent: 3, failed: 0, total: 3, campaignId: null }), 1500)
+          setTimeout(() => resolve(demoCampaignSendResult), demoCampaignSendDelayMs)
         )
       : campaigns.sendCampaign({ segmentCode, message, templateId, avantage, customMonths });
 

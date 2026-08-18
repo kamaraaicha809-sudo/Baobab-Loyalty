@@ -10,7 +10,7 @@ import {
 
 export const metadata = getSEOTags({
   title: "Fidélisation hôtelière à Douala — Baobab Loyalty",
-  description: "Hôtels à Douala : 12 réservations en une semaine avec Baobab Loyalty. Campagnes WhatsApp IA, −30% commissions OTA, prix en FCFA. Essai gratuit.",
+  description: "Hôtels à Douala : relancez vos clients inactifs via WhatsApp. Campagnes WhatsApp IA, zéro commission OTA, prix en FCFA. Essai gratuit.",
   canonicalUrlRelative: "/douala",
 });
 
@@ -34,22 +34,6 @@ const localBusinessSchema = {
   priceRange: "39 000 - 189 000 FCFA/mois",
   currenciesAccepted: "XOF",
   knowsLanguage: "fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "31",
-    bestRating: "5",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Sandrine M." },
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody:
-        "On avait une base de 300 clients mais aucun moyen de les recontacter. Baobab Loyalty nous a permis de lancer une campagne de réactivation en 15 minutes. Résultat : 22 réservations directes en 3 jours, sans passer par Booking.",
-      datePublished: "2026-05-05",
-    },
-  ],
 };
 
 const data: CountryPageData = {
@@ -63,13 +47,10 @@ const data: CountryPageData = {
     "Douala est la capitale économique du Cameroun et le premier hub d'affaires de l'Afrique centrale. Baobab Loyalty transforme chaque séjour en réservation directe — via WhatsApp, en FCFA, sans aucune commission.",
   heroCta: "Démarrer gratuitement",
   statsItems: [
-    {
-      value: "88%",
-      label: "des voyageurs d'affaires à Douala utilisent WhatsApp quotidiennement",
-    },
-    { value: "−30%", label: "de commissions OTA économisées après 3 mois" },
+    { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
-    { value: "3×", label: "plus de réservations directes en moyenne" },
+    { value: "FCFA", label: "facturation en devise locale" },
+    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels doualais perdent des revenus chaque mois",
   problemSubtitle:
@@ -108,14 +89,10 @@ const data: CountryPageData = {
       desc: "Rédigez votre message ou utilisez l'IA. Sélectionnez votre segment, validez et envoyez. Chaque client reçoit une offre personnalisée directement sur son WhatsApp.",
     },
   ],
-  testimonial: {
-    quote:
-      "On avait une base de 300 clients mais aucun moyen de les recontacter. Baobab Loyalty nous a permis de lancer une campagne de réactivation en 15 minutes. Résultat : 22 réservations directes en 3 jours, sans passer par Booking.",
-    author: "Sandrine M.",
-    role: "Responsable commerciale",
-    hotel: "Hôtel Akwa Palace Suites",
-    city: "Douala",
-    initials: "SM",
+  guarantee: {
+    title: "Pourquoi on peut se permettre de garantir des résultats",
+    text: "Baobab Loyalty est encore jeune à Douala — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels de Douala",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

@@ -10,13 +10,10 @@ export interface CountryPlan {
   highlighted: boolean;
 }
 
-export interface CountryTestimonial {
-  quote: string;
-  author: string;
-  role: string;
-  hotel: string;
-  city: string;
-  initials: string;
+export interface CountryGuarantee {
+  title: string;
+  text: string;
+  points: string[];
 }
 
 export interface CountryPageData {
@@ -35,7 +32,7 @@ export interface CountryPageData {
   solutionTitle: string;
   solutionSubtitle: string;
   solutionSteps: Array<{ step: string; title: string; desc: string }>;
-  testimonial: CountryTestimonial;
+  guarantee: CountryGuarantee;
   pricingTitle: string;
   pricingSubtitle: string;
   plans: CountryPlan[];
@@ -146,23 +143,24 @@ export function CountryLandingPage({ data }: { data: CountryPageData }) {
         </div>
       </section>
 
-      {/* Testimonial */}
+      {/* Guarantee */}
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <svg className="w-8 h-8 text-[#EBC161] mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-          </svg>
-          <blockquote className="text-lg sm:text-xl text-[#2C2C2C] font-medium leading-relaxed mb-8 italic">
-            &ldquo;{data.testimonial.quote}&rdquo;
-          </blockquote>
-          <div className="flex items-center justify-center gap-4">
-            <div className="w-11 h-11 rounded-full bg-[#1a2f2a] flex items-center justify-center">
-              <span className="text-[#EBC161] font-bold text-sm">{data.testimonial.initials}</span>
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-[#2C2C2C] text-sm">{data.testimonial.author}</p>
-              <p className="text-slate-400 text-xs">{data.testimonial.role} — {data.testimonial.hotel}, {data.testimonial.city}</p>
-            </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-4">
+            {data.guarantee.title}
+          </h2>
+          <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
+            {data.guarantee.text}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-slate-600">
+            {data.guarantee.points.map((point, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#1a2f2a] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                {point}
+              </div>
+            ))}
           </div>
         </div>
       </section>

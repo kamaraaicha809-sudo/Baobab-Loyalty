@@ -15,6 +15,10 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
   try {
+    // Exception volontaire à la règle "chaque fonctionnalité marche en mode démo" :
+    // ai_prompts est une table globale partagée par tous les hôtels, pas une
+    // donnée par hôtel. L'autoriser en démo permettrait à n'importe quel visiteur
+    // anonyme de réécrire les prompts IA réellement utilisés par les clients payants.
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
     if (isDemoMode) return errors.forbidden("Prompt update is disabled in demo mode");
 

@@ -14,9 +14,9 @@ export const metadata = getSEOTags({
 const keyFacts = [
   { value: "3", label: "pays actifs", detail: "Côte d'Ivoire, Sénégal, Cameroun" },
   { value: "10 min", label: "pour lancer une campagne", detail: "De l'import CSV au premier envoi WhatsApp" },
-  { value: "90%+", label: "taux d'ouverture WhatsApp", detail: "Vs 20% pour l'email marketing" },
-  { value: "3×", label: "plus de réservations directes", detail: "Constatés chez les hôteliers utilisateurs" },
-  { value: "−35%", label: "de dépendance OTA", detail: "Après 3 mois d'utilisation" },
+  { value: "98%", label: "taux d'ouverture WhatsApp", detail: "Moyenne du secteur (Meta), loin devant l'email marketing" },
+  { value: "0%", label: "commission sur les réservations directes", detail: "Contre 15 à 20% chez les OTAs" },
+  { value: "39 000 FCFA", label: "prix d'entrée par mois", detail: "Sans engagement" },
   { value: "FCFA", label: "facturation locale", detail: "Adapté au marché Afrique francophone" },
 ];
 
@@ -33,11 +33,9 @@ const pressReleases = [
 
 Les hôtels ivoiriens font face à une double pression : d'un côté, les plateformes de réservation en ligne (OTAs) comme Booking.com et Expedia qui prélèvent entre 15% et 20% de commission sur chaque réservation ; de l'autre, l'absence d'outils numériques adaptés au marché local, au FCFA et aux habitudes de communication africaines.
 
-"En Côte d'Ivoire, plus de 91% des voyageurs d'affaires utilisent WhatsApp quotidiennement. Pourtant, aucun logiciel hôtelier ne permettait d'en faire un canal de fidélisation structuré. Baobab Loyalty comble ce manque avec une solution 100% pensée pour l'Afrique", déclare l'équipe fondatrice de Baobab Loyalty.
+"WhatsApp est devenu le canal de communication de référence pour les voyageurs d'affaires en Côte d'Ivoire. Pourtant, aucun logiciel hôtelier ne permettait d'en faire un canal de fidélisation structuré. Baobab Loyalty comble ce manque avec une solution 100% pensée pour l'Afrique", déclare l'équipe fondatrice de Baobab Loyalty.
 
-La plateforme permet aux hôtels d'importer leur base clients depuis un fichier Excel ou CSV, de segmenter automatiquement les clients inactifs depuis 3, 6 ou 9 mois, puis d'envoyer des offres personnalisées directement sur WhatsApp. Un tableau de bord en temps réel permet de suivre les réservations générées et les revenus en FCFA.
-
-Les premiers hôtels utilisateurs à Abidjan constatent en moyenne un triplement de leurs réservations directes et une réduction de 35% de leur dépendance aux OTAs après trois mois d'utilisation.
+La plateforme permet aux hôtels d'importer leur base clients depuis un fichier Excel ou CSV, de segmenter automatiquement les clients inactifs depuis 3, 6 ou 9 mois, puis d'envoyer des offres personnalisées directement sur WhatsApp. Un tableau de bord en temps réel permet de suivre les réservations générées et les revenus en FCFA. Chaque réservation directe obtenue via la plateforme fait économiser à l'hôtelier les 15 à 20% de commission qu'il aurait versés à un OTA.
 
 Baobab Loyalty est disponible à partir de 39 000 FCFA par mois, sans engagement. Un accès gratuit en mode démo est proposé sans carte bancaire. La solution est déjà opérationnelle au Sénégal et au Cameroun.
 
@@ -66,7 +64,7 @@ Le tourisme d'affaires à Dakar connaît une croissance soutenue. La capitale s�
 
 Grâce à Baobab Loyalty, les hôtels sénégalais peuvent identifier leurs clients inactifs, créer des offres personnalisées (réductions, upgrades, cocktails de bienvenue) et les envoyer directement sur WhatsApp en quelques clics. L'intelligence artificielle intégrée aide à rédiger des messages adaptés à chaque segment de clientèle.
 
-Les hôtels utilisateurs constatent un taux d'ouverture supérieur à 90% pour leurs messages WhatsApp, contre moins de 20% pour les campagnes email classiques. Les réservations directes générées permettent d'économiser l'intégralité des commissions OTA sur ces transactions.
+WhatsApp affiche en moyenne un taux d'ouverture de 98% pour les messages professionnels (donnée Meta), loin devant les 20% habituels de l'email marketing. Les réservations directes générées via la plateforme permettent d'économiser l'intégralité des commissions OTA sur ces transactions.
 
 Baobab Loyalty est proposé à partir de 39 000 FCFA par mois. La plateforme est opérationnelle sans formation technique préalable — si vous savez utiliser Excel, vous savez utiliser Baobab Loyalty.
 
@@ -91,11 +89,9 @@ Site : https://baobabloyalty.com/presse`,
 
 Le marché hôtelier camerounais est l'un des plus dynamiques d'Afrique centrale. Douala, capitale économique et premier port du pays, accueille une clientèle d'affaires en forte croissance. Yaoundé, capitale administrative, reçoit délégations diplomatiques et fonctionnaires internationaux toute l'année. Pourtant, la plupart des hôtels de ces deux villes dépendent encore entièrement des OTAs pour leurs réservations, sans mécanisme de fidélisation propre.
 
-"Les hôteliers camerounais nous disaient tous la même chose : ils avaient une base de centaines de clients satisfaits, mais aucun moyen de les recontacter. Baobab Loyalty leur donne cet outil en 10 minutes", souligne l'équipe fondatrice.
+"Beaucoup d'hôteliers ont une base de centaines de clients satisfaits, mais aucun moyen structuré de les recontacter après leur séjour. Baobab Loyalty leur donne cet outil en 10 minutes", souligne l'équipe fondatrice.
 
-La plateforme s'intègre directement avec WhatsApp Business — le canal de communication dominant au Cameroun avec plus de 88% de pénétration chez les voyageurs d'affaires. Les campagnes de réactivation ciblent précisément les clients inactifs depuis 3, 6 ou 9 mois, avec des offres générées par intelligence artificielle et personnalisées selon le segment.
-
-Dès les premiers mois d'utilisation, les hôtels camerounais partenaires ont généré en moyenne 12 à 22 réservations directes supplémentaires par campagne, sans passer par Booking.com ou Expedia.
+La plateforme s'intègre directement avec WhatsApp Business — le canal de communication dominant au Cameroun chez les voyageurs d'affaires. Les campagnes de réactivation ciblent précisément les clients inactifs depuis 3, 6 ou 9 mois, avec des offres générées par intelligence artificielle et personnalisées selon le segment.
 
 Baobab Loyalty est accessible à partir de 39 000 FCFA par mois, sans engagement et sans frais d'installation. Un essai gratuit en mode démo est disponible sur baobabloyalty.com.
 

@@ -81,9 +81,13 @@ Deno.serve(async (req) => {
           break;
         }
 
+        // Chaque paiement couvre 1 mois : l'acces expire de lui-meme sans
+        // nouveau paiement (pas d'acces "a vie" apres un seul paiement).
+        const accessUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
         const { error } = await supabase
           .from("profiles")
-          .update({ has_access: true, price_id: plan || null })
+          .update({ has_access: true, price_id: plan || null, access_until: accessUntil })
           .eq("id", userId);
 
         if (error) throw error;
