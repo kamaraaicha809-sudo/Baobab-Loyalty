@@ -223,7 +223,7 @@ export default function CommentCaMarchePage() {
                 { value: "10 min", label: "Pour lancer votre première campagne" },
                 { value: "0%", label: "Commission sur vos réservations directes" },
                 { value: "30 jours", label: "Garantis ou le mois suivant est offert" },
-                { value: "98%", label: "Taux d'ouverture moyen de WhatsApp (Meta)" },
+                { value: "WhatsApp", label: "Canal de communication principal en Afrique de l'Ouest" },
               ].map((stat, i) => (
                 <div key={i}>
                   <p className="text-3xl font-bold text-[#EBC161] mb-1">{stat.value}</p>

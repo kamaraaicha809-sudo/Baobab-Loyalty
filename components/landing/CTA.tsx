@@ -64,7 +64,7 @@ const CTA = () => {
             Jusqu&apos;à 600 000 FCFA de revenus additionnels potentiels chaque mois — sans Booking, sans commission, sans effort.
           </p>
           <p className="text-white/70 text-sm sm:text-base mb-8 sm:mb-10 px-2 italic">
-            Garantie : si on ne te génère pas au moins 2 nuits dans le mois, on t&apos;offre le mois suivant.
+            Garantie : si on ne te génère pas au moins 2 réservations directes supplémentaires dans le mois, on t&apos;offre le mois suivant.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">

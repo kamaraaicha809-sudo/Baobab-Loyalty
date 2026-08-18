@@ -20,7 +20,7 @@ const faqList: FAQItem[] = [
     question: "Est-ce que mes clients vont vraiment répondre et réserver ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        WhatsApp affiche un taux d&apos;ouverture moyen de 98% pour les messages professionnels (donnée Meta), loin devant l&apos;email. Tes anciens clients ont déjà séjourné chez toi — ils te connaissent et te font confiance. Une offre personnalisée au bon moment suffit à déclencher la réservation.
+        WhatsApp est le canal que tes clients consultent déjà tous les jours, contrairement à l&apos;email souvent ignoré. Tes anciens clients ont déjà séjourné chez toi — ils te connaissent et te font confiance. Une offre personnalisée au bon moment suffit à déclencher la réservation.
       </div>
     ),
   },
@@ -44,7 +44,7 @@ const faqList: FAQItem[] = [
     question: "Est-ce que je m'engage sur la durée ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Non, aucun engagement. Tu peux résilier à tout moment depuis ton dashboard, sans frais ni justification. Et pour être honnêtes : si tu ne récupères pas au moins 2 nuits le premier mois, on t&apos;offre le mois suivant. On préfère te prouver que ça marche plutôt que de te retenir par contrat.
+        Non, aucun engagement. Tu peux résilier à tout moment depuis ton dashboard, sans frais ni justification. Et pour être honnêtes : si tu ne récupères pas au moins 2 réservations directes supplémentaires le premier mois, on t&apos;offre le mois suivant. On préfère te prouver que ça marche plutôt que de te retenir par contrat.
       </div>
     ),
   },

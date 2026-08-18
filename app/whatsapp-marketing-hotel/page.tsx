@@ -13,7 +13,7 @@ export const metadata = getSEOTags({
 const faqItems = [
   {
     question: "Pourquoi utiliser WhatsApp plutôt que l'email pour un hôtel en Afrique ?",
-    answer: "En Afrique de l'Ouest et centrale, le smartphone est l'outil de communication principal et WhatsApp en est l'application reine. Les clients le consultent plusieurs fois par jour, contrairement à l'email, largement délaissé sur ce marché. WhatsApp affiche un taux d'ouverture moyen de 98% pour les messages professionnels (donnée Meta).",
+    answer: "En Afrique de l'Ouest et centrale, le smartphone est l'outil de communication principal et WhatsApp en est l'application reine. Les clients le consultent plusieurs fois par jour, contrairement à l'email, largement délaissé sur ce marché.",
   },
   {
     question: "Faut-il un compte WhatsApp Business pour faire du marketing hôtelier ?",

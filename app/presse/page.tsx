@@ -14,7 +14,6 @@ export const metadata = getSEOTags({
 const keyFacts = [
   { value: "4", label: "pays actifs", detail: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
   { value: "10 min", label: "pour lancer une campagne", detail: "De l'import CSV au premier envoi WhatsApp" },
-  { value: "98%", label: "taux d'ouverture WhatsApp", detail: "Moyenne du secteur (Meta), loin devant l'email marketing" },
   { value: "0%", label: "commission sur les réservations directes", detail: "Contre 15 à 20% chez les OTAs" },
   { value: "39 000 FCFA", label: "prix d'entrée par mois", detail: "Sans engagement" },
   { value: "FCFA", label: "facturation locale", detail: "Adapté au marché Afrique francophone" },
@@ -60,7 +59,7 @@ Le tourisme d'affaires à Dakar connaît une croissance soutenue. La capitale s�
 
 Grâce à Baobab Loyalty, les hôtels sénégalais peuvent identifier leurs clients inactifs, créer des offres personnalisées (réductions, upgrades, cocktails de bienvenue) et les envoyer directement sur WhatsApp en quelques clics. L'intelligence artificielle intégrée aide à rédiger des messages adaptés à chaque segment de clientèle.
 
-WhatsApp affiche en moyenne un taux d'ouverture de 98% pour les messages professionnels (donnée Meta), loin devant les 20% habituels de l'email marketing. Les réservations directes générées via la plateforme permettent d'économiser l'intégralité des commissions OTA sur ces transactions.
+WhatsApp est aujourd'hui le canal de communication professionnel le plus consulté au Sénégal, loin devant l'email. Les réservations directes générées via la plateforme permettent d'économiser l'intégralité des commissions OTA sur ces transactions.
 
 Baobab Loyalty est proposé à partir de 39 000 FCFA par mois. La plateforme est opérationnelle sans formation technique préalable — si vous savez utiliser Excel, vous savez utiliser Baobab Loyalty.
 
@@ -196,7 +195,7 @@ export default function PressePage() {
                 <p className="text-slate-500 text-sm leading-relaxed mb-4">
                   Conçue spécifiquement pour le marché africain — WhatsApp comme canal
                   principal, facturation en FCFA, interface en français — Baobab Loyalty est
-                  opérationnelle en Côte d&apos;Ivoire, au Sénégal et au Cameroun.
+                  opérationnelle en Côte d&apos;Ivoire, au Sénégal, au Cameroun et au Ghana.
                 </p>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   La plateforme est accessible à partir de 39 000 FCFA par mois, sans
@@ -211,7 +210,6 @@ export default function PressePage() {
                     { label: "Marchés", value: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
                     { label: "Canal principal", value: "WhatsApp Business API" },
                     { label: "Devise", value: "FCFA (XOF) — GHS pour le Ghana" },
-                    { label: "Lancement", value: "2025" },
                     { label: "Site web", value: "baobabloyalty.com" },
                   ].map((item, i) => (
                     <div key={i} className="flex gap-3">

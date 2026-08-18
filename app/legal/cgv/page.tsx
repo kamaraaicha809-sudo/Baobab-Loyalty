@@ -73,7 +73,7 @@ export default function CGVPage() {
           <h2 className="text-xl font-semibold text-slate-800 mb-3">4. Garantie résultats</h2>
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
             <p className="text-slate-700 leading-relaxed font-medium mb-1">
-              Garantie &quot;2 nuits ou mois offert&quot;
+              Garantie &quot;2 réservations ou mois offert&quot;
             </p>
             <p className="text-slate-600 leading-relaxed text-sm">
               Si Baobab Loyalty ne vous génère pas au moins 2 réservations directes supplémentaires au cours d&apos;un mois calendaire, le mois suivant vous est offert automatiquement. Cette garantie s&apos;applique dès le premier mois complet d&apos;utilisation, à condition que votre base clients ait été correctement importée et qu&apos;au moins une campagne ait été envoyée.

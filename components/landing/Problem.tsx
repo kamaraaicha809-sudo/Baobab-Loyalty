@@ -1,17 +1,17 @@
 const consequences = [
   {
-    stat: "10–35M FCFA",
-    label: "perdus chaque mois",
-    detail: "en chambres vides que tu n'arrives pas à remplir",
+    stat: "Chambres vides",
+    label: "chaque mois",
+    detail: "des nuits que tu n'arrives pas à remplir, et que tu ne récupèreras jamais",
   },
   {
-    stat: "15 à 25%",
-    label: "de commission reversés",
-    detail: "à Booking.com sur chaque réservation que tu aurais pu avoir en direct",
+    stat: "Commission",
+    label: "reversée à Booking.com",
+    detail: "sur chaque réservation que tu aurais pu avoir en direct",
   },
   {
-    stat: "3 à 5h",
-    label: "perdues chaque jour",
+    stat: "Temps perdu",
+    label: "chaque jour",
     detail: "à appeler manuellement, envoyer des WhatsApp un par un, gérer Excel",
   },
   {

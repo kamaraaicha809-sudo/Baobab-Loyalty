@@ -91,7 +91,7 @@ const data: CountryPageData = {
   ],
   guarantee: {
     title: "Pourquoi on peut se permettre de garantir des résultats",
-    text: "Baobab Loyalty est encore jeune à Douala — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 nuits le premier mois, on vous offre le mois suivant.",
+    text: "Baobab Loyalty est encore jeune à Douala — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 réservations directes supplémentaires le premier mois, on vous offre le mois suivant.",
     points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels de Douala",

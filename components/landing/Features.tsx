@@ -15,7 +15,7 @@ const features = [
       </svg>
     ),
     title: "Tu envoies sur WhatsApp en 2 minutes",
-    desc: "98% de taux d'ouverture. Tes clients lisent et répondent le jour même. Fini les SMS ignorés et les emails perdus dans les spams.",
+    desc: "Tes clients lisent et répondent le jour même sur un canal qu'ils consultent déjà tous les jours. Fini les SMS ignorés et les emails perdus dans les spams.",
   },
   {
     icon: (

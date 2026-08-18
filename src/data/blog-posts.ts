@@ -73,7 +73,7 @@ Les 3 segments prioritaires :
 
 ### Stratégie 3 : Communiquer sur WhatsApp
 
-WhatsApp est le canal numéro un en Afrique de l'Ouest. Avec un taux d'ouverture de 98% et un taux de réponse de 40-60%, il n'existe pas de meilleur canal pour recontacter vos clients.
+WhatsApp est le canal numéro un en Afrique de l'Ouest. Avec un taux de réponse de 40-60%, il n'existe pas de meilleur canal pour recontacter vos clients.
 
 La clé : des messages courts, personnalisés, et avec une offre claire. "Bonjour Jean-Pierre, cela fait 4 mois que vous n'êtes pas revenu. Nous vous réservons notre meilleure chambre à tarif préférentiel ce week-end."
 
@@ -138,7 +138,7 @@ La raison est culturelle et technologique. En Côte d'Ivoire, au Sénégal, au C
 
 ## Les chiffres du WhatsApp en Afrique de l'Ouest
 
-**Taux d'ouverture : 95 à 98%**. Pratiquement tous vos messages sont lus, souvent dans les 5 minutes suivant l'envoi.
+**Taux d'ouverture élevé**. La grande majorité des messages WhatsApp sont lus, souvent dans les minutes suivant l'envoi.
 
 **Taux de réponse : 40 à 60%**. Vos clients vous répondent. Une conversation s'engage naturellement.
 
@@ -2191,7 +2191,7 @@ The numbers speak for themselves:
 | Channel | Open Rate | Response Rate | Time to Open |
 |---------|-----------|---------------|--------------|
 | Email | 12–18% | 2–5% | 24–72 hours |
-| WhatsApp | 92–98% | 35–60% | Under 5 minutes |
+| WhatsApp | High | 35–60% | Under 5 minutes |
 
 A well-crafted WhatsApp message sent to a guest who stayed at your hotel 4 months ago will be read in minutes. The same offer sent by email will likely go unread.
 
@@ -2292,7 +2292,7 @@ This guide shows you how to build a WhatsApp hotel marketing strategy that actua
 
 No other channel comes close to WhatsApp's reach and engagement in West Africa:
 
-- **98% open rate** on WhatsApp messages (versus 18–22% for email)
+- A significantly higher open rate on WhatsApp messages than on email
 - **40–60% response rate** when guests receive a personalized offer
 - **87% of business travelers** in Accra use WhatsApp as their primary business communication tool
 - Messages are read within **90 seconds** on average
@@ -2736,7 +2736,7 @@ C'est là qu'un logiciel de fidélisation hôtel change la donne. Il automatise 
 - L'envoi des campagnes WhatsApp au moment optimal
 - Le suivi des réservations générées
 
-Les hôtels abidjanais utilisant Baobab Loyalty lancent leur première campagne en moins de 10 minutes et observent 3 fois plus de réservations directes en moyenne après 3 mois.
+Avec Baobab Loyalty, les hôtels abidjanais lancent leur première campagne en moins de 10 minutes et peuvent réactiver des réservations directes dès les premières semaines, sans commission OTA.
 
 ## Le calcul financier pour un hôtel à Abidjan
 
