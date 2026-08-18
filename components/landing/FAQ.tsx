@@ -12,7 +12,7 @@ const faqList: FAQItem[] = [
     question: "Est-ce que ça vaut vraiment le coût ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Nos hôteliers récupèrent en moyenne 120 000 à 600 000 FCFA supplémentaires par mois. Et si ça ne marche pas, nous t&apos;offrons le mois suivant.
+        Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Et si ça ne marche pas, nous t&apos;offrons le mois suivant.
       </div>
     ),
   },
@@ -20,7 +20,7 @@ const faqList: FAQItem[] = [
     question: "Est-ce que mes clients vont vraiment répondre et réserver ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        WhatsApp affiche un taux d&apos;ouverture de 98%. Tes anciens clients ont déjà séjourné chez toi — ils te connaissent et te font confiance. Une offre personnalisée au bon moment suffit à déclencher la réservation. Nos beta testeurs voient en moyenne 2 à 5 nuits supplémentaires dès la première campagne.
+        WhatsApp affiche un taux d&apos;ouverture moyen de 98% pour les messages professionnels (donnée Meta), loin devant l&apos;email. Tes anciens clients ont déjà séjourné chez toi — ils te connaissent et te font confiance. Une offre personnalisée au bon moment suffit à déclencher la réservation.
       </div>
     ),
   },

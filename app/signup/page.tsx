@@ -318,12 +318,12 @@ function SignUpContent() {
               {/* Terms */}
               <p className="text-xs text-slate-400 text-center">
                 En créant un compte, vous acceptez nos{" "}
-                <Link href="/tos" className="text-primary hover:underline">
+                <Link href="/legal/cgu" className="text-primary hover:underline">
                   conditions d&apos;utilisation
                 </Link>{" "}
                 et notre{" "}
                 <Link
-                  href="/privacy-policy"
+                  href="/legal/confidentialite"
                   className="text-primary hover:underline"
                 >
                   politique de confidentialité

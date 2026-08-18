@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
@@ -54,7 +54,7 @@ const data: CountryPageData = {
   problemPoints: [
     {
       title: "Aucun suivi après le check-out",
-      desc: "Vos clients repartent satisfaits — mais sans recontact, ils ne pensent pas à revenir directement. 70% des clients ne retournent pas dans le même hôtel faute de maintien du lien.",
+      desc: "Vos clients repartent satisfaits — mais sans recontact, ils ne pensent pas à revenir directement. La majorité des clients ne retournent pas dans le même hôtel faute de maintien du lien.",
     },
     {
       title: "Commission OTA de 15 à 20%",
@@ -156,6 +156,10 @@ export default function CamerounPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
+      {renderBreadcrumbSchema([
+        { name: "Accueil", urlRelative: "/" },
+        { name: "Cameroun", urlRelative: "/cameroun" },
+      ])}
       <Suspense>
         <Header />
       </Suspense>

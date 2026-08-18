@@ -85,14 +85,17 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+function StarRating({ value, onChange, labelledBy }: { value: number; onChange: (v: number) => void; labelledBy: string }) {
   const [hovered, setHovered] = useState(0);
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2" role="radiogroup" aria-labelledby={labelledBy}>
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
           type="button"
+          role="radio"
+          aria-checked={value === star}
+          aria-label={`${star} étoile${star > 1 ? "s" : ""} sur 5`}
           onMouseEnter={() => setHovered(star)}
           onMouseLeave={() => setHovered(0)}
           onClick={() => onChange(star)}
@@ -114,17 +117,19 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-function YesNoButton({ value, onChange, withNA = false }: { value: string; onChange: (v: string) => void; withNA?: boolean }) {
+function YesNoButton({ value, onChange, withNA = false, labelledBy }: { value: string; onChange: (v: string) => void; withNA?: boolean; labelledBy: string }) {
   const options = withNA
     ? [{ id: "oui", label: "Oui" }, { id: "non", label: "Non" }, { id: "na", label: "Sans objet" }]
     : [{ id: "oui", label: "Oui" }, { id: "non", label: "Non" }];
 
   return (
-    <div className="flex gap-3 flex-wrap">
+    <div className="flex gap-3 flex-wrap" role="radiogroup" aria-labelledby={labelledBy}>
       {options.map((opt) => (
         <button
           key={opt.id}
           type="button"
+          role="radio"
+          aria-checked={value === opt.id}
           onClick={() => onChange(opt.id)}
           className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
             value === opt.id
@@ -139,14 +144,17 @@ function YesNoButton({ value, onChange, withNA = false }: { value: string; onCha
   );
 }
 
-function NpsSelector({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+function NpsSelector({ value, onChange, labelledBy }: { value: number; onChange: (v: number) => void; labelledBy: string }) {
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-labelledby={labelledBy}>
         {Array.from({ length: 11 }, (_, i) => (
           <button
             key={i}
             type="button"
+            role="radio"
+            aria-checked={value === i}
+            aria-label={`Note ${i} sur 10`}
             onClick={() => onChange(i)}
             className={`w-10 h-10 rounded-xl text-sm font-bold transition-all border ${
               value === i
@@ -179,25 +187,27 @@ function QuestionBlock({
   answer: string | number;
   onAnswer: (v: string | number) => void;
 }) {
+  const labelId = `question-${question.id}`;
+
   return (
     <div className="space-y-3">
-      <p className="text-slate-800 font-medium leading-snug">
+      <p id={labelId} className="text-slate-800 font-medium leading-snug">
         {question.text}
         {question.optional && (
           <span className="ml-1.5 text-xs text-slate-400 font-normal">(optionnel)</span>
         )}
       </p>
       {question.type === "stars" && (
-        <StarRating value={Number(answer)} onChange={(v) => onAnswer(v)} />
+        <StarRating value={Number(answer)} onChange={(v) => onAnswer(v)} labelledBy={labelId} />
       )}
       {question.type === "yesno" && (
-        <YesNoButton value={String(answer)} onChange={onAnswer} />
+        <YesNoButton value={String(answer)} onChange={onAnswer} labelledBy={labelId} />
       )}
       {question.type === "yesnoNA" && (
-        <YesNoButton value={String(answer)} onChange={onAnswer} withNA />
+        <YesNoButton value={String(answer)} onChange={onAnswer} withNA labelledBy={labelId} />
       )}
       {question.type === "nps" && (
-        <NpsSelector value={answer === "" ? -1 : Number(answer)} onChange={(v) => onAnswer(v)} />
+        <NpsSelector value={answer === "" ? -1 : Number(answer)} onChange={(v) => onAnswer(v)} labelledBy={labelId} />
       )}
       {question.type === "text" && (
         <textarea
@@ -205,6 +215,7 @@ function QuestionBlock({
           onChange={(e) => onAnswer(e.target.value)}
           placeholder="Votre réponse (optionnel)..."
           rows={3}
+          aria-labelledby={labelId}
           className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#075E54]/20 focus:border-[#075E54] transition-all resize-none text-sm"
         />
       )}

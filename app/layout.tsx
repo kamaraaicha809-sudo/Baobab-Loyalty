@@ -1,5 +1,5 @@
 import { Playfair_Display, Lato } from "next/font/google";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderWebSiteSchema } from "@/libs/seo";
 import ClientLayout from "@/components/common/LayoutClient";
 import config from "@/config";
 import "./globals.css";
@@ -51,6 +51,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 				<link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
 				<link rel="dns-prefetch" href="https://us.i.posthog.com" />
+				{renderWebSiteSchema()}
 			</head>
 			<body>
 				<ClientLayout>{children}</ClientLayout>

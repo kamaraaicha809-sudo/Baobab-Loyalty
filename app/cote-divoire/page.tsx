@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
@@ -123,7 +123,7 @@ const data: CountryPageData = {
   problemPoints: [
     {
       title: "Clients perdus après le check-out",
-      desc: "Votre client a passé un excellent séjour à Abidjan. Mais sans recontact, il réservera chez un concurrent la prochaine fois. 70% des clients ne reviennent pas faute de suivi.",
+      desc: "Votre client a passé un excellent séjour à Abidjan. Mais sans recontact, il réservera chez un concurrent la prochaine fois : la majorité des clients ne reviennent pas faute de suivi.",
     },
     {
       title: "Commission OTA de 15 à 20%",
@@ -225,6 +225,10 @@ export default function CoteDIvoirePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
+      {renderBreadcrumbSchema([
+        { name: "Accueil", urlRelative: "/" },
+        { name: "Côte d'Ivoire", urlRelative: "/cote-divoire" },
+      ])}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

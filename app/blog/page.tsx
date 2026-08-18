@@ -4,7 +4,7 @@ import { NewsletterBanner } from "@/components/newsletter/NewsletterBanner";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { Suspense } from "react";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 
 export const metadata = getSEOTags({
   title: "Blog Baobab Loyalty — Fidélisation hôtelière en Afrique",
@@ -19,6 +19,10 @@ export default function BlogPage() {
 
   return (
     <>
+      {renderBreadcrumbSchema([
+        { name: "Accueil", urlRelative: "/" },
+        { name: "Blog", urlRelative: "/blog" },
+      ])}
       <Suspense>
         <Header />
       </Suspense>

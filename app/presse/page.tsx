@@ -3,16 +3,16 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 
 export const metadata = getSEOTags({
   title: "Espace Presse — Baobab Loyalty",
-  description: "Communiqués de presse, chiffres clés et ressources pour journalistes. Baobab Loyalty, solution de fidélisation hôtelière n°1 en Afrique francophone.",
+  description: "Communiqués de presse, chiffres clés et ressources pour journalistes. Baobab Loyalty, solution de fidélisation hôtelière pour l'Afrique francophone.",
   canonicalUrlRelative: "/presse",
 });
 
 const keyFacts = [
-  { value: "3", label: "pays actifs", detail: "Côte d'Ivoire, Sénégal, Cameroun" },
+  { value: "4", label: "pays actifs", detail: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
   { value: "10 min", label: "pour lancer une campagne", detail: "De l'import CSV au premier envoi WhatsApp" },
   { value: "98%", label: "taux d'ouverture WhatsApp", detail: "Moyenne du secteur (Meta), loin devant l'email marketing" },
   { value: "0%", label: "commission sur les réservations directes", detail: "Contre 15 à 20% chez les OTAs" },
@@ -31,9 +31,7 @@ const pressReleases = [
       "Baobab Loyalty lance sa solution de fidélisation hôtelière en Côte d'Ivoire : les hôteliers abidjanais reprennent le contrôle de leurs réservations directes",
     body: `ABIDJAN, le 5 mai 2026 — Baobab Loyalty, startup spécialisée dans la fidélisation clients pour hôtels africains, annonce le lancement officiel de sa plateforme en Côte d'Ivoire. La solution, accessible dès aujourd'hui aux hôteliers ivoiriens, permet de créer et d'envoyer des campagnes de réservation via WhatsApp en moins de 2 minutes — sans commission, directement depuis leur tableau de bord.
 
-Les hôtels ivoiriens font face à une double pression : d'un côté, les plateformes de réservation en ligne (OTAs) comme Booking.com et Expedia qui prélèvent entre 15% et 20% de commission sur chaque réservation ; de l'autre, l'absence d'outils numériques adaptés au marché local, au FCFA et aux habitudes de communication africaines.
-
-"WhatsApp est devenu le canal de communication de référence pour les voyageurs d'affaires en Côte d'Ivoire. Pourtant, aucun logiciel hôtelier ne permettait d'en faire un canal de fidélisation structuré. Baobab Loyalty comble ce manque avec une solution 100% pensée pour l'Afrique", déclare l'équipe fondatrice de Baobab Loyalty.
+Les hôtels ivoiriens font face à une double pression : d'un côté, les plateformes de réservation en ligne (OTAs) comme Booking.com et Expedia qui prélèvent entre 15% et 20% de commission sur chaque réservation ; de l'autre, l'absence d'outils numériques adaptés au marché local, au FCFA et aux habitudes de communication africaines. WhatsApp est devenu le canal de communication de référence pour les voyageurs d'affaires en Côte d'Ivoire, mais aucun logiciel hôtelier ne permettait jusqu'ici d'en faire un canal de fidélisation structuré.
 
 La plateforme permet aux hôtels d'importer leur base clients depuis un fichier Excel ou CSV, de segmenter automatiquement les clients inactifs depuis 3, 6 ou 9 mois, puis d'envoyer des offres personnalisées directement sur WhatsApp. Un tableau de bord en temps réel permet de suivre les réservations générées et les revenus en FCFA. Chaque réservation directe obtenue via la plateforme fait économiser à l'hôtelier les 15 à 20% de commission qu'il aurait versés à un OTA.
 
@@ -42,7 +40,7 @@ Baobab Loyalty est disponible à partir de 39 000 FCFA par mois, sans engagement
 ###
 
 À propos de Baobab Loyalty
-Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal et au Cameroun.
+Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.
 
 Contact presse
 Email : presse@baobabloyalty.com
@@ -58,9 +56,7 @@ Site : https://baobabloyalty.com/presse`,
       "Baobab Loyalty s'implante à Dakar et aide les hôteliers sénégalais à réduire leur dépendance aux plateformes de réservation en ligne",
     body: `DAKAR, le 5 mai 2026 — Baobab Loyalty, plateforme SaaS de fidélisation clients pour hôtels africains, annonce son déploiement officiel au Sénégal. La solution est désormais accessible aux hôteliers de Dakar, des Almadies et de tout le Sénégal, avec une facturation en FCFA et un support en français.
 
-Le tourisme d'affaires à Dakar connaît une croissance soutenue. La capitale sénégalaise accueille chaque année des milliers de voyageurs professionnels, de délégations diplomatiques et de participants à des conférences régionales. Pourtant, la majorité des hôtels dakarois n'ont pas de dispositif structuré pour fidéliser ces clients après leur séjour.
-
-"Dakar est l'une des villes africaines où WhatsApp est le plus utilisé dans le milieu professionnel. Les hôtels qui ne l'intègrent pas dans leur stratégie marketing passent à côté d'un levier majeur de fidélisation directe", explique l'équipe de Baobab Loyalty.
+Le tourisme d'affaires à Dakar connaît une croissance soutenue. La capitale sénégalaise accueille chaque année des voyageurs professionnels, des délégations diplomatiques et des participants à des conférences régionales. Pourtant, la majorité des hôtels dakarois n'ont pas de dispositif structuré pour fidéliser ces clients après leur séjour, alors que WhatsApp est l'un des canaux les plus utilisés dans le milieu professionnel local.
 
 Grâce à Baobab Loyalty, les hôtels sénégalais peuvent identifier leurs clients inactifs, créer des offres personnalisées (réductions, upgrades, cocktails de bienvenue) et les envoyer directement sur WhatsApp en quelques clics. L'intelligence artificielle intégrée aide à rédiger des messages adaptés à chaque segment de clientèle.
 
@@ -71,7 +67,7 @@ Baobab Loyalty est proposé à partir de 39 000 FCFA par mois. La plateforme est
 ###
 
 À propos de Baobab Loyalty
-Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal et au Cameroun.
+Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.
 
 Contact presse
 Email : presse@baobabloyalty.com
@@ -87,9 +83,7 @@ Site : https://baobabloyalty.com/presse`,
       "Baobab Loyalty arrive au Cameroun : les hôtels de Douala et Yaoundé disposent enfin d'un outil de fidélisation adapté à leur marché",
     body: `DOUALA, le 5 mai 2026 — Baobab Loyalty, la plateforme de fidélisation hôtelière conçue pour l'Afrique, annonce son lancement officiel au Cameroun. Disponible immédiatement pour les hôtels de Douala et Yaoundé, la solution répond à un besoin longtemps ignoré par les logiciels marketing internationaux : permettre aux hôteliers camerounais de fidéliser leurs clients via WhatsApp, en FCFA, sans compétence technique.
 
-Le marché hôtelier camerounais est l'un des plus dynamiques d'Afrique centrale. Douala, capitale économique et premier port du pays, accueille une clientèle d'affaires en forte croissance. Yaoundé, capitale administrative, reçoit délégations diplomatiques et fonctionnaires internationaux toute l'année. Pourtant, la plupart des hôtels de ces deux villes dépendent encore entièrement des OTAs pour leurs réservations, sans mécanisme de fidélisation propre.
-
-"Beaucoup d'hôteliers ont une base de centaines de clients satisfaits, mais aucun moyen structuré de les recontacter après leur séjour. Baobab Loyalty leur donne cet outil en 10 minutes", souligne l'équipe fondatrice.
+Le marché hôtelier camerounais est l'un des plus dynamiques d'Afrique centrale. Douala, capitale économique et premier port du pays, accueille une clientèle d'affaires en forte croissance. Yaoundé, capitale administrative, reçoit délégations diplomatiques et fonctionnaires internationaux toute l'année. Pourtant, la plupart des hôtels de ces deux villes dépendent encore entièrement des OTAs pour leurs réservations, sans mécanisme de fidélisation propre pour recontacter leurs clients après leur séjour.
 
 La plateforme s'intègre directement avec WhatsApp Business — le canal de communication dominant au Cameroun chez les voyageurs d'affaires. Les campagnes de réactivation ciblent précisément les clients inactifs depuis 3, 6 ou 9 mois, avec des offres générées par intelligence artificielle et personnalisées selon le segment.
 
@@ -98,7 +92,7 @@ Baobab Loyalty est accessible à partir de 39 000 FCFA par mois, sans engagement
 ###
 
 À propos de Baobab Loyalty
-Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal et au Cameroun.
+Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.
 
 Contact presse
 Email : presse@baobabloyalty.com
@@ -127,6 +121,10 @@ export default function PressePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(pressSchema) }}
       />
+      {renderBreadcrumbSchema([
+        { name: "Accueil", urlRelative: "/" },
+        { name: "Presse", urlRelative: "/presse" },
+      ])}
       <Suspense>
         <Header />
       </Suspense>

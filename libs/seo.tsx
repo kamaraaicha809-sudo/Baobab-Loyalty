@@ -160,6 +160,8 @@ export const renderSchemaTags = () => {
 };
 
 export const renderOrganizationSchema = () => {
+  const sameAs = [config.social?.facebook, config.social?.instagram].filter(Boolean);
+
   return (
     <script
       type="application/ld+json"
@@ -175,6 +177,7 @@ export const renderOrganizationSchema = () => {
           },
           description: config.appDescription,
           email: "support@baobabloyalty.com",
+          ...(sameAs.length > 0 && { sameAs }),
           areaServed: [
             { "@type": "Country", name: "Côte d'Ivoire" },
             { "@type": "Country", name: "Sénégal" },
@@ -194,61 +197,49 @@ export const renderOrganizationSchema = () => {
   );
 };
 
-interface ReviewItem {
-  author: string;
-  ratingValue: number;
-  reviewBody: string;
-  datePublished: string;
-}
-
-interface AggregateRatingData {
-  ratingValue: string;
-  reviewCount: string;
-  itemName: string;
-  itemDescription?: string;
-  itemUrl?: string;
-  reviews?: ReviewItem[];
-}
-
-export const renderReviewSchema = ({
-  ratingValue,
-  reviewCount,
-  itemName,
-  itemDescription,
-  itemUrl,
-  reviews = [],
-}: AggregateRatingData) => {
+export const renderWebSiteSchema = () => {
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
         __html: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "Product",
-          name: itemName,
-          description: itemDescription || config.appDescription,
-          url: itemUrl || `https://${config.domainName}/`,
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue,
-            reviewCount,
-            bestRating: "5",
-            worstRating: "1",
+          "@type": "WebSite",
+          name: config.appName,
+          url: `https://${config.domainName}/`,
+          inLanguage: "fr-FR",
+          publisher: {
+            "@type": "Organization",
+            name: config.appName,
           },
-          review: reviews.map((r) => ({
-            "@type": "Review",
-            author: { "@type": "Person", name: r.author },
-            reviewRating: {
-              "@type": "Rating",
-              ratingValue: String(r.ratingValue),
-              bestRating: "5",
-            },
-            reviewBody: r.reviewBody,
-            datePublished: r.datePublished,
+        }),
+      }}
+    ></script>
+  );
+};
+
+interface BreadcrumbItem {
+  name: string;
+  urlRelative: string;
+}
+
+export const renderBreadcrumbSchema = (items: BreadcrumbItem[]) => {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: items.map((item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: item.name,
+            item: `https://${config.domainName}${item.urlRelative}`,
           })),
         }),
       }}
-    />
+    ></script>
   );
 };
 

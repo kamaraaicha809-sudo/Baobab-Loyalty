@@ -22,6 +22,21 @@ const nextConfig = {
       },
     ],
   },
+  // Redirections permanentes : anciennes pages légales génériques (template) vers les vraies pages légales Côte d'Ivoire
+  async redirects() {
+    return [
+      {
+        source: "/tos",
+        destination: "/legal/cgu",
+        permanent: true,
+      },
+      {
+        source: "/privacy-policy",
+        destination: "/legal/confidentialite",
+        permanent: true,
+      },
+    ];
+  },
   // Security headers
   async headers() {
     return [

@@ -11,6 +11,21 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/dashboard", "/admin", "/auth"],
       },
+      // Robots IA explicitement autorisés (compréhension/citation par les moteurs IA)
+      {
+        userAgent: [
+          "GPTBot",
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "ClaudeBot",
+          "Claude-Web",
+          "Google-Extended",
+          "PerplexityBot",
+          "CCBot",
+        ],
+        allow: "/",
+        disallow: ["/dashboard", "/admin", "/auth"],
+      },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
     host: baseUrl,

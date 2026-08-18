@@ -22,7 +22,7 @@ export function NewsletterBanner() {
 
         {/* Subtitle */}
         <p className="mb-8 text-base text-[#a3c4b5] leading-relaxed">
-          Rejoignez plus de 500 directeurs d&apos;hôtels en Afrique de l&apos;Ouest qui reçoivent
+          Rejoignez les directeurs d&apos;hôtels d&apos;Afrique de l&apos;Ouest qui reçoivent
           nos stratégies exclusives pour remplir leurs chambres et fidéliser leurs clients.
         </p>
 

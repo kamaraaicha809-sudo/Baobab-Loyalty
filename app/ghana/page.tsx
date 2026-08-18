@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
@@ -158,6 +158,10 @@ export default function GhanaPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
+      {renderBreadcrumbSchema([
+        { name: "Home", urlRelative: "/" },
+        { name: "Ghana", urlRelative: "/ghana" },
+      ])}
       <Suspense>
         <Header />
       </Suspense>

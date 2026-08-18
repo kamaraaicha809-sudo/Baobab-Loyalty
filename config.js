@@ -53,6 +53,8 @@ const config = {
   social: {
     twitter: "",           // @username (sans le @)
     linkedin: "",          // company-name ou in/username
+    facebook: "https://www.facebook.com/profile.php?id=61591703112434",
+    instagram: "https://www.instagram.com/baobabloyalty",
   },
 
   // ============================================

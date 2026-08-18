@@ -191,6 +191,8 @@ Le WhatsApp marketing n'est pas une tendance passagère en Afrique de l'Ouest �
 
 La technologie existe pour automatiser ces campagnes, les personnaliser à grande échelle, et mesurer précisément les réservations générées. La question n'est plus de savoir si vous devriez utiliser WhatsApp — c'est de savoir quand vous allez commencer.
 
+Pour aller plus loin, consultez notre page dédiée au [WhatsApp Marketing pour hôtels](/whatsapp-marketing-hotel).
+
 [Essayez Baobab Loyalty gratuitement et envoyez votre première campagne WhatsApp en moins de 10 minutes.](/demo)`,
   },
   {
@@ -273,6 +275,8 @@ Les OTA ont leur utilité pour remplir votre hôtel et vous faire découvrir de 
 La liberté vis-à-vis de Booking.com ne se gagne pas en claquant la porte des OTA, mais en construisant patiemment une base de clients fidèles qui réservent directement chez vous.
 
 Chaque chambre occupée est une opportunité de créer une relation directe. Avec les bons outils — une base de données clients, des campagnes WhatsApp personnalisées, et une offre "direct booking" claire — vous pouvez progressivement reprendre le contrôle de vos revenus.
+
+Pour aller plus loin, consultez notre page dédiée aux [réservations directes hôtel](/reservations-directes-hotel).
 
 [Découvrez comment Baobab Loyalty aide les hôtels africains à réduire leur dépendance aux OTA.](/demo)`,
   },
@@ -782,6 +786,8 @@ Les CRM classiques ont été conçus pour d'autres marchés, d'autres canaux, d'
 La bonne nouvelle : ces outils existent maintenant. Et ils changent radicalement la façon dont les hôtels africains gèrent leur relation client.
 
 [Logiciel fidélisation hôtel Côte d'Ivoire →](/cote-divoire) · [Sénégal →](/senegal) · [Cameroun →](/cameroun)
+
+Pour aller plus loin, consultez notre page dédiée au [CRM hôtelier](/crm-hotelier).
 
 [Découvrez Baobab Loyalty — le CRM WhatsApp conçu spécifiquement pour les hôtels d'Afrique de l'Ouest.](/demo)`,
   },
@@ -1459,6 +1465,8 @@ Ce calcul ne prend pas en compte les campagnes régulières (une par mois en moy
 Choisir un CRM hôtelier n'est pas une décision technique — c'est une décision stratégique. Le bon outil pour votre hôtel n'est pas forcément le plus puissant ni le plus cher. C'est celui qui correspond à votre réalité : taille de votre hôtel, canal de communication dominant (WhatsApp), langue de travail (français), devise (FCFA).
 
 Commencez simple. Montez en complexité quand vous en avez besoin. L'important, c'est de commencer.
+
+Pour aller plus loin, consultez notre page dédiée au [CRM hôtelier](/crm-hotelier).
 
 [Essayez Baobab Loyalty — le CRM conçu pour les hôtels africains.](/demo)`,
   },

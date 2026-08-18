@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
-import { getSEOTags } from "@/libs/seo";
+import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
@@ -58,7 +58,7 @@ const data: CountryPageData = {
   problemPoints: [
     {
       title: "Aucun suivi après le check-out",
-      desc: "Votre client d'affaires séjourne au Plateau, repart satisfait — mais sans recontact ciblé, il réserve un concurrent la prochaine fois. 70% des clients ne reviennent pas sans relance proactive.",
+      desc: "Votre client d'affaires séjourne au Plateau, repart satisfait — mais sans recontact ciblé, il réserve un concurrent la prochaine fois. La majorité des clients ne reviennent pas sans relance proactive.",
     },
     {
       title: "Commission OTA de 15 à 20%",
@@ -160,6 +160,10 @@ export default function AbidjanPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
+      {renderBreadcrumbSchema([
+        { name: "Accueil", urlRelative: "/" },
+        { name: "Abidjan", urlRelative: "/abidjan" },
+      ])}
       <Suspense>
         <Header />
       </Suspense>

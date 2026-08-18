@@ -14,6 +14,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
+      url: `${BASE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/a-propos`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
       url: `${BASE_URL}/blog`,
       lastModified: now,
       changeFrequency: "daily",
@@ -62,28 +74,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/blog/hotel-loyalty-program-ghana-accra`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/blog/whatsapp-hotel-marketing-ghana`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/blog/cut-ota-commissions-ghana-hotels`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
       url: `${BASE_URL}/fonctionnalites`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/logiciel-fidelisation-hotel`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/crm-hotelier`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/whatsapp-marketing-hotel`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/reservations-directes-hotel`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/reactivation-clients-hotel`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/fidelisation-client-hotel`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
     },
     {
       url: `${BASE_URL}/tarifs`,
@@ -132,18 +162,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/privacy-policy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${BASE_URL}/tos`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
     },
     {
       url: `${BASE_URL}/legal/mentions-legales`,
