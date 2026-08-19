@@ -19,9 +19,18 @@ const MONEROO_API_URL = "https://api.moneroo.io/v1";
 const CheckoutBodySchema = v.object({
   planSlug: v.pipe(v.string(), v.minLength(1), v.maxLength(50)),
   planName: v.optional(v.pipe(v.string(), v.maxLength(100))),
-  successUrl: v.pipe(v.string(), v.url()),
-  cancelUrl: v.pipe(v.string(), v.url()),
+  successUrl: v.pipe(v.string(), v.minLength(1), v.maxLength(2000)),
+  cancelUrl: v.pipe(v.string(), v.minLength(1), v.maxLength(2000)),
 });
+
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
@@ -41,6 +50,9 @@ Deno.serve(async (req) => {
       return errors.badRequest("Missing or invalid required fields: planSlug, successUrl, cancelUrl");
     }
     const { planSlug, planName, successUrl, cancelUrl } = parsed.output;
+    if (!isValidHttpUrl(successUrl) || !isValidHttpUrl(cancelUrl)) {
+      return errors.badRequest("successUrl et cancelUrl doivent être des URLs http(s) valides");
+    }
 
     // Le montant n'est JAMAIS pris depuis le client : on le recalcule ici a
     // partir du plan. Sinon n'importe quel appelant peut poster son propre

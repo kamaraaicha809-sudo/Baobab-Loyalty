@@ -1,0 +1,85 @@
+project_id = "nsohqxohmxeklejdltip"
+
+[functions.config-update]
+verify_jwt = true
+
+[functions.prompts-update]
+verify_jwt = true
+
+[functions.email-send]
+verify_jwt = true
+
+[functions.ai-generate]
+verify_jwt = true
+
+[functions.config-get]
+verify_jwt = false
+
+[functions.storage-upload]
+verify_jwt = true
+
+[functions.user-get-profile]
+verify_jwt = false
+
+[functions.linkedin-to-template]
+verify_jwt = true
+
+[functions.prompts-create]
+verify_jwt = true
+
+[functions.prompts-delete]
+verify_jwt = true
+
+[functions.prompts-list]
+verify_jwt = true
+
+[functions.storage-delete]
+verify_jwt = true
+
+[functions.billing-create-checkout]
+verify_jwt = false
+
+[functions.billing-create-portal]
+verify_jwt = true
+
+[functions.billing-webhook]
+verify_jwt = false
+
+[functions.clients-email-sync]
+verify_jwt = false
+
+[functions.campaign-send]
+verify_jwt = false
+
+[functions.email-welcome]
+verify_jwt = true
+
+[functions.whatsapp-connect]
+verify_jwt = false
+
+[functions.whatsapp-disconnect]
+verify_jwt = false
+
+[functions.fne-worker]
+verify_jwt = false
+
+[functions.team-invite]
+verify_jwt = false
+
+[functions.team-accept-invite]
+verify_jwt = false
+
+[functions.team-remove-member]
+verify_jwt = false
+
+[functions.team-list]
+verify_jwt = false
+
+[functions.whatsapp-status]
+verify_jwt = true
+
+[functions.newsletter-subscribe]
+verify_jwt = false
+
+[functions.contact-send]
+verify_jwt = false
