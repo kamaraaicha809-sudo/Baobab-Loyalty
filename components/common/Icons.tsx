@@ -23,6 +23,7 @@ interface IconsCollection {
   Cocktail: () => ReactElement;
   Calendar: () => ReactElement;
   Cursor: () => ReactElement;
+  CreditCard: () => ReactElement;
 }
 
 export const Icons: IconsCollection = {
@@ -115,6 +116,11 @@ export const Icons: IconsCollection = {
   Cursor: () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672z" />
+    </svg>
+  ),
+  CreditCard: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0018.75 4.5H5.25A2.25 2.25 0 003 6.75v10.5A2.25 2.25 0 005.25 19.5z" />
     </svg>
   ),
 };

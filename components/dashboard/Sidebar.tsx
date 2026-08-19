@@ -57,6 +57,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
           },
         ]
       : []),
+    { id: 'abonnement', label: 'Abonnement', icon: <Icons.CreditCard />, href: '/dashboard/abonnement' },
   ];
 
   // Navigation admin (visible uniquement pour les admins)
