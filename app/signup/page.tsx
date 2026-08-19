@@ -24,6 +24,8 @@ function SignUpContent() {
     if (plan) sessionStorage.setItem("pending_checkout_plan", plan);
     const ref = searchParams.get("ref");
     if (ref === "beta") sessionStorage.setItem("signup_ref", "beta");
+    const invite = searchParams.get("invite");
+    if (invite) sessionStorage.setItem("pending_invite_token", invite);
   }, [searchParams]);
 
   // En mode démo, on laisse le formulaire s'afficher normalement
@@ -112,7 +114,13 @@ function SignUpContent() {
         // mailer_autoconfirm activé : l'utilisateur est directement connecté
         toast.success("Compte créé avec succès !");
         import("@/src/sdk").then(({ email }) => email.sendWelcomeEmail()).catch(() => {});
-        window.location.href = config.auth.callbackUrl;
+        const pendingInvite = sessionStorage.getItem("pending_invite_token");
+        if (pendingInvite) {
+          sessionStorage.removeItem("pending_invite_token");
+          window.location.href = `/auth/accept-invite?token=${encodeURIComponent(pendingInvite)}`;
+        } else {
+          window.location.href = config.auth.callbackUrl;
+        }
       } else {
         // Vérification email requise
         sessionStorage.setItem("verify_email", email);

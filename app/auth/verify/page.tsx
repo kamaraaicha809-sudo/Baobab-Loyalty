@@ -95,10 +95,14 @@ function VerifyContent() {
 
           const pendingPlan = sessionStorage.getItem("pending_checkout_plan");
           sessionStorage.removeItem("pending_checkout_plan");
+          const pendingInvite = sessionStorage.getItem("pending_invite_token");
+          sessionStorage.removeItem("pending_invite_token");
           toast.success("Email vérifié avec succès !");
           // Non-blocking — we do not await to avoid delaying navigation
           import("@/src/sdk").then(({ email }) => email.sendWelcomeEmail()).catch(() => {});
-          if (signupRef === "beta") {
+          if (pendingInvite) {
+            router.push(`/auth/accept-invite?token=${encodeURIComponent(pendingInvite)}`);
+          } else if (signupRef === "beta") {
             router.push("/");
           } else {
             router.push(pendingPlan ? `/checkout?plan=${pendingPlan}` : config.auth.callbackUrl);
