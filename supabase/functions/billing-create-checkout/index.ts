@@ -17,10 +17,10 @@ import { v } from "../_shared/deps.ts";
 const MONEROO_API_URL = "https://api.moneroo.io/v1";
 
 const CheckoutBodySchema = v.object({
-  planSlug: v.pipe(v.string(), v.minLength(1), v.maxLength(50)),
-  planName: v.optional(v.pipe(v.string(), v.maxLength(100))),
-  successUrl: v.pipe(v.string(), v.minLength(1), v.maxLength(2000)),
-  cancelUrl: v.pipe(v.string(), v.minLength(1), v.maxLength(2000)),
+  planSlug: v.string([v.minLength(1), v.maxLength(50)]),
+  planName: v.optional(v.string([v.maxLength(100)])),
+  successUrl: v.string([v.minLength(1), v.maxLength(2000)]),
+  cancelUrl: v.string([v.minLength(1), v.maxLength(2000)]),
 });
 
 function isValidHttpUrl(value: string): boolean {
