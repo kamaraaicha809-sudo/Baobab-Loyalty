@@ -24,6 +24,30 @@ export async function resolveProfile<T = Record<string, unknown>>(
   userId: string,
   select = "*"
 ): Promise<ResolvedProfile<T>> {
+  // Verifie team_members EN PREMIER : handle_new_user cree automatiquement un
+  // profil personnel (souvent vide, config_complete = false) pour CHAQUE
+  // compte a l'inscription, y compris les comptes invites dans une equipe. Si
+  // on verifiait "son propre profil" en premier, un membre d'equipe resoudrait
+  // toujours vers cette coquille vide au lieu de l'hotel qu'il a rejoint.
+  // team-accept-invite garantit qu'une ligne team_members n'existe que pour un
+  // compte qui ne gere pas deja son propre hotel (config_complete) : pas
+  // d'ambiguite possible a inverser cette priorite.
+  const { data: membership } = await userClient
+    .from("team_members")
+    .select("profile_id, team_role")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (membership) {
+    const { data: profile } = await userClient
+      .from("profiles")
+      .select(select)
+      .eq("id", membership.profile_id)
+      .maybeSingle();
+
+    return { profile: profile as T | null, teamRole: membership.team_role as TeamRole };
+  }
+
   const { data: owned } = await userClient
     .from("profiles")
     .select(select)
@@ -32,19 +56,5 @@ export async function resolveProfile<T = Record<string, unknown>>(
 
   if (owned) return { profile: owned as T, teamRole: "owner" };
 
-  const { data: membership } = await userClient
-    .from("team_members")
-    .select("profile_id, team_role")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (!membership) return { profile: null, teamRole: null };
-
-  const { data: profile } = await userClient
-    .from("profiles")
-    .select(select)
-    .eq("id", membership.profile_id)
-    .maybeSingle();
-
-  return { profile: profile as T | null, teamRole: membership.team_role as TeamRole };
+  return { profile: null, teamRole: null };
 }

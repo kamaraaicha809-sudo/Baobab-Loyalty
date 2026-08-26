@@ -11,6 +11,7 @@ import { requireAuth, getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { resolveProfile } from "../_shared/team.ts";
+import { logAudit } from "../_shared/audit.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
@@ -56,6 +57,12 @@ Deno.serve(async (req) => {
         .eq("id", memberId)
         .eq("profile_id", profile.id);
       if (error) return errors.internal("Échec de la suppression du membre.");
+      await logAudit(serviceClient, {
+        profileId: profile.id,
+        actorUserId: user.id,
+        action: "team_member_removed",
+        details: { memberId },
+      });
     } else if (invitationId) {
       const { error } = await serviceClient
         .from("team_invitations")
@@ -63,6 +70,12 @@ Deno.serve(async (req) => {
         .eq("id", invitationId)
         .eq("profile_id", profile.id);
       if (error) return errors.internal("Échec de l'annulation de l'invitation.");
+      await logAudit(serviceClient, {
+        profileId: profile.id,
+        actorUserId: user.id,
+        action: "team_invitation_revoked",
+        details: { invitationId },
+      });
     }
 
     return success({ removed: true });

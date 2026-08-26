@@ -21,8 +21,8 @@ Deno.serve(async (req) => {
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
     if (isDemoMode) return errors.forbidden("File upload is disabled in demo mode");
 
-    const { user, error: authError } = await requireAuth(req);
-    if (authError || !user) return errors.unauthorized(authError || "Authentication required");
+    const { user, userClient, error: authError } = await requireAuth(req);
+    if (authError || !user || !userClient) return errors.unauthorized(authError || "Authentication required");
 
     const contentType = req.headers.get("content-type") || "";
     if (!contentType.includes("multipart/form-data")) {
@@ -38,6 +38,19 @@ Deno.serve(async (req) => {
     if (!bucket) return errors.badRequest("Bucket name is required");
     if (file.size > MAX_FILE_SIZE) return errors.badRequest("File too large (max 10 MB)");
     if (!ALLOWED_TYPES.includes(file.type)) return errors.badRequest("File type not allowed");
+
+    // Security: user can only upload to their own path unless admin
+    if (path && !path.startsWith(`${user.id}/`)) {
+      const { data: profile } = await userClient
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.role !== "admin") {
+        return errors.forbidden("You can only upload to your own files");
+      }
+    }
 
     const filePath = path || `${user.id}/${Date.now()}_${file.name}`;
     const serviceClient = getServiceClient();

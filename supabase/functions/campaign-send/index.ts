@@ -4,7 +4,8 @@
  *
  * Auth: Required (JWT) — bypassed in DEMO_MODE
  * Method: POST
- * Body: { segmentCode, message, templateId, avantage?, customMonths? }
+ * Body: { segmentCode, message, templateId, avantage?, customMonths?,
+ *          minMontantDepense?, minNombreReservations?, typeChambreContains?, saisonContains? }
  */
 
 import { requireAuth, getServiceClient } from "../_shared/auth.ts";
@@ -12,6 +13,7 @@ import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { getMonthlyRelanceQuota, startOfCurrentMonthIso } from "../_shared/plan.ts";
 import { resolveProfile } from "../_shared/team.ts";
+import { logAudit } from "../_shared/audit.ts";
 
 interface Client {
   id: string;
@@ -19,6 +21,35 @@ interface Client {
   whatsapp: string | null;
   telephone: string | null;
   derniere_visite: string;
+  marketing_consent: boolean;
+  nombre_reservations: number;
+  montant_total_depense: number;
+  type_chambre_preferee: string | null;
+  saison_habituelle: string | null;
+}
+
+interface AdvancedFilters {
+  minMontantDepense?: number;
+  minNombreReservations?: number;
+  typeChambreContains?: string;
+  saisonContains?: string;
+}
+
+// Duplique src/sdk/clients.ts::matchesAdvancedFilters (pas d'import
+// cross-runtime possible entre le frontend et une Edge Function Deno) —
+// garder les deux synchronisées.
+function clientMatchesAdvancedFilters(client: Client, filters: AdvancedFilters): boolean {
+  if (filters.minMontantDepense != null && (client.montant_total_depense ?? 0) < filters.minMontantDepense) return false;
+  if (filters.minNombreReservations != null && (client.nombre_reservations ?? 0) < filters.minNombreReservations) return false;
+  if (filters.typeChambreContains?.trim()) {
+    const needle = filters.typeChambreContains.trim().toLowerCase();
+    if (!(client.type_chambre_preferee ?? "").toLowerCase().includes(needle)) return false;
+  }
+  if (filters.saisonContains?.trim()) {
+    const needle = filters.saisonContains.trim().toLowerCase();
+    if (!(client.saison_habituelle ?? "").toLowerCase().includes(needle)) return false;
+  }
+  return true;
 }
 
 function formatE164(raw: string): string | null {
@@ -64,6 +95,33 @@ function clientMatchesSegment(client: Client, segmentCode: string, customMonths?
   return true;
 }
 
+// Extrait un message d'erreur lisible depuis une reponse d'echec Meta/360dialog.
+// Les deux APIs renvoient un corps JSON de la forme { error: { message, code } }
+// en cas de rejet (template refuse, numero invalide, quota depasse...). Si le
+// corps n'est pas du JSON exploitable, on garde le texte brut (tronque).
+function extractErrorInfo(rawBody: string): { code?: string; message: string } {
+  try {
+    const parsed = JSON.parse(rawBody);
+    const apiError = parsed?.error;
+    if (apiError?.message) {
+      return {
+        code: apiError.code !== undefined ? String(apiError.code) : undefined,
+        message: String(apiError.error_data?.details || apiError.message).slice(0, 500),
+      };
+    }
+  } catch {
+    // Corps non-JSON, on retombe sur le texte brut ci-dessous
+  }
+  return { message: rawBody.slice(0, 500) || "Erreur inconnue du fournisseur WhatsApp" };
+}
+
+interface SendResult {
+  ok: boolean;
+  providerMessageId?: string;
+  errorCode?: string;
+  errorMsg?: string;
+}
+
 async function sendViaMeta(
   phoneNumberId: string,
   accessToken: string,
@@ -71,7 +129,7 @@ async function sendViaMeta(
   clientName: string,
   templateName: string,
   messageBody: string,
-): Promise<{ ok: boolean; errorMsg?: string }> {
+): Promise<SendResult> {
   try {
     const firstName = clientName.split(" ")[0];
     const res = await fetch(
@@ -104,12 +162,21 @@ async function sendViaMeta(
       },
     );
 
+    const body = await res.text();
+
     if (!res.ok) {
-      const body = await res.text();
-      return { ok: false, errorMsg: body };
+      const { code, message } = extractErrorInfo(body);
+      return { ok: false, errorCode: code, errorMsg: message };
     }
 
-    return { ok: true };
+    let providerMessageId: string | undefined;
+    try {
+      providerMessageId = JSON.parse(body)?.messages?.[0]?.id;
+    } catch {
+      // Reponse succes non-JSON (improbable) : on garde providerMessageId undefined
+    }
+
+    return { ok: true, providerMessageId };
   } catch (err) {
     return { ok: false, errorMsg: err instanceof Error ? err.message : "Network error" };
   }
@@ -124,7 +191,7 @@ async function sendViaBsp(
   clientName: string,
   templateName: string,
   messageBody: string,
-): Promise<{ ok: boolean; errorMsg?: string }> {
+): Promise<SendResult> {
   try {
     const firstName = clientName.split(" ")[0];
     // 360dialog v2 requires phone without + prefix
@@ -157,12 +224,21 @@ async function sendViaBsp(
       }),
     });
 
+    const body = await res.text();
+
     if (!res.ok) {
-      const body = await res.text();
-      return { ok: false, errorMsg: body };
+      const { code, message } = extractErrorInfo(body);
+      return { ok: false, errorCode: code, errorMsg: message };
     }
 
-    return { ok: true };
+    let providerMessageId: string | undefined;
+    try {
+      providerMessageId = JSON.parse(body)?.messages?.[0]?.id;
+    } catch {
+      // Reponse succes non-JSON (improbable) : on garde providerMessageId undefined
+    }
+
+    return { ok: true, providerMessageId };
   } catch (err) {
     return { ok: false, errorMsg: err instanceof Error ? err.message : "Network error" };
   }
@@ -175,6 +251,7 @@ Deno.serve(async (req) => {
     const isDemoMode = Deno.env.get("DEMO_MODE") === "true";
 
     let profileId: string;
+    let actorUserId: string | null = null;
 
     if (isDemoMode) {
       profileId = "demo-user-id";
@@ -185,10 +262,27 @@ Deno.serve(async (req) => {
       const { profile } = await resolveProfile<{ id: string }>(userClient, user.id, "id");
       if (!profile) return errors.forbidden("Profil introuvable.");
       profileId = profile.id;
+      actorUserId = user.id;
     }
 
     const body = await req.json();
-    const { segmentCode, message, templateId, avantage, customMonths } = body;
+    const {
+      segmentCode,
+      message,
+      templateId,
+      avantage,
+      customMonths,
+      minMontantDepense,
+      minNombreReservations,
+      typeChambreContains,
+      saisonContains,
+    } = body;
+    const advancedFilters: AdvancedFilters = {
+      minMontantDepense: typeof minMontantDepense === "number" ? minMontantDepense : undefined,
+      minNombreReservations: typeof minNombreReservations === "number" ? minNombreReservations : undefined,
+      typeChambreContains: typeof typeChambreContains === "string" ? typeChambreContains : undefined,
+      saisonContains: typeof saisonContains === "string" ? saisonContains : undefined,
+    };
 
     if (!segmentCode || !message) {
       return errors.badRequest("segmentCode et message sont requis");
@@ -237,13 +331,23 @@ Deno.serve(async (req) => {
     // Fetch all clients for this profile
     const { data: allClients, error: clientsError } = await db
       .from("clients")
-      .select("id, nom, whatsapp, telephone, derniere_visite")
+      .select(
+        "id, nom, whatsapp, telephone, derniere_visite, marketing_consent, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle"
+      )
       .eq("profile_id", profileId);
 
     if (clientsError) return errors.internal(clientsError.message);
 
     const clients: Client[] = allClients || [];
-    const targets = clients.filter((c) => clientMatchesSegment(c, segmentCode, customMonths));
+    const segmentTargets = clients
+      .filter((c) => clientMatchesSegment(c, segmentCode, customMonths))
+      .filter((c) => clientMatchesAdvancedFilters(c, advancedFilters));
+
+    // Un client peut correspondre au segment mais avoir demande a ne plus
+    // recevoir de messages marketing (STOP recu via le webhook, ou opt-out
+    // manuel) : on ne doit jamais lui envoyer une campagne, meme par erreur.
+    const targets = segmentTargets.filter((c) => c.marketing_consent);
+    const excludedOptOut = segmentTargets.length - targets.length;
 
     // Create campaign record (map custom segments to "tous")
     const dbSegmentCode = ["3-6mois", "6-9mois", "9-12mois", "1an+", "tous"].includes(segmentCode)
@@ -308,6 +412,8 @@ Deno.serve(async (req) => {
             message_content: message,
             template_id: templateId || null,
             status: "failed",
+            error_message: "Numéro de téléphone invalide",
+            failed_at: new Date().toISOString(),
           });
           continue;
         }
@@ -337,6 +443,10 @@ Deno.serve(async (req) => {
           message_content: message,
           template_id: templateId || null,
           status: result.ok ? "sent" : "failed",
+          provider_message_id: result.providerMessageId || null,
+          error_code: result.errorCode || null,
+          error_message: result.errorMsg || null,
+          failed_at: result.ok ? null : new Date().toISOString(),
         });
 
         if (result.ok) {
@@ -361,7 +471,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    return success({ sent, failed, total: targets.length, campaignId });
+    await logAudit(db, {
+      profileId,
+      actorUserId,
+      action: "campaign_sent",
+      details: { campaignId, segmentCode, sent, failed, total: targets.length },
+    });
+
+    return success({ sent, failed, total: targets.length, campaignId, excludedOptOut });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Erreur interne";
     return errors.internal(msg);

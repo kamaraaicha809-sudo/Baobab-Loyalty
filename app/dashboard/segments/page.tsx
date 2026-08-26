@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
-import { clients as clientsSDK, Client } from "@/src/sdk/clients";
+import { clients as clientsSDK, Client, SegmentFilters, matchesAdvancedFilters } from "@/src/sdk/clients";
 import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
 
 interface SegmentDef {
@@ -15,9 +15,21 @@ interface SegmentDef {
   months: number | null;
   minDays?: number;
   maxDays?: number | null;
-  icon: "clock" | "users";
+  icon: "clock" | "users" | "star" | "sparkles";
   isCustom?: boolean;
+  // Segments dérivés de la valeur/fréquence du client plutôt que de son
+  // ancienneté (derniere_visite) — réutilisent matchesAdvancedFilters.
+  valueFilters?: SegmentFilters;
+  maxNombreReservations?: number;
 }
+
+// Seuils validés avec l'hôtelière (2026-08-26) : aucune donnée réelle en
+// base pour les calibrer (aucun hôtel actif n'a encore de montant/réservations
+// renseignés), ce sont des points de départ pour le marché FCFA visé, pas une
+// moyenne calculée. À ajuster si l'usage réel montre qu'ils sont mal calibrés.
+const VIP_MONTANT_MIN_FCFA = 300000;
+const REGULIER_RESERVATIONS_MIN = 2;
+const NOUVEAU_RESERVATIONS_MAX = 1;
 
 const DEFAULT_SEGMENTS: SegmentDef[] = [
   {
@@ -63,10 +75,46 @@ const DEFAULT_SEGMENTS: SegmentDef[] = [
     months: null,
     icon: "users",
   },
+  {
+    id: "vip",
+    name: "Clients VIP",
+    description: `Ont dépensé au moins ${VIP_MONTANT_MIN_FCFA.toLocaleString("fr-FR")} FCFA au total`,
+    months: null,
+    icon: "star",
+    valueFilters: { minMontantDepense: VIP_MONTANT_MIN_FCFA },
+  },
+  {
+    id: "reguliers",
+    name: "Clients réguliers",
+    description: `Au moins ${REGULIER_RESERVATIONS_MIN} réservations chez vous`,
+    months: null,
+    icon: "users",
+    valueFilters: { minNombreReservations: REGULIER_RESERVATIONS_MIN },
+  },
+  {
+    id: "nouveaux",
+    name: "Nouveaux clients",
+    description: "Un seul séjour pour l'instant (ou aucun) — à fidéliser",
+    months: null,
+    icon: "sparkles",
+    maxNombreReservations: NOUVEAU_RESERVATIONS_MAX,
+  },
 ];
+
+function isValueSegment(segment: SegmentDef): boolean {
+  return !!segment.valueFilters || segment.maxNombreReservations !== undefined;
+}
 
 function filterBySegment(allClients: Client[], segment: SegmentDef): Client[] {
   if (segment.id === "tous") return allClients;
+
+  if (isValueSegment(segment)) {
+    return allClients.filter((c) => {
+      if (segment.valueFilters && !matchesAdvancedFilters(c, segment.valueFilters)) return false;
+      if (segment.maxNombreReservations !== undefined && (c.nombre_reservations ?? 0) > segment.maxNombreReservations) return false;
+      return true;
+    });
+  }
 
   const now = Date.now();
 
@@ -96,6 +144,10 @@ const DEMO_CLIENTS: Client[] = [
     whatsapp: null,
     derniere_visite: new Date(Date.now() - (100 + i * 10) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     notes: null,
+    nombre_reservations: i + 1,
+    montant_total_depense: (i + 1) * 70000, // dernier client du groupe dépasse le seuil VIP (démo)
+    type_chambre_preferee: i % 2 === 0 ? "Suite" : "Standard",
+    saison_habituelle: i % 2 === 0 ? "Haute saison" : "Basse saison",
   })),
   ...Array.from({ length: 4 }, (_, i) => ({
     id: `demo-b${i}`,
@@ -106,6 +158,10 @@ const DEMO_CLIENTS: Client[] = [
     whatsapp: null,
     derniere_visite: new Date(Date.now() - (190 + i * 15) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     notes: null,
+    nombre_reservations: i + 1,
+    montant_total_depense: (i + 1) * 30000,
+    type_chambre_preferee: "Standard",
+    saison_habituelle: "Basse saison",
   })),
   ...Array.from({ length: 3 }, (_, i) => ({
     id: `demo-c${i}`,
@@ -116,6 +172,10 @@ const DEMO_CLIENTS: Client[] = [
     whatsapp: null,
     derniere_visite: new Date(Date.now() - (280 + i * 20) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     notes: null,
+    nombre_reservations: i,
+    montant_total_depense: i * 20000,
+    type_chambre_preferee: "Deluxe",
+    saison_habituelle: "Haute saison",
   })),
   ...Array.from({ length: 3 }, (_, i) => ({
     id: `demo-d${i}`,
@@ -126,6 +186,10 @@ const DEMO_CLIENTS: Client[] = [
     whatsapp: null,
     derniere_visite: new Date(Date.now() - (400 + i * 30) * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     notes: null,
+    nombre_reservations: i,
+    montant_total_depense: 0,
+    type_chambre_preferee: null,
+    saison_habituelle: null,
   })),
 ];
 
@@ -137,6 +201,17 @@ export default function SegmentsPage() {
   const [listSegment, setListSegment] = useState<SegmentDef | null>(null);
   const [allClients, setAllClients] = useState<Client[] | null>(null);
   const [loadingClients, setLoadingClients] = useState(false);
+
+  // Filtres combinables (P5) : en plus des segments basés sur la dernière
+  // visite, on peut affiner par montant dépensé, nombre de réservations,
+  // type de chambre préférée et saison habituelle.
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<SegmentFilters>({});
+  const hasActiveFilters =
+    filters.minMontantDepense != null ||
+    filters.minNombreReservations != null ||
+    !!filters.typeChambreContains?.trim() ||
+    !!filters.saisonContains?.trim();
 
   // Create segment modal
   const [showCreate, setShowCreate] = useState(false);
@@ -156,6 +231,7 @@ export default function SegmentsPage() {
     const load = async () => {
       if (isDemoMode) {
         setCounts(demoSegmentCounts);
+        setAllClients(DEMO_CLIENTS);
         return;
       }
       const supabase = createClient();
@@ -168,6 +244,15 @@ export default function SegmentsPage() {
         setCounts(seg);
       } catch {
         setCounts(demoSegmentCounts);
+      }
+      // Chargé dès l'arrivée sur la page (pas seulement au clic sur "Voir la
+      // liste") : nécessaire pour calculer un nombre de destinataires à jour
+      // dès qu'un filtre combinable est actif.
+      try {
+        const list = await clientsSDK.getClients(user.id);
+        setAllClients(list);
+      } catch {
+        setAllClients([]);
       }
     };
     load();
@@ -229,8 +314,26 @@ export default function SegmentsPage() {
   }
 
   const filteredClients = listSegment && allClients
-    ? filterBySegment(allClients, listSegment)
+    ? filterBySegment(allClients, listSegment).filter((c) => matchesAdvancedFilters(c, filters))
     : [];
+
+  function segmentDisplayCount(segment: SegmentDef): number | string {
+    if (segment.isCustom) return "—";
+    // Les segments VIP/réguliers/nouveaux ne sont pas dans get_segment_counts
+    // (basé uniquement sur derniere_visite) : toujours calculés côté client.
+    if (!hasActiveFilters && !isValueSegment(segment)) return counts[segment.id] ?? "—";
+    if (!allClients) return "…";
+    return filterBySegment(allClients, segment).filter((c) => matchesAdvancedFilters(c, filters)).length;
+  }
+
+  function segmentHref(segment: SegmentDef): string {
+    const params = new URLSearchParams({ segment: segment.id });
+    if (filters.minMontantDepense != null) params.set("montantMin", String(filters.minMontantDepense));
+    if (filters.minNombreReservations != null) params.set("reservationsMin", String(filters.minNombreReservations));
+    if (filters.typeChambreContains?.trim()) params.set("typeChambre", filters.typeChambreContains.trim());
+    if (filters.saisonContains?.trim()) params.set("saison", filters.saisonContains.trim());
+    return `/dashboard/templates?${params.toString()}`;
+  }
 
   return (
     <div className="space-y-6">
@@ -249,16 +352,110 @@ export default function SegmentsPage() {
             L&apos;IA de {config.appName} a analysé votre base de données pour identifier les meilleurs segments.
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="shrink-0 self-start sm:mt-6 inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Créer un segment
-        </button>
+        <div className="flex gap-2 shrink-0 self-start sm:mt-6">
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${
+              hasActiveFilters
+                ? "border-[var(--color-primary)] text-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                : "border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+            </svg>
+            Filtres avancés
+          </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Créer un segment
+          </button>
+        </div>
       </header>
+
+      {showFilters && (
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-slate-900">Filtres combinables</h3>
+            <p className="text-xs text-slate-400">S&apos;ajoutent au segment choisi ci-dessous</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                Montant dépensé minimum (FCFA)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={filters.minMontantDepense ?? ""}
+                onChange={(e) =>
+                  setFilters((f) => ({
+                    ...f,
+                    minMontantDepense: e.target.value === "" ? undefined : Math.max(0, parseInt(e.target.value, 10) || 0),
+                  }))
+                }
+                placeholder="Ex : 100000"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                Nombre de réservations minimum
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={filters.minNombreReservations ?? ""}
+                onChange={(e) =>
+                  setFilters((f) => ({
+                    ...f,
+                    minNombreReservations: e.target.value === "" ? undefined : Math.max(0, parseInt(e.target.value, 10) || 0),
+                  }))
+                }
+                placeholder="Ex : 2"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                Type de chambre préférée
+              </label>
+              <input
+                type="text"
+                value={filters.typeChambreContains ?? ""}
+                onChange={(e) => setFilters((f) => ({ ...f, typeChambreContains: e.target.value }))}
+                placeholder="Ex : Suite"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                Saison habituelle
+              </label>
+              <input
+                type="text"
+                value={filters.saisonContains ?? ""}
+                onChange={(e) => setFilters((f) => ({ ...f, saisonContains: e.target.value }))}
+                placeholder="Ex : Haute saison"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]"
+              />
+            </div>
+          </div>
+          {hasActiveFilters && (
+            <button
+              onClick={() => setFilters({})}
+              className="mt-4 text-xs font-medium text-slate-500 hover:text-slate-700 underline"
+            >
+              Réinitialiser les filtres
+            </button>
+          )}
+        </div>
+      )}
 
       {!isDemoMode && (counts["tous"] ?? 0) === 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -287,12 +484,20 @@ export default function SegmentsPage() {
             className="rounded-xl border border-slate-200 bg-white hover:border-[var(--color-primary)]/40 hover:shadow-md transition-all overflow-hidden"
           >
             <Link
-              href={`/dashboard/templates?segment=${segment.id}`}
+              href={segmentHref(segment)}
               className="flex items-start justify-between gap-4 p-5"
             >
               <div className="flex items-start gap-3 min-w-0">
                 <span className="text-slate-400 shrink-0 mt-0.5">
-                  {segment.icon === "users" ? <Icons.Users /> : <Icons.Clock />}
+                  {segment.icon === "users" ? (
+                    <Icons.Users />
+                  ) : segment.icon === "star" ? (
+                    <Icons.Star />
+                  ) : segment.icon === "sparkles" ? (
+                    <Icons.Sparkles />
+                  ) : (
+                    <Icons.Clock />
+                  )}
                 </span>
                 <div>
                   <h3 className="font-semibold text-slate-900">{segment.name}</h3>
@@ -301,7 +506,7 @@ export default function SegmentsPage() {
               </div>
               <div className="text-right shrink-0">
                 <span className="block text-2xl sm:text-3xl font-bold text-slate-900">
-                  {segment.isCustom ? "—" : (counts[segment.id] ?? "—")}
+                  {segmentDisplayCount(segment)}
                 </span>
                 <span className="text-xs text-slate-400 uppercase font-medium">clients</span>
               </div>
@@ -444,32 +649,34 @@ export default function SegmentsPage() {
                   <p className="text-sm">Aucun client dans ce segment</p>
                 </div>
               ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-slate-400 uppercase font-medium border-b border-slate-100">
-                      <th className="text-left pb-3 pr-4">Nom</th>
-                      <th className="text-left pb-3 pr-4 hidden sm:table-cell">Contact</th>
-                      <th className="text-left pb-3">Dernière visite</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {filteredClients.map((client) => (
-                      <tr key={client.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-3 pr-4 font-medium text-slate-900">{client.nom}</td>
-                        <td className="py-3 pr-4 text-slate-500 hidden sm:table-cell">
-                          {client.whatsapp || client.telephone || client.email || "—"}
-                        </td>
-                        <td className="py-3 text-slate-500">
-                          {new Date(client.derniere_visite).toLocaleDateString("fr-FR", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[420px] text-sm">
+                    <thead>
+                      <tr className="text-xs text-slate-400 uppercase font-medium border-b border-slate-100">
+                        <th className="text-left pb-3 pr-4">Nom</th>
+                        <th className="text-left pb-3 pr-4">Contact</th>
+                        <th className="text-left pb-3 whitespace-nowrap">Dernière visite</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {filteredClients.map((client) => (
+                        <tr key={client.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="py-3 pr-4 font-medium text-slate-900 whitespace-nowrap">{client.nom}</td>
+                          <td className="py-3 pr-4 text-slate-500 whitespace-nowrap">
+                            {client.whatsapp || client.telephone || client.email || "—"}
+                          </td>
+                          <td className="py-3 text-slate-500 whitespace-nowrap">
+                            {new Date(client.derniere_visite).toLocaleDateString("fr-FR", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </div>

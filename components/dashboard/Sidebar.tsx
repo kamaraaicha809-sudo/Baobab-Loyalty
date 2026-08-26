@@ -34,9 +34,11 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
   // Navigation principale
   const mainNavItems: NavItem[] = [
     { id: 'dashboard', label: 'Tableau de bord', icon: <Icons.Home />, href: '/dashboard' },
+    { id: 'reservations', label: 'Réservations', icon: <Icons.Calendar />, href: '/dashboard/reservations' },
     { id: 'configuration', label: 'Configuration', icon: <Icons.Settings />, href: '/dashboard/configuration' },
     { id: 'segments', label: 'Segments', icon: <Icons.Users />, href: '/dashboard/segments' },
     { id: 'templates', label: 'Templates', icon: <Icons.Template />, href: '/dashboard/templates' },
+    { id: 'historique', label: 'Historique', icon: <Icons.Clock />, href: '/dashboard/historique' },
     ...(isPremium
       ? [
           {

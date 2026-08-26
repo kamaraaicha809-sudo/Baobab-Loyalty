@@ -18,6 +18,14 @@ function SuccessContent() {
   const [copied, setCopied] = useState(false);
   const [campaignImage, setCampaignImage] = useState<string | null>(null);
 
+  const sentParam = searchParams.get("sent");
+  const failedParam = searchParams.get("failed");
+  const excludedOptOutParam = searchParams.get("excludedOptOut");
+  const hasSendStats = sentParam !== null;
+  const sentCount = Number(sentParam || 0);
+  const failedCount = Number(failedParam || 0);
+  const excludedOptOutCount = Number(excludedOptOutParam || 0);
+
   useEffect(() => {
     const img = sessionStorage.getItem("campaign_image");
     if (img) startTransition(() => setCampaignImage(img));
@@ -75,6 +83,29 @@ function SuccessContent() {
           <p className="text-slate-600 text-base max-w-md">
             Vos clients reçoivent actuellement leur offre personnalisée. Voici à quoi ressemble le message sur leur téléphone.
           </p>
+          {hasSendStats && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-md mx-auto lg:mx-0">
+              <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-slate-900">{sentCount}</p>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Envoyés</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
+                <p className={`text-2xl font-bold ${failedCount > 0 ? "text-red-600" : "text-slate-900"}`}>{failedCount}</p>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Échoués</p>
+              </div>
+              {excludedOptOutCount > 0 && (
+                <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-slate-900">{excludedOptOutCount}</p>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Désabonnés exclus</p>
+                </div>
+              )}
+            </div>
+          )}
+          {hasSendStats && failedCount > 0 && (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 max-w-md mx-auto lg:mx-0">
+              {failedCount} message{failedCount > 1 ? "s n'ont" : " n'a"} pas pu être envoyé{failedCount > 1 ? "s" : ""} (numéro invalide ou refus du fournisseur WhatsApp).
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/dashboard"

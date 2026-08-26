@@ -209,11 +209,68 @@ export const demoFlux = [
 // DONNÉES FICTIVES — DERNIÈRES CAMPAGNES (dashboard)
 // ============================================
 
+export const demoAuditLog = [
+  { id: "demo-audit-1", action: "campaign_sent", details: { segmentCode: "6-9mois", sent: 64, failed: 1 }, created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString() },
+  { id: "demo-audit-2", action: "reservation_confirmed", details: { montantFcfa: 85000 }, created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString() },
+  { id: "demo-audit-3", action: "reservation_cancelled", details: {}, created_at: new Date(Date.now() - 26 * 3600 * 1000).toISOString() },
+  { id: "demo-audit-4", action: "team_member_removed", details: {}, created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
+];
+
+export const demoRecommendation = {
+  segmentCode: "6-9mois",
+  templateId: "remise",
+  reasoning:
+    "Ce segment regroupe le plus de clients inactifs à fort potentiel et votre taux de conversion mesuré est déjà bon sur les remises.",
+  bestTiming: "En début de semaine, pour laisser le temps de réserver avant le week-end.",
+};
+
+export const demoOpportunities = [
+  {
+    segmentCode: "6-9mois",
+    segmentLabel: "clients inactifs depuis 6 à 9 mois",
+    clientCount: 127,
+    potentialRevenueFcfa: 850000,
+    ctaHref: "/dashboard/templates?segment=6-9mois",
+  },
+  {
+    segmentCode: "3-6mois",
+    segmentLabel: "clients inactifs depuis 3 à 6 mois",
+    clientCount: 64,
+    potentialRevenueFcfa: 310000,
+    ctaHref: "/dashboard/templates?segment=3-6mois",
+  },
+];
+
 export const demoCampagnesSummary = [
-  { date: "24 Fév 2026", segment: "Clients 6 à 9 mois", offre: "Remise 20%", resultats: "8 résas", statut: "TERMINÉE" },
-  { date: "18 Fév 2026", segment: "Tous les clients", offre: "Cocktail offert", resultats: "14 résas", statut: "TERMINÉE" },
-  { date: "10 Fév 2026", segment: "Clients 3 à 6 mois", offre: "Surclassement", resultats: "5 résas", statut: "TERMINÉE" },
-  { date: "12 Mar 2026", segment: "Clients 9 à 12 mois", offre: "Offre Famille", resultats: "En cours", statut: "EN COURS" },
+  { date: "24 Fév 2026", segment: "Clients 6 à 9 mois", offre: "Remise 20%", resultats: "8 résas", ca: "480 000 FCFA", statut: "TERMINÉE" },
+  { date: "18 Fév 2026", segment: "Tous les clients", offre: "Cocktail offert", resultats: "14 résas", ca: "820 000 FCFA", statut: "TERMINÉE" },
+  { date: "10 Fév 2026", segment: "Clients 3 à 6 mois", offre: "Surclassement", resultats: "5 résas", ca: "295 000 FCFA", statut: "TERMINÉE" },
+  { date: "12 Mar 2026", segment: "Clients 9 à 12 mois", offre: "Offre Famille", resultats: "En cours", ca: "—", statut: "EN COURS" },
+];
+
+// ============================================
+// DONNÉES FICTIVES — RÉSERVATIONS EN ATTENTE DE CONFIRMATION
+// ============================================
+
+export const demoPendingReservations = [
+  {
+    id: "demo-resa-1",
+    client_name: "Fatou Ndiaye",
+    client_phone: "+221770000001",
+    check_in_date: "2026-08-28",
+    check_out_date: "2026-08-30",
+    nights: 2,
+    created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-resa-2",
+    client_name: "Moussa Kane",
+    client_phone: "+221770000002",
+    check_in_date: "2026-09-02",
+    check_out_date: "2026-09-05",
+    nights: 3,
+    created_at: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(),
+  },
 ];
 
 // ============================================

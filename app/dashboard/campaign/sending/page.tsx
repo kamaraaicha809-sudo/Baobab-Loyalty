@@ -18,6 +18,14 @@ function SendingContent() {
     const message = searchParams.get("message") || "";
     const avantage = searchParams.get("avantage") || "";
 
+    // Filtres combinables (P5), en plus du segment de base
+    const montantMinRaw = searchParams.get("montantMin");
+    const reservationsMinRaw = searchParams.get("reservationsMin");
+    const typeChambre = searchParams.get("typeChambre") || undefined;
+    const saison = searchParams.get("saison") || undefined;
+    const minMontantDepense = montantMinRaw ? Number(montantMinRaw) : undefined;
+    const minNombreReservations = reservationsMinRaw ? Number(reservationsMinRaw) : undefined;
+
     // Resolve custom segment months from localStorage
     let customMonths: number | undefined;
     if (segmentCode.startsWith("custom-")) {
@@ -45,10 +53,20 @@ function SendingContent() {
     // rejetterait l'appel avant même d'atteindre campaign-send. On simule donc
     // ici le même résultat que la branche démo de l'Edge Function.
     const sendPromise = isDemoMode
-      ? new Promise<{ sent: number; failed: number; total: number; campaignId: string | null }>((resolve) =>
+      ? new Promise<{ sent: number; failed: number; total: number; campaignId: string | null; excludedOptOut?: number }>((resolve) =>
           setTimeout(() => resolve(demoCampaignSendResult), demoCampaignSendDelayMs)
         )
-      : campaigns.sendCampaign({ segmentCode, message, templateId, avantage, customMonths });
+      : campaigns.sendCampaign({
+          segmentCode,
+          message,
+          templateId,
+          avantage,
+          customMonths,
+          minMontantDepense,
+          minNombreReservations,
+          typeChambreContains: typeChambre,
+          saisonContains: saison,
+        });
 
     sendPromise
       .then((result) => {
@@ -61,6 +79,7 @@ function SendingContent() {
           params.set("sent", String(result.sent));
           params.set("failed", String(result.failed));
           params.set("total", String(result.total));
+          params.set("excludedOptOut", String(result.excludedOptOut || 0));
           router.replace(`/dashboard/campaign/success?${params.toString()}`);
         }, 600);
       })

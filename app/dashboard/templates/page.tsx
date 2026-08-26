@@ -132,6 +132,7 @@ function OffresTab({
   initialAvantage = "",
   initialMessage = null,
   initialFeteName = "",
+  filterParams,
 }: {
   segmentId: string;
   segmentName: string;
@@ -139,6 +140,7 @@ function OffresTab({
   initialAvantage?: string;
   initialMessage?: string | null;
   initialFeteName?: string;
+  filterParams: URLSearchParams;
 }) {
   const router = useRouter();
 
@@ -330,6 +332,10 @@ function OffresTab({
         params.set("message", avantage.trim());
       } else if (generatedMessage) {
         params.set("message", generatedMessage);
+      }
+      for (const key of ["montantMin", "reservationsMin", "typeChambre", "saison"]) {
+        const value = filterParams.get(key);
+        if (value) params.set(key, value);
       }
       router.push(`/dashboard/campaign/confirm?${params.toString()}`);
     }
@@ -1401,6 +1407,7 @@ function TemplatesContent() {
           initialAvantage={initialAvantage}
           initialMessage={initialMessage}
           initialFeteName={initialFeteName}
+          filterParams={searchParams}
         />
       )}
       {isPremium && activeTab === "linkedin" && <LinkedInTab />}

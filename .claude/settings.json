@@ -24,7 +24,22 @@
       "Bash(python generate_pdfs.py)",
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(awk '{print NR\": \"$0}')",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(lsof -ti:3000 -sTCP:LISTEN)",
+      "Bash(xargs -r kill)",
+      "Bash(npx --yes playwright install chromium --with-deps)",
+      "Bash(taskkill //PID 8212 //F)",
+      "Bash(python -c \"print\\(open\\(r'C:\\\\Users\\\\HP\\\\.claude\\\\projects\\\\c--Users-HP-Desktop-Micro-SaaS-Baobab-Loyalty-Baobab-Loyalty-Kodefast\\\\1ef293b5-f4bf-436d-b9bb-34acf65fcf6d\\\\tool-results\\\\mcp-supabase-get_advisors-1787040220759.txt'\\).read\\(\\)[0:80000]\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(supabase --version)",
+      "Bash(supabase projects *)",
+      "WebFetch(domain:claude.ai)",
+      "Bash(node -e ' *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s \"http://localhost:3001/\")",
+      "Bash(curl -s -o /dev/null -w \"home -> %{http_code}\\\\n\" \"http://localhost:3001/\")",
+      "Bash(pkill -f \"next-server\")",
+      "WebFetch(domain:baobabloyalty.com)"
     ]
   },
   "defaultMode": "bypassPermissions"

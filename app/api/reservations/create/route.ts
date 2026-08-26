@@ -122,16 +122,116 @@ export async function POST(request: Request) {
       client_phone: client_phone || null,
     };
 
+    let reservationId: string | null = null;
     try {
-      const { error } = await supabase.from("reservations").insert({ ...insertPayload, source: "baobab" });
+      const { data: inserted, error } = await supabase
+        .from("reservations")
+        .insert({ ...insertPayload, source: "baobab" })
+        .select("id")
+        .single();
       if (error && error.message.includes("source")) {
-        const { error: err2 } = await supabase.from("reservations").insert(insertPayload);
+        const { data: inserted2, error: err2 } = await supabase
+          .from("reservations")
+          .insert(insertPayload)
+          .select("id")
+          .single();
         if (err2) throw new Error(err2.message);
+        reservationId = inserted2?.id ?? null;
       } else if (error) {
         throw new Error(error.message);
+      } else {
+        reservationId = inserted?.id ?? null;
       }
     } catch (insertErr) {
       return NextResponse.json({ error: String(insertErr) }, { status: 500 });
+    }
+
+    // Attribution "dernier contact" (best effort, ne doit jamais faire échouer
+    // la réservation) : on retrouve le client par son numéro de téléphone —
+    // c'est la seule donnée fiable dont on dispose ici, le lien /offre ne
+    // porte aujourd'hui aucun identifiant de campagne ou de message. On
+    // rattache la réservation au dernier message WhatsApp envoyé à ce client
+    // dans les 30 derniers jours (fenêtre standard d'attribution "dernier
+    // clic" pour ce type de relance marketing).
+    if (reservationId && client_phone) {
+      try {
+        const digits = client_phone.replace(/\D/g, "");
+        if (digits.length >= 7) {
+          const e164 = `+${digits}`;
+          const { data: matchedClient } = await supabase
+            .from("clients")
+            .select("id")
+            .eq("profile_id", profile_id)
+            .or(`whatsapp.eq.${e164},whatsapp.eq.${digits},telephone.eq.${e164},telephone.eq.${digits}`)
+            .maybeSingle();
+
+          if (matchedClient) {
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+            const { data: lastMessage } = await supabase
+              .from("sent_messages")
+              .select("id, campaign_id")
+              .eq("client_id", matchedClient.id)
+              .eq("profile_id", profile_id)
+              .in("status", ["sent", "delivered", "read"])
+              .gte("sent_at", thirtyDaysAgo)
+              .order("sent_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+            if (lastMessage) {
+              let offerId: string | null = null;
+              if (lastMessage.campaign_id) {
+                const { data: campaign } = await supabase
+                  .from("campaigns")
+                  .select("offer_id")
+                  .eq("id", lastMessage.campaign_id)
+                  .maybeSingle();
+                offerId = campaign?.offer_id ?? null;
+              }
+
+              // Le clic a peut-être déjà créé une redemption "clicked" (voir
+              // /api/offre/track-click) : on la fait progresser vers "booked"
+              // plutôt que d'en créer une seconde pour le même message.
+              const { data: existingRedemption } = await supabase
+                .from("redemptions")
+                .select("id")
+                .eq("sent_message_id", lastMessage.id)
+                .maybeSingle();
+
+              let redemptionId: string | null = null;
+              if (existingRedemption) {
+                await supabase
+                  .from("redemptions")
+                  .update({ status: "booked", offer_id: offerId })
+                  .eq("id", existingRedemption.id);
+                redemptionId = existingRedemption.id;
+              } else {
+                const { data: redemption } = await supabase
+                  .from("redemptions")
+                  .insert({
+                    client_id: matchedClient.id,
+                    offer_id: offerId,
+                    sent_message_id: lastMessage.id,
+                    profile_id,
+                    status: "booked",
+                  })
+                  .select("id")
+                  .single();
+                redemptionId = redemption?.id ?? null;
+              }
+
+              if (redemptionId) {
+                await supabase
+                  .from("reservations")
+                  .update({ client_id: matchedClient.id, offer_id: offerId, redemption_id: redemptionId })
+                  .eq("id", reservationId);
+              }
+            }
+          }
+        }
+      } catch {
+        // Attribution non bloquante : la réservation est déjà créée
+      }
     }
 
     // Notifier la réception (email + WhatsApp — best effort)

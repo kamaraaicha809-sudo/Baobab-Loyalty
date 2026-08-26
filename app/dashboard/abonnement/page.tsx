@@ -2,6 +2,7 @@
 
 import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import config from "@/config";
 import { billing, user as userSdk } from "@/src/sdk";
 import { isDemoMode } from "@/src/lib/demo";
@@ -77,7 +78,9 @@ export default function AbonnementPage() {
         cancelUrl: `${window.location.origin}/dashboard/abonnement`,
       });
       setUpgradeRedirectUrl(url);
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Impossible de démarrer le paiement. Réessayez.";
+      toast.error(message);
       setUpgradeLoading(null);
     }
   };
@@ -95,8 +98,10 @@ export default function AbonnementPage() {
       setShowCancelConfirm(false);
       setHasAccess(false);
       setCurrentPlanIndex(null);
-    } catch {
-      // handled by finally
+      toast.success("Abonnement résilié. Vous pouvez vous réabonner à tout moment.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Échec de la résiliation. Réessayez ou contactez le support.";
+      toast.error(message);
     } finally {
       setCancelLoading(false);
     }

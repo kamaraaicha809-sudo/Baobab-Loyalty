@@ -137,9 +137,133 @@ export async function generateLinkedInPost(
   });
 }
 
+// Catalogue réel des offres proposables (même liste que TEMPLATES dans
+// app/dashboard/templates/page.tsx, "vide" exclu car ce n'est pas une offre).
+// Dupliqué ici plutôt qu'importé : ce fichier est un composant client avec
+// des dépendances React, pas exportable proprement vers le SDK.
+const OFFER_CATALOG: { id: string; name: string }[] = [
+  { id: "remise", name: "Remise Exceptionnelle" },
+  { id: "surclassement", name: "Surclassement Offert" },
+  { id: "cocktail", name: "Cocktail de Bienvenue" },
+  { id: "famille", name: "Offre Famille" },
+  { id: "evenements", name: "Événements Spéciaux" },
+  { id: "sondage", name: "Sondage Satisfaction" },
+];
+
+export const OFFER_TEMPLATE_NAMES: Record<string, string> = Object.fromEntries(
+  OFFER_CATALOG.map((o) => [o.id, o.name])
+);
+
+const RECOMMENDATION_SYSTEM_PROMPT = `Tu es un assistant commercial pour un hotel en Afrique francophone qui utilise Baobab Loyalty.
+
+ROLE : a partir de donnees reelles (segments de clients inactifs, taux de conversion mesure), tu recommandes UNE seule action commerciale prioritaire parmi les opportunites fournies.
+
+CATALOGUE D'OFFRES DISPONIBLES (choisis UNIQUEMENT un id de cette liste) :
+${OFFER_CATALOG.map((o) => `- ${o.id} : ${o.name}`).join("\n")}
+
+FORMAT DE REPONSE OBLIGATOIRE : reponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni apres, sans bloc markdown, exactement ce schema :
+{"segment_code": "...", "template_id": "...", "reasoning": "...", "best_timing": "..."}
+
+- "segment_code" doit etre EXACTEMENT l'un des codes de segment listes dans les opportunites fournies (jamais un autre).
+- "template_id" doit etre EXACTEMENT l'un des id du catalogue ci-dessus.
+- "reasoning" : 1 a 2 phrases en francais expliquant pourquoi ce segment et cette offre, basees sur les chiffres fournis.
+- "best_timing" : 1 phrase suggerant le meilleur moment pour lancer la campagne.
+Ne rediges PAS le message de campagne. N'invente AUCUN chiffre : si tu cites un montant, utilise uniquement ceux deja fournis dans les donnees.`;
+
+export interface RecommendCampaignParams {
+  opportunities: {
+    segmentCode: string;
+    segmentLabel: string;
+    clientCount: number;
+    potentialRevenueFcfa: number | null;
+  }[];
+  funnel: {
+    responseRate: number | null;
+    conversionRate: number | null;
+  };
+}
+
+export interface CampaignRecommendation {
+  segmentCode: string;
+  templateId: string;
+  reasoning: string;
+  bestTiming: string;
+}
+
+function parseRecommendation(raw: string, validSegmentCodes: string[]): CampaignRecommendation {
+  let parsed: unknown;
+  try {
+    const cleaned = raw.trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/, "");
+    parsed = JSON.parse(cleaned);
+  } catch {
+    throw new Error("Réponse IA invalide (format inattendu). Réessayez.");
+  }
+
+  const obj = (parsed && typeof parsed === "object" ? parsed : {}) as Record<string, unknown>;
+  const segmentCode = typeof obj.segment_code === "string" ? obj.segment_code : "";
+  const templateId = typeof obj.template_id === "string" ? obj.template_id : "";
+  const reasoning = typeof obj.reasoning === "string" ? obj.reasoning.trim() : "";
+  const bestTiming = typeof obj.best_timing === "string" ? obj.best_timing.trim() : "";
+
+  if (!validSegmentCodes.includes(segmentCode)) {
+    throw new Error("Réponse IA invalide (segment inconnu). Réessayez.");
+  }
+  if (!OFFER_CATALOG.some((o) => o.id === templateId)) {
+    throw new Error("Réponse IA invalide (offre inconnue). Réessayez.");
+  }
+  if (!reasoning || !bestTiming) {
+    throw new Error("Réponse IA invalide (champs manquants). Réessayez.");
+  }
+
+  return { segmentCode, templateId, reasoning, bestTiming };
+}
+
+/**
+ * Recommande UNE action commerciale prioritaire (segment + offre + moment)
+ * parmi les opportunités déjà calculées (src/sdk/opportunities.ts) et la
+ * performance réelle mesurée (src/sdk/funnel.ts). L'IA ne fait que choisir
+ * et justifier — elle ne calcule ni n'invente aucun chiffre de revenu.
+ */
+export async function recommendCampaign(params: RecommendCampaignParams): Promise<CampaignRecommendation> {
+  const validSegmentCodes = params.opportunities.map((o) => o.segmentCode);
+
+  const promptLines = [
+    "Opportunités actuelles (données réelles) :",
+    ...params.opportunities.map(
+      (o) =>
+        `- ${o.segmentCode} (${o.segmentLabel}) : ${o.clientCount} clients, revenu potentiel ${
+          o.potentialRevenueFcfa != null ? `${o.potentialRevenueFcfa} FCFA` : "non calculable (pas assez d'historique)"
+        }`
+    ),
+    "",
+    "Performance mesurée sur les 30 derniers jours :",
+    `- Taux de réponse : ${
+      params.funnel.responseRate != null ? `${Math.round(params.funnel.responseRate * 100)}%` : "pas encore mesuré"
+    }`,
+    `- Taux de conversion : ${
+      params.funnel.conversionRate != null ? `${Math.round(params.funnel.conversionRate * 100)}%` : "pas encore mesuré"
+    }`,
+  ];
+
+  const { content } = await callEdgeFunction<GenerateResponse>("ai-generate", {
+    method: "POST",
+    body: {
+      prompt: promptLines.join("\n"),
+      system: RECOMMENDATION_SYSTEM_PROMPT,
+      promptName: "campaign_recommendation",
+      model: "anthropic/claude-haiku-4-5",
+      maxTokens: 300,
+      temperature: 0.4,
+    },
+  });
+
+  return parseRecommendation(content, validSegmentCodes);
+}
+
 // Export as namespace
 export const ai = {
   generate,
   generateCampaignMessage,
   generateLinkedInPost,
+  recommendCampaign,
 };

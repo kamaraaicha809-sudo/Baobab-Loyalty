@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
-import { clients, type ImportClientRow } from "@/src/sdk/clients";
+import { clients, MAX_CSV_FILE_SIZE_BYTES, type ImportClientRow, type ImportPreview } from "@/src/sdk/clients";
 import { whatsapp } from "@/src/sdk/whatsapp";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/demo";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
@@ -100,6 +100,9 @@ export default function ConfigurationPage() {
   const [importing, setImporting] = useState(false);
   const [importStatus, setImportStatus] = useState<string>("");
   const [failedImportRows, setFailedImportRows] = useState<ImportClientRow[]>([]);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [csvPreview, setCsvPreview] = useState<ImportPreview | null>(null);
+  const [pendingRows, setPendingRows] = useState<ImportClientRow[] | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({ "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>({ connected: false });
@@ -346,35 +349,68 @@ export default function ConfigurationPage() {
     }
   };
 
-  const handleImportCSV = async (e: React.FormEvent) => {
+  // Étape 1 : lit et analyse le fichier (aucune écriture en base) pour
+  // afficher une synthèse — doublons internes, numéros invalides, lignes
+  // rejetées — avant que l'hôtelier confirme l'import.
+  const handleAnalyzeCSV = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!csvFile || !profileId) return;
-    if (isDemoMode) {
-      toast.success("Import simulé en mode démo");
-      setCounts((c) => ({ ...c, tous: c.tous + 50, "3-6mois": c["3-6mois"] + 20, "6-9mois": c["6-9mois"] + 15, "9-12mois": c["9-12mois"] + 10, "1an+": c["1an+"] + 5 }));
-      setCsvFile(null);
+    if (!csvFile) return;
+    // La lecture/analyse (parseClientsCSV, previewImport) ne touche jamais
+    // la base — elle fonctionne à l'identique en mode démo, sur le vrai
+    // fichier importé. Seule la confirmation (handleConfirmImport) est
+    // simulée en démo.
+    if (!isDemoMode && !profileId) return;
+
+    if (csvFile.size > MAX_CSV_FILE_SIZE_BYTES) {
+      toast.error(
+        `Fichier trop volumineux (${(csvFile.size / (1024 * 1024)).toFixed(1)} Mo). La taille maximale est de ${MAX_CSV_FILE_SIZE_BYTES / (1024 * 1024)} Mo.`
+      );
       return;
     }
 
-    setImporting(true);
-    setImportStatus("Lecture du fichier CSV...");
+    setAnalyzing(true);
     setFailedImportRows([]);
+    setCsvPreview(null);
     try {
-      const text = await csvFile.text();
+      const text = await clients.readCsvFileSmart(csvFile);
       const rows = clients.parseClientsCSV(text);
       if (rows.length === 0) {
         toast.error("Aucune ligne valide trouvée. Vérifiez le format CSV.");
-        setImporting(false);
-        setImportStatus("");
         return;
       }
-      setImportStatus(`Importation de ${rows.length} client(s) détecté(s)...`);
-      const { inserted, errors, warnings, failedRows } = await clients.importClients(profileId, rows);
+      setPendingRows(rows);
+      setCsvPreview(clients.previewImport(rows));
+    } catch {
+      toast.error("Erreur lors de la lecture du fichier");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  // Étape 2 : écriture réelle, seulement après confirmation de l'hôtelier
+  // sur la synthèse affichée par handleAnalyzeCSV.
+  const handleConfirmImport = async () => {
+    if (!pendingRows || !csvPreview) return;
+
+    if (isDemoMode) {
+      toast.success(`${csvPreview.validRows} client(s) importé(s) (simulé en mode démo)`);
+      setCounts((c) => ({ ...c, tous: c.tous + 50, "3-6mois": c["3-6mois"] + 20, "6-9mois": c["6-9mois"] + 15, "9-12mois": c["9-12mois"] + 10, "1an+": c["1an+"] + 5 }));
+      setCsvFile(null);
+      setCsvPreview(null);
+      setPendingRows(null);
+      return;
+    }
+    if (!profileId) return;
+
+    setImporting(true);
+    setImportStatus(`Importation de ${pendingRows.length} client(s)...`);
+    try {
+      const { inserted, errors, warnings, failedRows } = await clients.importClients(profileId, pendingRows);
       setFailedImportRows(failedRows);
       if (inserted > 0) {
         toast.success(`${inserted} client(s) importé(s)`);
         if (errors.length > 0) toast.error(`${errors.length} ligne(s) en échec — téléchargez-les pour les corriger et réessayer`);
-        if (warnings.length > 0) toast.error(`${warnings.length} numéro(s) sans indicatif pays détecté(s)`);
+        if (warnings.length > 0) toast.error(`${warnings.length} avertissement(s) — vérifiez les numéros et doublons signalés`);
         setImportStatus(`${inserted} client(s) importé(s) avec succès`);
         const seg = await clients.getSegmentCounts(profileId);
         setCounts(seg);
@@ -383,6 +419,8 @@ export default function ConfigurationPage() {
         setImportStatus("");
       }
       setCsvFile(null);
+      setCsvPreview(null);
+      setPendingRows(null);
     } catch {
       toast.error("Erreur lors de l'import");
       setImportStatus("");
@@ -391,14 +429,33 @@ export default function ConfigurationPage() {
     }
   };
 
+  const handleCancelImportPreview = () => {
+    setCsvPreview(null);
+    setPendingRows(null);
+    setCsvFile(null);
+  };
+
   const handleDownloadFailedRows = () => {
     if (failedImportRows.length === 0) return;
-    const header = "nom,email,telephone,whatsapp,derniere_visite";
+    const header = "nom,email,telephone,whatsapp,derniere_visite,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
     const lines = failedImportRows.map((r) =>
-      [r.nom, r.email || "", r.telephone || "", r.whatsapp || "", r.derniere_visite].join(",")
+      [
+        r.nom,
+        r.email || "",
+        r.telephone || "",
+        r.whatsapp || "",
+        r.derniere_visite,
+        r.nombre_reservations ?? "",
+        r.montant_total_depense ?? "",
+        r.type_chambre_preferee || "",
+        r.saison_habituelle || "",
+      ].join(",")
     );
     const csv = [header, ...lines].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    // BOM UTF-8 en tête : sans lui, Excel sous Windows rouvre ce fichier en
+    // Windows-1252 par defaut et casse a nouveau les accents des noms —
+    // exactement le probleme que readCsvFileSmart corrige a la lecture.
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -848,31 +905,109 @@ export default function ConfigurationPage() {
           <Icons.Users />
           Base de données clients
         </h2>
-        <p className="text-slate-600 text-sm mb-4">
+        <p className="text-slate-600 text-sm mb-1">
           Importez votre liste clients (CSV) avec les colonnes : <strong>nom</strong>, <strong>email</strong>, <strong>téléphone</strong>, <strong>dernière visite</strong> (format JJ/MM/AAAA ou AAAA-MM-JJ).
         </p>
-        <form onSubmit={handleImportCSV} className="flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <input
-              type="file"
-              accept=".csv,.txt"
-              onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-              className="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary/20 file:text-slate-900 file:font-medium"
-            />
+        <p className="text-slate-500 text-xs mb-4">
+          Colonnes optionnelles pour affiner vos segments : <strong>nombre_reservations</strong>, <strong>montant_total_depense</strong>, <strong>type_chambre_preferee</strong>, <strong>saison_habituelle</strong>. Taille maximale : {MAX_CSV_FILE_SIZE_BYTES / (1024 * 1024)} Mo. Les fichiers Excel accentués (Windows ou Mac) sont pris en charge automatiquement.
+        </p>
+        {!csvPreview && (
+          <form onSubmit={handleAnalyzeCSV} className="flex flex-wrap items-end gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <input
+                type="file"
+                accept=".csv,.txt"
+                onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary/20 file:text-slate-900 file:font-medium"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!csvFile || analyzing}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {analyzing ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Analyse en cours…
+                </>
+              ) : "Analyser le fichier"}
+            </button>
+          </form>
+        )}
+
+        {/* Synthèse pré-import : doublons internes, numéros invalides, lignes
+            rejetées — affichée avant toute écriture en base, pour que
+            l'hôtelier confirme en connaissance de cause plutôt que de
+            découvrir les problèmes après coup. */}
+        {csvPreview && (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="font-medium text-slate-900 mb-3">
+              {csvPreview.totalRows} ligne(s) trouvée(s) dans le fichier — voici ce qui sera importé :
+            </p>
+            <ul className="space-y-1.5 text-sm text-slate-700 mb-4">
+              <li className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                {csvPreview.validRows} client(s) prêt(s) à être importés
+              </li>
+              {csvPreview.invalidRows > 0 && (
+                <li className="flex items-center gap-2 text-amber-700">
+                  <span className="w-4 h-4 shrink-0 text-center">!</span>
+                  {csvPreview.invalidRows} ligne(s) rejetée(s) (nom ou date de dernière visite manquant)
+                </li>
+              )}
+              {csvPreview.duplicatesInFile > 0 && (
+                <li className="flex items-center gap-2 text-amber-700">
+                  <span className="w-4 h-4 shrink-0 text-center">!</span>
+                  {csvPreview.duplicatesInFile} doublon(s) interne(s) au fichier (même téléphone) — seront fusionnés
+                </li>
+              )}
+              {csvPreview.possibleNameDuplicates > 0 && (
+                <li className="flex items-center gap-2 text-amber-700">
+                  <span className="w-4 h-4 shrink-0 text-center">!</span>
+                  {csvPreview.possibleNameDuplicates} nom(s) en double avec des numéros différents — à vérifier
+                </li>
+              )}
+              {csvPreview.missingCountryCode > 0 && (
+                <li className="flex items-center gap-2 text-amber-700">
+                  <span className="w-4 h-4 shrink-0 text-center">!</span>
+                  {csvPreview.missingCountryCode} numéro(s) sans indicatif pays (ex: +221)
+                </li>
+              )}
+              {csvPreview.invalidPhoneFormat > 0 && (
+                <li className="flex items-center gap-2 text-amber-700">
+                  <span className="w-4 h-4 shrink-0 text-center">!</span>
+                  {csvPreview.invalidPhoneFormat} numéro(s) au format invalide
+                </li>
+              )}
+            </ul>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleConfirmImport}
+                disabled={importing || csvPreview.validRows === 0}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {importing ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Import en cours…
+                  </>
+                ) : `Confirmer l'import de ${csvPreview.validRows} client(s)`}
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelImportPreview}
+                disabled={importing}
+                className="text-sm font-medium text-slate-500 hover:text-slate-700"
+              >
+                Annuler
+              </button>
+            </div>
           </div>
-          <button
-            type="submit"
-            disabled={!csvFile || importing}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {importing ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Import en cours…
-              </>
-            ) : "Importer"}
-          </button>
-        </form>
+        )}
         {/* M2 — Feedback progression import */}
         {importStatus && (
           <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -23,8 +23,25 @@ function OffreContent() {
   const [step, setStep] = useState<Step>("offre");
   const [checkinDate, setCheckinDate] = useState(getTomorrow());
   const [nights, setNights] = useState(2);
+  const clickTracked = useRef(false);
 
   const messageText = `Cher {nom}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : "${avantage}"`;
+
+  // Suivi du clic (best effort, non bloquant) : alimente le taux de réponse
+  // du dashboard. Ne fonctionne que si le lien porte le numéro du client
+  // (paramètre "tel") — dépend de la configuration du bouton du template
+  // WhatsApp côté Meta, hors de portée de ce code.
+  useEffect(() => {
+    if (clickTracked.current || !profileId || !clientPhone) return;
+    clickTracked.current = true;
+    fetch("/api/offre/track-click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profile_id: profileId, client_phone: clientPhone }),
+    }).catch(() => {
+      // Suivi non bloquant : un échec ne doit jamais gêner le client
+    });
+  }, [profileId, clientPhone]);
 
   const handleReserver = () => {
     setStep("date-form");

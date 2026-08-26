@@ -3,9 +3,33 @@
 import { useState, Suspense, useEffect, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
-import { clients } from "@/src/sdk/clients";
+import { isDemoMode, demoSegmentCounts, demoClients } from "@/src/lib/demo";
+import { clients, Client, SegmentFilters, matchesAdvancedFilters } from "@/src/sdk/clients";
 import { createClient } from "@/libs/supabase/client";
+
+function matchesSegmentDateRange(client: Client, segmentId: string): boolean {
+  if (segmentId === "tous") return true;
+  const now = Date.now();
+  const days = (now - new Date(client.derniere_visite).getTime()) / (1000 * 60 * 60 * 24);
+  if (segmentId === "3-6mois") return days >= 90 && days < 180;
+  if (segmentId === "6-9mois") return days >= 180 && days < 270;
+  if (segmentId === "9-12mois") return days >= 270 && days < 365;
+  if (segmentId === "1an+") return days >= 365;
+  return true;
+}
+
+// demoClients (src/lib/demo.ts) est partagé par d'autres pages et n'a pas les
+// colonnes P5 : on les complète ici avec des valeurs déterministes plutôt que
+// d'ajouter ces champs à l'export partagé et risquer de casser son usage
+// ailleurs.
+const DEMO_CLIENTS_WITH_CRITERIA: Client[] = demoClients.map((c, i) => ({
+  ...c,
+  profile_id: "demo-user-id",
+  nombre_reservations: (i % 4) + 1,
+  montant_total_depense: ((i % 4) + 1) * 35000,
+  type_chambre_preferee: i % 2 === 0 ? "Suite" : "Standard",
+  saison_habituelle: i % 3 === 0 ? "Haute saison" : "Basse saison",
+}));
 
 const SEGMENT_NAMES: Record<string, string> = {
   "3-6mois":  "Clients 3 à 6 mois",
@@ -33,7 +57,20 @@ function ConfirmContent() {
   const avantage = searchParams.get("avantage") || "";
   const aiMessage = searchParams.get("message") || "";
 
+  const filters: SegmentFilters = {
+    minMontantDepense: searchParams.get("montantMin") ? Number(searchParams.get("montantMin")) : undefined,
+    minNombreReservations: searchParams.get("reservationsMin") ? Number(searchParams.get("reservationsMin")) : undefined,
+    typeChambreContains: searchParams.get("typeChambre") || undefined,
+    saisonContains: searchParams.get("saison") || undefined,
+  };
+  const hasActiveFilters =
+    filters.minMontantDepense != null ||
+    filters.minNombreReservations != null ||
+    !!filters.typeChambreContains ||
+    !!filters.saisonContains;
+
   const [counts, setCounts] = useState<Record<string, number>>(demoSegmentCounts);
+  const [filteredCount, setFilteredCount] = useState<number | null>(null);
   const [sending, setSending] = useState(false);
   const [campaignImage, setCampaignImage] = useState<string | null>(null);
 
@@ -46,6 +83,12 @@ function ConfirmContent() {
     const load = async () => {
       if (isDemoMode) {
         setCounts(demoSegmentCounts);
+        if (hasActiveFilters) {
+          const filtered = DEMO_CLIENTS_WITH_CRITERIA
+            .filter((c) => matchesSegmentDateRange(c, segmentId))
+            .filter((c) => matchesAdvancedFilters(c, filters));
+          setFilteredCount(filtered.length);
+        }
         return;
       }
       const supabase = createClient();
@@ -57,19 +100,43 @@ function ConfirmContent() {
       } catch {
         setCounts(demoSegmentCounts);
       }
+      // Le RPC get_segment_counts ne connait pas les filtres combinables
+      // (P5) : quand au moins un est actif, on recharge la liste complète
+      // pour recalculer un nombre de destinataires exact côté client.
+      if (hasActiveFilters) {
+        try {
+          const list = await clients.getClients(user.id);
+          const filtered = list
+            .filter((c) => matchesSegmentDateRange(c, segmentId))
+            .filter((c) => matchesAdvancedFilters(c, filters));
+          setFilteredCount(filtered.length);
+        } catch {
+          setFilteredCount(0);
+        }
+      }
     };
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [segmentId, hasActiveFilters]);
 
   const segmentName = SEGMENT_NAMES[segmentId] || segmentId;
   const offerName = feteName ? `${TEMPLATE_NAMES[templateId] || templateId} - ${feteName}` : (TEMPLATE_NAMES[templateId] || templateId);
-  const clientCount = counts[segmentId] ?? 0;
+  const clientCount = hasActiveFilters ? (filteredCount ?? 0) : (counts[segmentId] ?? 0);
+  const stillLoadingFilteredCount = hasActiveFilters && filteredCount === null;
+
+  const filterQueryParams: [string, string | undefined][] = [
+    ["montantMin", searchParams.get("montantMin") || undefined],
+    ["reservationsMin", searchParams.get("reservationsMin") || undefined],
+    ["typeChambre", searchParams.get("typeChambre") || undefined],
+    ["saison", searchParams.get("saison") || undefined],
+  ];
 
   const templatesParams = new URLSearchParams({ segment: segmentId });
   if (templateId) templatesParams.set("template", templateId);
   if (avantage) templatesParams.set("avantage", avantage);
   if (feteName) templatesParams.set("fete", feteName);
   if (aiMessage) templatesParams.set("message", aiMessage);
+  for (const [key, value] of filterQueryParams) if (value) templatesParams.set(key, value);
   const templatesUrl = `/dashboard/templates?${templatesParams.toString()}`;
 
   const handleConfirmerEnvoi = () => {
@@ -81,6 +148,7 @@ function ConfirmContent() {
     if (avantage) params.set("avantage", avantage);
     if (feteName) params.set("fete", feteName);
     if (aiMessage) params.set("message", aiMessage);
+    for (const [key, value] of filterQueryParams) if (value) params.set(key, value);
     router.push(`/dashboard/campaign/sending?${params.toString()}`);
   };
 
@@ -110,11 +178,18 @@ function ConfirmContent() {
           </h1>
           <p className="text-slate-600 text-base">
             Votre campagne est configurée. Nous allons envoyer ce message à{" "}
-            <strong className="text-slate-900">{clientCount} clients</strong> via WhatsApp.
+            <strong className="text-slate-900">
+              {stillLoadingFilteredCount ? "…" : clientCount} client{clientCount > 1 ? "s" : ""}
+            </strong> via WhatsApp.
           </p>
-          {clientCount === 0 && (
+          {hasActiveFilters && (
+            <p className="mt-2 text-xs text-slate-400">
+              Filtres combinables appliqués en plus du segment.
+            </p>
+          )}
+          {!stillLoadingFilteredCount && clientCount === 0 && (
             <p className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
-              Ce segment ne contient aucun client pour le moment. L&apos;envoi est désactivé pour ne pas consommer un quota de campagne inutilement.
+              Aucun client ne correspond à ce segment{hasActiveFilters ? " et à ces filtres" : ""}. L&apos;envoi est désactivé pour ne pas consommer un quota de campagne inutilement.
             </p>
           )}
         </div>
@@ -177,7 +252,7 @@ function ConfirmContent() {
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button
             onClick={handleConfirmerEnvoi}
-            disabled={sending || clientCount === 0}
+            disabled={sending || stillLoadingFilteredCount || clientCount === 0}
             className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {sending ? (

@@ -2,24 +2,54 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { user, billing } from "@/src/sdk";
-import { reservations } from "@/src/sdk/reservations";
+import { user } from "@/src/sdk";
+import { reservations, type RevenueGenerated } from "@/src/sdk/reservations";
+import { campaigns as campaignsSdk, type RecentCampaign } from "@/src/sdk/campaigns";
+import { funnel, type CampaignFunnelStats } from "@/src/sdk/funnel";
+import { opportunities as opportunitiesSdk, type RevenueOpportunity } from "@/src/sdk/opportunities";
+import { ai, OFFER_TEMPLATE_NAMES, type CampaignRecommendation } from "@/src/sdk/ai";
 import config from "@/config";
-import { isDemoMode, demoUser, demoChartData, demoFlux, demoCampagnesSummary, demoMetrics } from "@/src/lib/demo";
+import { isDemoMode, demoUser, demoChartData, demoFlux, demoCampagnesSummary, demoOpportunities, demoRecommendation, demoMetrics } from "@/src/lib/demo";
+import { Icons } from "@/components/common/Icons";
+import toast from "react-hot-toast";
+
+const SEGMENT_LABELS: Record<string, string> = {
+  "3-6mois": "Clients 3 à 6 mois",
+  "6-9mois": "Clients 6 à 9 mois",
+  "9-12mois": "Clients 9 à 12 mois",
+  "1an+": "Plus d'un an",
+  tous: "Tous les clients",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  draft: "Brouillon",
+  sending: "En cours",
+  completed: "Terminée",
+  completed_with_errors: "Terminée (erreurs)",
+  failed: "Échouée",
+};
+
+function formatPercent(rate: number | null): string {
+  if (rate === null) return "—";
+  return `${Math.round(rate * 100)}%`;
+}
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 
 const maxChartFromData = (data: { directes: number; autres: number }[]) =>
   Math.max(1, ...data.flatMap((d) => d.directes + d.autres));
 
 export default function Dashboard() {
-  const router = useRouter();
   const [profile, setProfile] = useState<{ id?: string; email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [portalLoading, setPortalLoading] = useState(false);
   const [chartData, setChartData] = useState(demoChartData);
   const [impactCount, setImpactCount] = useState<number>(0);
   const [totalFromApp, setTotalFromApp] = useState<number>(12);
+  const [revenue, setRevenue] = useState<RevenueGenerated | null>(null);
+  const [recentCampaigns, setRecentCampaigns] = useState<RecentCampaign[] | null>(null);
+  const [funnelStats, setFunnelStats] = useState<CampaignFunnelStats | null>(null);
+  const [revenueOpportunities, setRevenueOpportunities] = useState<RevenueOpportunity[] | null>(null);
+  const [recommendation, setRecommendation] = useState<CampaignRecommendation | null>(null);
+  const [recoLoading, setRecoLoading] = useState(false);
 
   const displayName = isDemoMode
     ? demoUser.user_metadata.full_name
@@ -42,15 +72,29 @@ export default function Dashboard() {
         setProfile(data);
         if (data?.id) {
           try {
-            const [chart, todayCount, fromAppCount] = await Promise.all([
+            const [chart, todayCount, fromAppCount, revenueGenerated, campaignsRecent, funnelData] = await Promise.all([
               reservations.getReservationsChart(data.id),
               reservations.getReservationsTodayCount(data.id),
               reservations.getReservationsFromAppCount(data.id),
+              reservations.getRevenueGenerated(data.id),
+              campaignsSdk.listRecentCampaigns(data.id),
+              funnel.getCampaignFunnelStats(data.id),
             ]);
             const hasData = chart.some((d) => d.directes > 0 || d.autres > 0);
             if (hasData) setChartData(chart);
             setImpactCount(todayCount);
             setTotalFromApp(fromAppCount);
+            setRevenue(revenueGenerated);
+            setRecentCampaigns(campaignsRecent);
+            setFunnelStats(funnelData);
+            try {
+              // Dépend du taux de conversion du funnel ci-dessus : ne peut pas
+              // être calculé dans le même Promise.all.
+              const opportunitiesData = await opportunitiesSdk.getRevenueOpportunities(data.id, funnelData.conversionRate);
+              setRevenueOpportunities(opportunitiesData);
+            } catch {
+              setRevenueOpportunities([]);
+            }
           } catch {
             setImpactCount(0);
             setTotalFromApp(0);
@@ -107,21 +151,38 @@ export default function Dashboard() {
     };
   }, [profile?.id]);
 
-  const handleManageSubscription = async () => {
-    if (isDemoMode) {
-      router.push("/dashboard");
-      return;
-    }
-    setPortalLoading(true);
+  async function handleAskRecommendation() {
+    const opps = isDemoMode ? demoOpportunities : revenueOpportunities ?? [];
+    if (opps.length === 0) return;
+
+    setRecoLoading(true);
     try {
-      const { url } = await billing.createPortal({ returnUrl: window.location.href });
-      window.location.href = url;
-    } catch {
-      router.push("/dashboard");
+      if (isDemoMode) {
+        // Aucun appel réel à l'IA en mode démo (voir ai-generate) — la
+        // simulation renvoie du texte, pas le JSON attendu ici.
+        await new Promise((r) => setTimeout(r, 700));
+        setRecommendation(demoRecommendation);
+        return;
+      }
+      const reco = await ai.recommendCampaign({
+        opportunities: opps.map((o) => ({
+          segmentCode: o.segmentCode,
+          segmentLabel: o.segmentLabel,
+          clientCount: o.clientCount,
+          potentialRevenueFcfa: o.potentialRevenueFcfa,
+        })),
+        funnel: {
+          responseRate: funnelStats?.responseRate ?? null,
+          conversionRate: funnelStats?.conversionRate ?? null,
+        },
+      });
+      setRecommendation(reco);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Recommandation IA indisponible. Réessayez.");
     } finally {
-      setPortalLoading(false);
+      setRecoLoading(false);
     }
-  };
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -171,7 +232,13 @@ export default function Dashboard() {
           <div className="flex items-end justify-end mb-3">
             <span className="text-xs text-slate-400">Derniers 3 jours</span>
           </div>
-          <p className="text-3xl font-bold text-slate-900">{isDemoMode ? demoMetrics.revenueFormatted : "120 000"} FCFA</p>
+          {isDemoMode ? (
+            <p className="text-3xl font-bold text-slate-900">{demoMetrics.revenueFormatted} FCFA</p>
+          ) : revenue?.hasConfirmedRevenueEver ? (
+            <p className="text-3xl font-bold text-slate-900">{revenue.total.toLocaleString("fr-FR")} FCFA</p>
+          ) : (
+            <p className="text-xl font-semibold text-slate-400">Bientôt disponible</p>
+          )}
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mt-0.5">
             Généré via {config.appName}
           </p>
@@ -196,6 +263,101 @@ export default function Dashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
           </Link>
+        </div>
+      )}
+
+      {/* Opportunités de revenus — croise segments et historique réel pour proposer des relances concrètes */}
+      {(isDemoMode ? demoOpportunities : revenueOpportunities ?? []).length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6">
+          <h2 className="font-bold text-base text-slate-900 mb-1">Opportunités de revenus</h2>
+          <p className="text-xs text-slate-400 mb-4">
+            Segments de clients inactifs à fort potentiel, calculés à partir de vos données réelles.
+          </p>
+          <div className="space-y-3">
+            {(isDemoMode ? demoOpportunities : revenueOpportunities ?? []).map((opp) => (
+              <div
+                key={opp.segmentCode}
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-slate-100 bg-slate-50"
+              >
+                <div className="flex items-start gap-3 min-w-0">
+                  <span className="text-[var(--color-primary)] shrink-0 mt-0.5 w-5 h-5">
+                    <Icons.Target />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-900">
+                      {opp.clientCount} {opp.segmentLabel}
+                    </p>
+                    {opp.potentialRevenueFcfa !== null ? (
+                      <p className="text-sm text-slate-600 mt-0.5">
+                        Revenu potentiel estimé :{" "}
+                        <span className="font-semibold text-green-600">
+                          {opp.potentialRevenueFcfa.toLocaleString("fr-FR")} FCFA
+                        </span>
+                      </p>
+                    ) : (
+                      <p className="text-sm text-slate-400 mt-0.5">
+                        Revenu potentiel disponible après votre première campagne
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Link
+                  href={opp.ctaHref}
+                  className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
+                >
+                  Lancer la campagne
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Recommandation IA : choisit un segment + une offre + un moment
+              parmi les opportunités ci-dessus. Générée à la demande (pas au
+              chargement) pour ne pas consommer inutilement le quota IA. */}
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            {!recommendation ? (
+              <button
+                onClick={handleAskRecommendation}
+                disabled={recoLoading}
+                className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-primary)] text-[var(--color-primary)] text-sm font-semibold rounded-lg hover:bg-[var(--color-primary)]/5 transition-colors disabled:opacity-50"
+              >
+                <span className="w-4 h-4">
+                  <Icons.Sparkles />
+                </span>
+                {recoLoading ? "Analyse en cours…" : "Demander une recommandation IA"}
+              </button>
+            ) : (
+              <div className="p-4 rounded-lg border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
+                <div className="flex items-start gap-3">
+                  <span className="text-[var(--color-primary)] shrink-0 mt-0.5 w-5 h-5">
+                    <Icons.Sparkles />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-slate-900">
+                      Recommandation : {SEGMENT_LABELS[recommendation.segmentCode] || recommendation.segmentCode} avec{" "}
+                      {OFFER_TEMPLATE_NAMES[recommendation.templateId] || recommendation.templateId}
+                    </p>
+                    <p className="text-sm text-slate-600 mt-1">{recommendation.reasoning}</p>
+                    <p className="text-sm text-slate-500 mt-1">Meilleur moment : {recommendation.bestTiming}</p>
+                    <div className="flex flex-wrap items-center gap-3 mt-3">
+                      <Link
+                        href={`/dashboard/templates?segment=${recommendation.segmentCode}&template=${recommendation.templateId}`}
+                        className="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
+                      >
+                        Lancer cette campagne
+                      </Link>
+                      <button
+                        onClick={() => setRecommendation(null)}
+                        className="text-xs font-medium text-slate-500 hover:text-slate-700 underline"
+                      >
+                        Redemander
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -262,27 +424,81 @@ export default function Dashboard() {
                     <th className="pb-3 pr-4 font-medium">SEGMENT</th>
                     <th className="pb-3 pr-4 font-medium">OFFRE</th>
                     <th className="pb-3 pr-4 font-medium">RÉSULTATS</th>
+                    <th className="pb-3 pr-4 font-medium">CA GÉNÉRÉ</th>
                     <th className="pb-3 font-medium">STATUT</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {demoCampagnesSummary.map((c, i) => (
-                    <tr key={i} className="border-b border-slate-50">
-                      <td className="py-3 pr-4 text-slate-600">{c.date}</td>
-                      <td className="py-3 pr-4 text-slate-600">{c.segment}</td>
-                      <td className="py-3 pr-4 text-slate-600">{c.offre}</td>
-                      <td className="py-3 pr-4 text-green-600 font-medium">{c.resultats}</td>
-                      <td className="py-3">
-                        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
-                          {c.statut}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {isDemoMode
+                    ? demoCampagnesSummary.map((c, i) => (
+                        <tr key={i} className="border-b border-slate-50">
+                          <td className="py-3 pr-4 text-slate-600">{c.date}</td>
+                          <td className="py-3 pr-4 text-slate-600">{c.segment}</td>
+                          <td className="py-3 pr-4 text-slate-600">{c.offre}</td>
+                          <td className="py-3 pr-4 text-green-600 font-medium">{c.resultats}</td>
+                          <td className="py-3 pr-4 text-slate-900 font-medium">{c.ca}</td>
+                          <td className="py-3">
+                            <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                              {c.statut}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    : (recentCampaigns ?? []).map((c) => (
+                        <tr key={c.id} className="border-b border-slate-50">
+                          <td className="py-3 pr-4 text-slate-600">
+                            {new Date(c.started_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                          </td>
+                          <td className="py-3 pr-4 text-slate-600">{SEGMENT_LABELS[c.segment_code] || c.segment_code}</td>
+                          <td className="py-3 pr-4 text-slate-600">{c.name || "—"}</td>
+                          <td className="py-3 pr-4 text-green-600 font-medium">
+                            {c.bookedCount} résa{c.bookedCount > 1 ? "s" : ""} / {c.recipient_count} envoyés
+                          </td>
+                          <td className="py-3 pr-4 text-slate-900 font-medium">
+                            {c.revenueFcfa > 0 ? `${c.revenueFcfa.toLocaleString("fr-FR")} FCFA` : "—"}
+                          </td>
+                          <td className="py-3">
+                            <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                              {STATUS_LABELS[c.status] || c.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
+              {!isDemoMode && (recentCampaigns ?? []).length === 0 && (
+                <p className="text-sm text-slate-400 text-center py-6">Aucune campagne envoyée pour le moment.</p>
+              )}
             </div>
           </div>
+
+          {/* Performance réelle (taux de réponse/conversion, nuits, ROI) */}
+          {!isDemoMode && funnelStats && (
+            <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-200">
+              <h2 className="font-bold text-base text-slate-900 mb-1">Performance des 30 derniers jours</h2>
+              <p className="text-xs text-slate-400 mb-4">Calculée à partir des messages et réservations réels.</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{formatPercent(funnelStats.responseRate)}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Taux de réponse</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{formatPercent(funnelStats.conversionRate)}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Taux de conversion</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{funnelStats.nightsRecovered}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Nuits récupérées</p>
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${funnelStats.roiFcfa !== null && funnelStats.roiFcfa >= 0 ? "text-green-600" : "text-slate-900"}`}>
+                    {funnelStats.roiFcfa !== null ? `${funnelStats.roiFcfa.toLocaleString("fr-FR")} FCFA` : "—"}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">ROI (CA − abonnement)</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Colonne droite - 1/3 */}
