@@ -6,9 +6,9 @@ import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
-import { clients, MAX_CSV_FILE_SIZE_BYTES, type ImportClientRow, type ImportPreview } from "@/src/sdk/clients";
+import { clients, MAX_CSV_FILE_SIZE_BYTES, type Client, type ImportClientRow, type ImportPreview } from "@/src/sdk/clients";
 import { whatsapp } from "@/src/sdk/whatsapp";
-import { isDemoMode, demoUser, demoProfile, demoSegmentCounts } from "@/src/lib/demo";
+import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
 
 const SEGMENT_LABELS: Record<string, string> = {
@@ -109,6 +109,7 @@ export default function ConfigurationPage() {
   const [isPremium, setIsPremium] = useState(false);
   const [aiSettings, setAiSettings] = useState<AiSettingsForm>(emptyAiSettings);
   const [savingAiSettings, setSavingAiSettings] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const setAiField = (field: keyof AiSettingsForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setAiSettings((s) => ({ ...s, [field]: e.target.value }));
@@ -462,6 +463,48 @@ export default function ConfigurationPage() {
     a.download = "clients-echecs-import.csv";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Sauvegarde : permet à l'hôtelier de conserver une copie de sa base
+  // clients en dehors de Baobab, à tout moment, sans dépendre de nous.
+  // Mêmes colonnes que l'import (buildClientsCSV) : le fichier téléchargé
+  // peut être ré-importé tel quel si besoin.
+  const handleExportClients = async () => {
+    setExporting(true);
+    try {
+      let list: Client[];
+      if (isDemoMode) {
+        list = demoClients.map((c) => ({
+          ...c,
+          profile_id: demoUser.id,
+          nombre_reservations: 0,
+          montant_total_depense: 0,
+          type_chambre_preferee: null,
+          saison_habituelle: null,
+        }));
+      } else {
+        if (!profileId) return;
+        list = await clients.getClients(profileId);
+      }
+      if (list.length === 0) {
+        toast.error("Aucun client à sauvegarder pour le moment.");
+        return;
+      }
+      const csv = clients.buildClientsCSV(list);
+      // BOM UTF-8 en tête pour qu'Excel Windows rouvre le fichier sans casser les accents.
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `baobab-sauvegarde-clients-${new Date().toISOString().split("T")[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`Sauvegarde téléchargée — ${list.length} client(s).`);
+    } catch {
+      toast.error("Erreur lors de la sauvegarde.");
+    } finally {
+      setExporting(false);
+    }
   };
 
   if (loading) {
@@ -1058,6 +1101,42 @@ export default function ConfigurationPage() {
                 <p className="text-xs text-slate-500">{SEGMENT_LABELS[id]}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="mt-0.5 shrink-0 w-8 h-8 rounded-md bg-slate-200 flex items-center justify-center">
+              <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0-3-3m3 3 3-3M3.75 9.776c0-1.578 1.005-2.917 2.412-3.42a4.5 4.5 0 0 1 8.676-1.812 3.75 3.75 0 0 1 4.5 3.664 3.751 3.751 0 0 1-1.464 7.212H5.25a3 3 0 0 1-1.5-5.644Z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-800">Sauvegarde de vos données</p>
+              <p className="text-sm text-slate-500 mt-0.5 mb-3">
+                Téléchargez à tout moment une copie complète de votre base clients — utile pour garder une sauvegarde personnelle, en dehors de {config.appName}, ou pour migrer vers un autre outil.
+              </p>
+              <button
+                type="button"
+                onClick={handleExportClients}
+                disabled={exporting}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {exporting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                    Préparation…
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Télécharger une sauvegarde (CSV)
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </section>

@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Icons } from "@/components/common/Icons";
 import toast from "react-hot-toast";
-import config from "@/config";
 import { linkedin, ai } from "@/src/sdk";
 import { usePremiumAccess } from "@/src/hooks/usePremiumAccess";
 import {
+  isDemoMode,
   demoGeneratedTemplate,
   demoLinkedinPost,
   demoLinkedInPostGenerated,
@@ -157,7 +157,7 @@ function OffresTab({
   );
   const [generatedMessage, setGeneratedMessage] = useState<string | null>(initialMessage);
   const [generating, setGenerating] = useState(false);
-  const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
+  const [hotelName, setHotelName] = useState(isDemoMode ? demoProfile.hotel_name : "");
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [discountPct, setDiscountPct] = useState(50);
   const [eligibleDays, setEligibleDays] = useState<"lun-jeu" | "7jours">("7jours");
@@ -168,7 +168,7 @@ function OffresTab({
   const fetes = selected?.id === "evenements" && "fetes" in selected ? (selected.fetes as Fete[]) : null;
 
   useEffect(() => {
-    if (config.isDemoMode) return;
+    if (isDemoMode) return;
     const loadProfile = async () => {
       try {
         const { createClient } = await import("@/libs/supabase/client");
@@ -253,7 +253,7 @@ function OffresTab({
     setGeneratedMessage(null);
 
     try {
-      if (config.isDemoMode) {
+      if (isDemoMode) {
         await new Promise((r) => setTimeout(r, 1300));
         const hotel = hotelName || "notre hôtel";
         const demoMessages: Record<string, string> = selected.id === "sondage" ? {
@@ -727,11 +727,11 @@ function LinkedInTab() {
   const [saving, setSaving] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState<MessageTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
-  const [profileId, setProfileId] = useState<string | null>(config.isDemoMode ? demoProfile.id : null);
+  const [profileId, setProfileId] = useState<string | null>(isDemoMode ? demoProfile.id : null);
 
   // Charge le vrai profil connecté (hors mode démo)
   useEffect(() => {
-    if (config.isDemoMode) return;
+    if (isDemoMode) return;
     const loadProfileId = async () => {
       try {
         const { createClient } = await import("@/libs/supabase/client");
@@ -747,11 +747,11 @@ function LinkedInTab() {
 
   // Charger les templates sauvegardés
   useEffect(() => {
-    if (!config.isDemoMode && !profileId) return;
+    if (!isDemoMode && !profileId) return;
     const loadTemplates = async () => {
       setLoadingTemplates(true);
       try {
-        if (config.isDemoMode) {
+        if (isDemoMode) {
           setSavedTemplates(demoMessageTemplates as MessageTemplate[]);
         } else {
           const templates = await linkedin.getTemplates(profileId!);
@@ -783,7 +783,7 @@ function LinkedInTab() {
     setVariablesFound([]);
 
     try {
-      if (config.isDemoMode) {
+      if (isDemoMode) {
         // Simulation en mode démo
         await new Promise((r) => setTimeout(r, 1200));
         setPostPreview(demoLinkedinPost.preview);
@@ -810,14 +810,14 @@ function LinkedInTab() {
       toast.error("Donnez un nom à votre template avant de sauvegarder.");
       return;
     }
-    if (!config.isDemoMode && !profileId) {
+    if (!isDemoMode && !profileId) {
       toast.error("Profil non chargé, réessayez dans un instant.");
       return;
     }
 
     setSaving(true);
     try {
-      if (config.isDemoMode) {
+      if (isDemoMode) {
         await new Promise((r) => setTimeout(r, 600));
         const newTemplate: MessageTemplate = {
           id: `tpl-${Date.now()}`,
@@ -854,7 +854,7 @@ function LinkedInTab() {
 
   const handleDelete = async (id: string) => {
     try {
-      if (!config.isDemoMode) {
+      if (!isDemoMode) {
         await linkedin.deleteTemplate(id);
       }
       setSavedTemplates((prev) => prev.filter((t) => t.id !== id));
@@ -871,7 +871,7 @@ function LinkedInTab() {
 
   return (
     <div className="space-y-6">
-      {config.isDemoMode && (
+      {isDemoMode && (
         <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
           Mode démo — les appels Unipile et LinkedIn sont simulés.
         </div>
@@ -1105,11 +1105,11 @@ function LinkedInPostTab() {
   const [loading, setLoading] = useState(false);
   const [generatedPost, setGeneratedPost] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [hotelName, setHotelName] = useState(config.isDemoMode ? demoProfile.hotel_name : "");
+  const [hotelName, setHotelName] = useState(isDemoMode ? demoProfile.hotel_name : "");
 
   // Charge le vrai nom d'hôtel connecté (hors mode démo)
   useEffect(() => {
-    if (config.isDemoMode) return;
+    if (isDemoMode) return;
     const loadHotelName = async () => {
       try {
         const { createClient } = await import("@/libs/supabase/client");
@@ -1141,7 +1141,7 @@ function LinkedInPostTab() {
     setGeneratedPost(null);
 
     try {
-      if (config.isDemoMode) {
+      if (isDemoMode) {
         await new Promise((r) => setTimeout(r, 1400));
         setGeneratedPost(demoLinkedInPostGenerated.content);
         toast.success("Post généré avec succès !");
@@ -1172,7 +1172,7 @@ function LinkedInPostTab() {
 
   return (
     <div className="space-y-6">
-      {config.isDemoMode && (
+      {isDemoMode && (
         <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
           Mode démo — la génération est simulée sans appel à l&apos;IA.
         </div>

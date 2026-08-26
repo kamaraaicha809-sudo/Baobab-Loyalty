@@ -429,6 +429,32 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
   return rows;
 }
 
+/**
+ * Construit un CSV de sauvegarde à partir de la base clients complète —
+ * mêmes colonnes que l'import (voir parseClientsCSV), pour qu'un fichier
+ * exporté ici puisse être ré-importé tel quel si besoin. Fonction pure
+ * (aucun accès réseau) : le déclenchement du téléchargement reste côté UI.
+ */
+export function buildClientsCSV(clientsList: Client[]): string {
+  const header = "nom,email,telephone,whatsapp,derniere_visite,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
+  const escape = (v: string): string =>
+    /[,"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  const lines = clientsList.map((c) =>
+    [
+      escape(c.nom || ""),
+      escape(c.email || ""),
+      escape(c.telephone || ""),
+      escape(c.whatsapp || ""),
+      c.derniere_visite || "",
+      c.nombre_reservations ?? "",
+      c.montant_total_depense ?? "",
+      escape(c.type_chambre_preferee || ""),
+      escape(c.saison_habituelle || ""),
+    ].join(",")
+  );
+  return [header, ...lines].join("\n");
+}
+
 function parseDate(input: string): string {
   if (!input || !input.trim()) return new Date().toISOString().split("T")[0];
   const trimmed = input.trim();
@@ -485,4 +511,5 @@ export const clients = {
   parseClientsCSV,
   readCsvFileSmart,
   matchesAdvancedFilters,
+  buildClientsCSV,
 };
