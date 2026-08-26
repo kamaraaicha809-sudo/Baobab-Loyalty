@@ -69,13 +69,6 @@ const DEFAULT_SEGMENTS: SegmentDef[] = [
     icon: "clock",
   },
   {
-    id: "tous",
-    name: "Tous les clients",
-    description: "Idéal pour les événements spéciaux et fêtes",
-    months: null,
-    icon: "users",
-  },
-  {
     id: "vip",
     name: "Clients VIP",
     description: `Ont dépensé au moins ${VIP_MONTANT_MIN_FCFA.toLocaleString("fr-FR")} FCFA au total`,
@@ -98,6 +91,13 @@ const DEFAULT_SEGMENTS: SegmentDef[] = [
     months: null,
     icon: "sparkles",
     maxNombreReservations: NOUVEAU_RESERVATIONS_MAX,
+  },
+  {
+    id: "tous",
+    name: "Tous les clients",
+    description: "Idéal pour les événements spéciaux et fêtes",
+    months: null,
+    icon: "users",
   },
 ];
 
