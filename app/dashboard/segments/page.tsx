@@ -2,6 +2,7 @@
 
 import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
@@ -201,6 +202,7 @@ export default function SegmentsPage() {
   const [listSegment, setListSegment] = useState<SegmentDef | null>(null);
   const [allClients, setAllClients] = useState<Client[] | null>(null);
   const [loadingClients, setLoadingClients] = useState(false);
+  const [updatingConsentId, setUpdatingConsentId] = useState<string | null>(null);
 
   // Filtres combinables (P5) : en plus des segments basés sur la dernière
   // visite, on peut affiner par montant dépensé, nombre de réservations,
@@ -310,6 +312,29 @@ export default function SegmentsPage() {
       }
     } finally {
       setLoadingClients(false);
+    }
+  }
+
+  async function handleToggleConsent(client: Client) {
+    const nextConsent = client.marketing_consent === false;
+    setUpdatingConsentId(client.id);
+    try {
+      if (!isDemoMode) {
+        await clientsSDK.setMarketingConsent(client.id, nextConsent);
+      }
+      setAllClients((prev) =>
+        prev
+          ? prev.map((c) =>
+              c.id === client.id
+                ? { ...c, marketing_consent: nextConsent, opted_out_at: nextConsent ? null : new Date().toISOString() }
+                : c
+            )
+          : prev
+      );
+    } catch {
+      toast.error("Impossible de mettre à jour le statut d'abonnement.");
+    } finally {
+      setUpdatingConsentId(null);
     }
   }
 
@@ -650,30 +675,52 @@ export default function SegmentsPage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[420px] text-sm">
+                  <table className="w-full min-w-[560px] text-sm">
                     <thead>
                       <tr className="text-xs text-slate-400 uppercase font-medium border-b border-slate-100">
                         <th className="text-left pb-3 pr-4">Nom</th>
                         <th className="text-left pb-3 pr-4">Contact</th>
-                        <th className="text-left pb-3 whitespace-nowrap">Dernière visite</th>
+                        <th className="text-left pb-3 pr-4 whitespace-nowrap">Dernière visite</th>
+                        <th className="text-left pb-3 whitespace-nowrap">Marketing</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
-                      {filteredClients.map((client) => (
-                        <tr key={client.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="py-3 pr-4 font-medium text-slate-900 whitespace-nowrap">{client.nom}</td>
-                          <td className="py-3 pr-4 text-slate-500 whitespace-nowrap">
-                            {client.whatsapp || client.telephone || client.email || "—"}
-                          </td>
-                          <td className="py-3 text-slate-500 whitespace-nowrap">
-                            {new Date(client.derniere_visite).toLocaleDateString("fr-FR", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </td>
-                        </tr>
-                      ))}
+                      {filteredClients.map((client) => {
+                        const isOptedOut = client.marketing_consent === false;
+                        return (
+                          <tr key={client.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="py-3 pr-4 font-medium text-slate-900 whitespace-nowrap">{client.nom}</td>
+                            <td className="py-3 pr-4 text-slate-500 whitespace-nowrap">
+                              {client.whatsapp || client.telephone || client.email || "—"}
+                            </td>
+                            <td className="py-3 pr-4 text-slate-500 whitespace-nowrap">
+                              {new Date(client.derniere_visite).toLocaleDateString("fr-FR", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </td>
+                            <td className="py-3 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    isOptedOut ? "bg-slate-100 text-slate-500" : "bg-green-50 text-green-700"
+                                  }`}
+                                >
+                                  {isOptedOut ? "Désinscrit" : "Abonné"}
+                                </span>
+                                <button
+                                  onClick={() => handleToggleConsent(client)}
+                                  disabled={updatingConsentId === client.id}
+                                  className="text-xs text-[var(--color-primary)] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isOptedOut ? "Réabonner" : "Désinscrire"}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

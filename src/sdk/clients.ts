@@ -3,6 +3,7 @@
  */
 
 import { createClient } from "@/libs/supabase/client";
+import { callEdgeFunction } from "./_core";
 
 export interface Client {
   id: string;
@@ -17,6 +18,10 @@ export interface Client {
   montant_total_depense: number;
   type_chambre_preferee: string | null;
   saison_habituelle: string | null;
+  // Absent sur les données de démo (littéraux statiques) : à traiter comme
+  // `true`/`null` (valeurs par défaut réelles en base, migration 050).
+  marketing_consent?: boolean;
+  opted_out_at?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -82,7 +87,7 @@ export async function getClients(profileId: string, limit = 1000): Promise<Clien
   const { data, error } = await supabase
     .from("clients")
     .select(
-      "id, profile_id, nom, email, telephone, whatsapp, derniere_visite, notes, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle, created_at, updated_at"
+      "id, profile_id, nom, email, telephone, whatsapp, derniere_visite, notes, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle, marketing_consent, opted_out_at, created_at, updated_at"
     )
     .eq("profile_id", profileId)
     .order("derniere_visite", { ascending: false })
@@ -90,6 +95,39 @@ export async function getClients(profileId: string, limit = 1000): Promise<Clien
 
   if (error) throw error;
   return (data || []) as Client[];
+}
+
+/**
+ * Bascule manuellement le consentement marketing d'un client (toggle
+ * hôtelier depuis le dashboard). Écriture directe sous RLS (l'hôtelier est
+ * déjà propriétaire de ses clients), pas besoin d'Edge Function ici.
+ */
+export async function setMarketingConsent(clientId: string, consent: boolean): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("clients")
+    .update({
+      marketing_consent: consent,
+      opted_out_at: consent ? null : new Date().toISOString(),
+    })
+    .eq("id", clientId);
+  if (error) throw error;
+}
+
+export interface UnsubscribeResult {
+  hotelName: string | null;
+  alreadyUnsubscribed: boolean;
+}
+
+/**
+ * Désinscription en libre-service depuis le lien inclus dans les messages de
+ * campagne — appelée par le client final de l'hôtel, sans session Supabase.
+ */
+export async function unsubscribe(clientId: string): Promise<UnsubscribeResult> {
+  return callEdgeFunction<UnsubscribeResult>("clients-unsubscribe", {
+    body: { clientId },
+    requireAuth: false,
+  });
 }
 
 export interface ImportClientRow {
@@ -512,4 +550,6 @@ export const clients = {
   readCsvFileSmart,
   matchesAdvancedFilters,
   buildClientsCSV,
+  setMarketingConsent,
+  unsubscribe,
 };

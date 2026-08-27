@@ -52,6 +52,15 @@ function clientMatchesAdvancedFilters(client: Client, filters: AdvancedFilters):
   return true;
 }
 
+// Lien de desinscription individuel ajoute a la fin de chaque message envoye
+// (audit juridique 2026-08 : consentement/desinscription WhatsApp). L'UUID du
+// client (122 bits aleatoires) sert de jeton non devinable, sans colonne
+// dediee ni infrastructure de signature supplementaire.
+function buildUnsubscribeSuffix(clientId: string): string {
+  const siteUrl = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
+  return `\n\nPour ne plus recevoir nos offres : ${siteUrl}/desinscription?c=${clientId}`;
+}
+
 function formatE164(raw: string): string | null {
   // Remove spaces and special chars except leading +
   let cleaned = raw.replace(/[\s\-().]/g, "");
@@ -395,6 +404,7 @@ Deno.serve(async (req) => {
     // journalisés au lieu d'être perdus.
     try {
       for (const client of targets) {
+        const personalizedMessage = message + buildUnsubscribeSuffix(client.id);
         const rawNumber = client.whatsapp || client.telephone;
         if (!rawNumber) {
           failed++;
@@ -409,7 +419,7 @@ Deno.serve(async (req) => {
             client_id: client.id,
             profile_id: profileId,
             channel: "whatsapp",
-            message_content: message,
+            message_content: personalizedMessage,
             template_id: templateId || null,
             status: "failed",
             error_message: "Numéro de téléphone invalide",
@@ -424,7 +434,7 @@ Deno.serve(async (req) => {
               e164,
               client.nom,
               "baobab_offre_hotel",
-              message,
+              personalizedMessage,
             )
           : await sendViaMeta(
               profile.whatsapp_phone_number_id!,
@@ -432,7 +442,7 @@ Deno.serve(async (req) => {
               e164,
               client.nom,
               "baobab_offre_hotel",
-              message,
+              personalizedMessage,
             );
 
         await db.from("sent_messages").insert({
@@ -440,7 +450,7 @@ Deno.serve(async (req) => {
           client_id: client.id,
           profile_id: profileId,
           channel: "whatsapp",
-          message_content: message,
+          message_content: personalizedMessage,
           template_id: templateId || null,
           status: result.ok ? "sent" : "failed",
           provider_message_id: result.providerMessageId || null,

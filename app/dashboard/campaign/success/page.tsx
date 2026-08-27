@@ -52,6 +52,10 @@ function SuccessContent() {
   sondageParams.set("discount", discountPct);
 
   const messageText = aiMessage || `Cher {{nom}}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : "${avantage}"`;
+  // Uniquement pour l'aperçu ci-dessous : chaque message réellement envoyé
+  // contient un lien de désinscription personnalisé par client (ajouté côté
+  // campaign-send), impossible à représenter ici avant l'envoi réel.
+  const messagePreviewWithUnsubscribe = `${messageText}\n\nPour ne plus recevoir nos offres : baobabloyalty.com/desinscription?c=...`;
 
   const handleCopy = async () => {
     try {
@@ -186,7 +190,7 @@ function SuccessContent() {
                       className="w-full rounded-md mb-2 object-cover max-h-40"
                     />
                   )}
-                  <p className="text-slate-800 text-sm leading-snug whitespace-pre-wrap">{messageText}</p>
+                  <p className="text-slate-800 text-sm leading-snug whitespace-pre-wrap">{messagePreviewWithUnsubscribe}</p>
                   {isSondage ? (
                     <Link
                       href={`/sondage?${sondageParams.toString()}`}
