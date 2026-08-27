@@ -80,16 +80,25 @@ function VerifyContent() {
           toast.success("Code vérifié ! Définissez votre nouveau mot de passe.");
           router.push("/auth/update-password");
         } else {
-          // Si l'utilisateur vient de /beta, marquer comme bêta testeur
+          // Si l'utilisateur vient de /beta, marquer comme bêta testeur et
+          // reduire son essai a 14 jours (au lieu des 30 jours par defaut
+          // poses par handle_new_user()) : les premiers hotels beta ont un
+          // parcours commercial different, decide explicitement, qui ne doit
+          // pas s'appliquer aux futurs inscrits normaux.
+          //
+          // Passe par une Edge Function (service role) : is_beta_tester et
+          // trial_ends_at ne sont pas modifiables directement depuis le
+          // navigateur (migration 044_restrict_profiles_columns.sql empeche
+          // un compte de s'auto-attribuer de l'acces gratuit).
           const signupRef = sessionStorage.getItem("signup_ref");
           if (signupRef === "beta") {
             sessionStorage.removeItem("signup_ref");
-            const { data: { user: authUser } } = await supabase.auth.getUser();
-            if (authUser) {
-              await supabase
-                .from("profiles")
-                .update({ is_beta_tester: true })
-                .eq("id", authUser.id);
+            try {
+              const { user: userSdk } = await import("@/src/sdk");
+              await userSdk.activateBetaTrial();
+            } catch {
+              // Non-bloquant : l'hotel garde l'essai standard de 30 jours si
+              // l'activation beta echoue, plutot que de bloquer l'inscription.
             }
           }
 

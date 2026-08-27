@@ -43,7 +43,26 @@ export async function getProfile(): Promise<UserProfile> {
   });
 }
 
+export interface BetaTrialActivationResult {
+  activated: boolean;
+  alreadyActive?: boolean;
+  trialEndsAt?: string;
+}
+
+/**
+ * Active l'essai bêta 14 jours pour le compte connecté (hôtels /signup?ref=beta).
+ * Doit passer par une Edge Function : is_beta_tester et trial_ends_at ne sont
+ * pas modifiables directement par un utilisateur authentifié (voir migration
+ * 044_restrict_profiles_columns.sql).
+ */
+export async function activateBetaTrial(): Promise<BetaTrialActivationResult> {
+  return callEdgeFunction<BetaTrialActivationResult>("profile-activate-beta-trial", {
+    method: "POST",
+  });
+}
+
 // Export as namespace
 export const user = {
   getProfile,
+  activateBetaTrial,
 };
