@@ -51,6 +51,21 @@ export default function ConfidentialitePage() {
                 <li>Statistiques de réservations</li>
               </ul>
             </div>
+            <div className="bg-slate-50 rounded-lg p-4">
+              <p className="font-medium text-slate-700 mb-2">Données de mesure d&apos;audience (visiteurs du site, uniquement avec votre consentement)</p>
+              <ul className="text-slate-600 text-sm space-y-1 list-disc list-inside">
+                <li>Pages consultées et parcours de navigation sur nos pages publiques</li>
+                <li>Interactions avec les éléments de la page (clics, défilement)</li>
+                <li>Informations techniques : type d&apos;appareil, navigateur, pays approximatif</li>
+              </ul>
+              <p className="text-slate-500 text-xs mt-2">
+                Collectées via PostHog uniquement si vous cliquez sur « Accepter » dans le bandeau
+                cookies. Aucune collecte si vous refusez ou avant votre choix. Ces outils ne
+                tournent jamais dans votre espace hôtelier (tableau de bord) : ils ne touchent
+                jamais les données de vos propres clients. Voir la{" "}
+                <a href="/legal/cookies" className="text-primary hover:underline">politique cookies</a>.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -62,6 +77,7 @@ export default function ConfidentialitePage() {
             <li>Envoi d&apos;emails transactionnels (confirmation, factures)</li>
             <li>Support client et assistance technique</li>
             <li>Amélioration du service (données anonymisées)</li>
+            <li>Mesure d&apos;audience de notre site web (uniquement avec votre consentement)</li>
           </ul>
         </section>
 
@@ -86,6 +102,7 @@ export default function ConfidentialitePage() {
             <li><strong>Données de compte :</strong> durée de l&apos;abonnement + 3 ans après résiliation</li>
             <li><strong>Données de facturation :</strong> 10 ans (obligation légale comptable)</li>
             <li><strong>Journaux d&apos;activité :</strong> 12 mois</li>
+            <li><strong>Données de mesure d&apos;audience (PostHog) :</strong> durée définie par les paramètres du compte PostHog de Baobab Loyalty ; supprimées immédiatement si vous refusez le dépôt de cookies non essentiels</li>
           </ul>
         </section>
 
@@ -112,7 +129,7 @@ export default function ConfidentialitePage() {
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Supabase</td>
                   <td className="p-3 border border-slate-200">Base de données & authentification</td>
-                  <td className="p-3 border border-slate-200">États-Unis</td>
+                  <td className="p-3 border border-slate-200">Irlande, Union européenne (société éditrice basée aux États-Unis)</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">Resend</td>
@@ -132,6 +149,11 @@ export default function ConfidentialitePage() {
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">OpenRouter</td>
                   <td className="p-3 border border-slate-200">Génération de messages IA</td>
+                  <td className="p-3 border border-slate-200">États-Unis</td>
+                </tr>
+                <tr>
+                  <td className="p-3 border border-slate-200">PostHog</td>
+                  <td className="p-3 border border-slate-200">Mesure d&apos;audience du site (uniquement avec consentement, jamais dans le tableau de bord hôtelier)</td>
                   <td className="p-3 border border-slate-200">États-Unis</td>
                 </tr>
               </tbody>

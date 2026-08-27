@@ -55,7 +55,7 @@ export default function CGVPage() {
           </div>
 
           <p className="text-slate-500 text-sm mt-3">
-            Les tarifs ci-dessus sont exprimés hors taxes (HT). Baobab Loyalty SAS bénéficie actuellement d&apos;un régime d&apos;exonération de TVA (régime de l&apos;entreprenant / microentreprise) : aucune TVA n&apos;est donc ajoutée à ce jour. Dès que ce régime évoluera vers un régime assujetti, la TVA sera ajoutée automatiquement au taux légal en vigueur et apparaîtra distinctement sur chaque facture, sans action requise de votre part. Baobab Loyalty SAS se réserve le droit de modifier ses tarifs, avec préavis de 30 jours.
+            Les tarifs ci-dessus sont exprimés hors taxes (HT). Le régime fiscal de Baobab Loyalty SAS applicable à la TVA est en cours de confirmation auprès de l&apos;administration fiscale ivoirienne. Si la TVA est due, elle sera ajoutée au taux légal en vigueur et apparaîtra distinctement sur chaque facture, sans action requise de votre part. Baobab Loyalty SAS se réserve le droit de modifier ses tarifs, avec préavis de 30 jours.
           </p>
         </section>
 

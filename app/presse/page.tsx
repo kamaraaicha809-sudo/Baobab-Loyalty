@@ -12,91 +12,11 @@ export const metadata = getSEOTags({
 });
 
 const keyFacts = [
-  { value: "4", label: "pays actifs", detail: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
+  { value: "4", label: "marchés disponibles", detail: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
   { value: "10 min", label: "pour lancer une campagne", detail: "De l'import CSV au premier envoi WhatsApp" },
   { value: "0%", label: "commission sur les réservations directes", detail: "Contre 15 à 20% chez les OTAs" },
   { value: "39 000 FCFA", label: "prix d'entrée par mois", detail: "Sans engagement" },
   { value: "FCFA", label: "facturation locale", detail: "Adapté au marché Afrique francophone" },
-];
-
-const pressReleases = [
-  {
-    id: "civ",
-    country: "Côte d'Ivoire",
-    date: "5 mai 2026",
-    city: "Abidjan",
-    flag: "🇨🇮",
-    headline:
-      "Baobab Loyalty lance sa solution de fidélisation hôtelière en Côte d'Ivoire : les hôteliers abidjanais reprennent le contrôle de leurs réservations directes",
-    body: `ABIDJAN, le 5 mai 2026 — Baobab Loyalty, startup spécialisée dans la fidélisation clients pour hôtels africains, annonce le lancement officiel de sa plateforme en Côte d'Ivoire. La solution, accessible dès aujourd'hui aux hôteliers ivoiriens, permet de créer et d'envoyer des campagnes de réservation via WhatsApp en moins de 2 minutes — sans commission, directement depuis leur tableau de bord.
-
-Les hôtels ivoiriens font face à une double pression : d'un côté, les plateformes de réservation en ligne (OTAs) comme Booking.com et Expedia qui prélèvent entre 15% et 20% de commission sur chaque réservation ; de l'autre, l'absence d'outils numériques adaptés au marché local, au FCFA et aux habitudes de communication africaines. WhatsApp est devenu le canal de communication de référence pour les voyageurs d'affaires en Côte d'Ivoire, mais aucun logiciel hôtelier ne permettait jusqu'ici d'en faire un canal de fidélisation structuré.
-
-La plateforme permet aux hôtels d'importer leur base clients depuis un fichier Excel ou CSV, de segmenter automatiquement les clients inactifs depuis 3, 6 ou 9 mois, puis d'envoyer des offres personnalisées directement sur WhatsApp. Un tableau de bord en temps réel permet de suivre les réservations générées et les revenus en FCFA. Chaque réservation directe obtenue via la plateforme fait économiser à l'hôtelier les 15 à 20% de commission qu'il aurait versés à un OTA.
-
-Baobab Loyalty est disponible à partir de 39 000 FCFA par mois, sans engagement. Un accès gratuit en mode démo est proposé sans carte bancaire. La solution est déjà opérationnelle au Sénégal et au Cameroun.
-
-###
-
-À propos de Baobab Loyalty
-Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.
-
-Contact presse
-Email : presse@baobabloyalty.com
-Site : https://baobabloyalty.com/presse`,
-  },
-  {
-    id: "sn",
-    country: "Sénégal",
-    date: "5 mai 2026",
-    city: "Dakar",
-    flag: "🇸🇳",
-    headline:
-      "Baobab Loyalty s'implante à Dakar et aide les hôteliers sénégalais à réduire leur dépendance aux plateformes de réservation en ligne",
-    body: `DAKAR, le 5 mai 2026 — Baobab Loyalty, plateforme SaaS de fidélisation clients pour hôtels africains, annonce son déploiement officiel au Sénégal. La solution est désormais accessible aux hôteliers de Dakar, des Almadies et de tout le Sénégal, avec une facturation en FCFA et un support en français.
-
-Le tourisme d'affaires à Dakar connaît une croissance soutenue. La capitale sénégalaise accueille chaque année des voyageurs professionnels, des délégations diplomatiques et des participants à des conférences régionales. Pourtant, la majorité des hôtels dakarois n'ont pas de dispositif structuré pour fidéliser ces clients après leur séjour, alors que WhatsApp est l'un des canaux les plus utilisés dans le milieu professionnel local.
-
-Grâce à Baobab Loyalty, les hôtels sénégalais peuvent identifier leurs clients inactifs, créer des offres personnalisées (réductions, upgrades, cocktails de bienvenue) et les envoyer directement sur WhatsApp en quelques clics. L'intelligence artificielle intégrée aide à rédiger des messages adaptés à chaque segment de clientèle.
-
-WhatsApp est aujourd'hui le canal de communication professionnel le plus consulté au Sénégal, loin devant l'email. Les réservations directes générées via la plateforme permettent d'économiser l'intégralité des commissions OTA sur ces transactions.
-
-Baobab Loyalty est proposé à partir de 39 000 FCFA par mois. La plateforme est opérationnelle sans formation technique préalable — si vous savez utiliser Excel, vous savez utiliser Baobab Loyalty.
-
-###
-
-À propos de Baobab Loyalty
-Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.
-
-Contact presse
-Email : presse@baobabloyalty.com
-Site : https://baobabloyalty.com/presse`,
-  },
-  {
-    id: "cm",
-    country: "Cameroun",
-    date: "5 mai 2026",
-    city: "Douala",
-    flag: "🇨🇲",
-    headline:
-      "Baobab Loyalty arrive au Cameroun : les hôtels de Douala et Yaoundé disposent enfin d'un outil de fidélisation adapté à leur marché",
-    body: `DOUALA, le 5 mai 2026 — Baobab Loyalty, la plateforme de fidélisation hôtelière conçue pour l'Afrique, annonce son lancement officiel au Cameroun. Disponible immédiatement pour les hôtels de Douala et Yaoundé, la solution répond à un besoin longtemps ignoré par les logiciels marketing internationaux : permettre aux hôteliers camerounais de fidéliser leurs clients via WhatsApp, en FCFA, sans compétence technique.
-
-Le marché hôtelier camerounais est l'un des plus dynamiques d'Afrique centrale. Douala, capitale économique et premier port du pays, accueille une clientèle d'affaires en forte croissance. Yaoundé, capitale administrative, reçoit délégations diplomatiques et fonctionnaires internationaux toute l'année. Pourtant, la plupart des hôtels de ces deux villes dépendent encore entièrement des OTAs pour leurs réservations, sans mécanisme de fidélisation propre pour recontacter leurs clients après leur séjour.
-
-La plateforme s'intègre directement avec WhatsApp Business — le canal de communication dominant au Cameroun chez les voyageurs d'affaires. Les campagnes de réactivation ciblent précisément les clients inactifs depuis 3, 6 ou 9 mois, avec des offres générées par intelligence artificielle et personnalisées selon le segment.
-
-Baobab Loyalty est accessible à partir de 39 000 FCFA par mois, sans engagement et sans frais d'installation. Un essai gratuit en mode démo est disponible sur baobabloyalty.com.
-
-###
-
-À propos de Baobab Loyalty
-Baobab Loyalty est une solution SaaS de fidélisation clients pour hôtels en Afrique francophone. Fondée pour répondre aux spécificités du marché hôtelier africain — WhatsApp, FCFA, clientèle d'affaires locale — la plateforme aide les hôteliers à reconquérir leurs clients inactifs et à générer des réservations directes sans passer par les OTAs. Disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.
-
-Contact presse
-Email : presse@baobabloyalty.com
-Site : https://baobabloyalty.com/presse`,
-  },
 ];
 
 const pressSchema = {
@@ -195,7 +115,7 @@ export default function PressePage() {
                 <p className="text-slate-500 text-sm leading-relaxed mb-4">
                   Conçue spécifiquement pour le marché africain — WhatsApp comme canal
                   principal, facturation en FCFA, interface en français — Baobab Loyalty est
-                  opérationnelle en Côte d&apos;Ivoire, au Sénégal, au Cameroun et au Ghana.
+                  disponible pour les hôteliers de Côte d&apos;Ivoire, du Sénégal, du Cameroun et du Ghana.
                 </p>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   La plateforme est accessible à partir de 39 000 FCFA par mois, sans
@@ -209,7 +129,7 @@ export default function PressePage() {
                     { label: "Secteur", value: "SaaS / Hôtellerie / Tech for Africa" },
                     { label: "Marchés", value: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
                     { label: "Canal principal", value: "WhatsApp Business API" },
-                    { label: "Devise", value: "FCFA (XOF) — GHS pour le Ghana" },
+                    { label: "Devise", value: "FCFA (XOF)" },
                     { label: "Site web", value: "baobabloyalty.com" },
                   ].map((item, i) => (
                     <div key={i} className="flex gap-3">
@@ -225,53 +145,20 @@ export default function PressePage() {
           </div>
         </section>
 
-        {/* Press releases */}
+        {/* Kit média */}
         <section className="py-16 sm:py-20 bg-[#F8F8F6]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-4">
-                Communiqués de presse
-              </h2>
-              <p className="text-slate-500 text-sm">
-                Disponibles pour diffusion immédiate. Reproduction autorisée avec mention de la source.
-              </p>
-            </div>
-            <div className="space-y-8">
-              {pressReleases.map((pr) => (
-                <article
-                  key={pr.id}
-                  className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden"
-                >
-                  {/* Header */}
-                  <div className="flex items-start gap-4 p-6 sm:p-8 border-b border-slate-100">
-                    <div className="w-10 h-10 rounded-xl bg-[#1a2f2a]/6 flex items-center justify-center text-xl shrink-0">
-                      {pr.flag}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="text-xs font-semibold text-[#1a2f2a] uppercase tracking-widest">
-                          {pr.country}
-                        </span>
-                        <span className="text-slate-300">·</span>
-                        <span className="text-xs text-slate-400">{pr.date}</span>
-                        <span className="px-2 py-0.5 rounded-full bg-[#1a2f2a]/8 text-[#1a2f2a] text-xs font-semibold">
-                          Pour diffusion immédiate
-                        </span>
-                      </div>
-                      <h3 className="font-bold text-[#2C2C2C] text-sm sm:text-base leading-snug">
-                        {pr.headline}
-                      </h3>
-                    </div>
-                  </div>
-                  {/* Body */}
-                  <div className="p-6 sm:p-8">
-                    <div className="prose prose-sm max-w-none text-slate-600 leading-relaxed whitespace-pre-line text-sm">
-                      {pr.body}
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-4">
+              Kit média
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed mb-2">
+              Aucun communiqué de presse n&apos;a encore été publié à ce jour. Pour toute demande
+              d&apos;information, de chiffres actualisés ou de mise en relation avec l&apos;équipe
+              fondatrice en vue d&apos;un article, contactez directement le service presse.
+            </p>
+            <p className="text-slate-400 text-xs sm:text-sm">
+              Logo, captures d&apos;écran et éléments de langage disponibles sur demande par email.
+            </p>
           </div>
         </section>
 

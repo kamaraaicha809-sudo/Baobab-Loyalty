@@ -69,7 +69,7 @@ const faqs = [
   },
   {
     q: "Mes clients reçoivent-ils les messages sur leur WhatsApp personnel ?",
-    a: "Oui. Les messages sont envoyés directement sur le numéro WhatsApp de vos clients. C'est pourquoi WhatsApp est le canal le plus efficace : le taux d'ouverture dépasse 90% en Afrique de l'Ouest.",
+    a: "Oui. Les messages sont envoyés directement sur le numéro WhatsApp de vos clients. C'est pourquoi WhatsApp est un canal particulièrement efficace : son taux d'ouverture est très largement supérieur à celui de l'email.",
   },
   {
     q: "Puis-je personaliser les messages pour chaque segment ?",
@@ -222,7 +222,7 @@ export default function CommentCaMarchePage() {
               {[
                 { value: "10 min", label: "Pour lancer votre première campagne" },
                 { value: "0%", label: "Commission sur vos réservations directes" },
-                { value: "30 jours", label: "Garantis ou le mois suivant est offert" },
+                { value: "2 réservations", label: "Garanties ou le mois suivant est offert" },
                 { value: "WhatsApp", label: "Canal de communication principal en Afrique de l'Ouest" },
               ].map((stat, i) => (
                 <div key={i}>

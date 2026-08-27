@@ -29,7 +29,7 @@ const faqItems = [
   },
   {
     question: "Dans quels pays Baobab Loyalty est-il disponible ?",
-    answer: "Baobab Loyalty est opérationnel en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.",
+    answer: "Baobab Loyalty est disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana.",
   },
 ];
 

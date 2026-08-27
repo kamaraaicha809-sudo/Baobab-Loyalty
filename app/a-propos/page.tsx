@@ -23,7 +23,7 @@ const facts = [
   { label: "Siège social", value: "Plateau, Abidjan, Côte d'Ivoire" },
   { label: "Secteur", value: "SaaS / Hôtellerie / Technologie pour l'Afrique" },
   { label: "Canal principal", value: "WhatsApp Business API" },
-  { label: "Devise", value: "FCFA (XOF) — GHS pour le Ghana" },
+  { label: "Devise", value: "FCFA (XOF)" },
 ];
 
 export default function AProposPage() {
@@ -105,7 +105,7 @@ export default function AProposPage() {
               Où sommes-nous disponibles ?
             </h2>
             <p className="text-[#a3c4b5] text-sm sm:text-base mb-10 max-w-xl mx-auto leading-relaxed">
-              Baobab Loyalty est opérationnel dans quatre marchés d&apos;Afrique francophone
+              Baobab Loyalty est disponible dans quatre marchés d&apos;Afrique francophone
               et anglophone.
             </p>
             <div className="flex flex-wrap justify-center gap-3">

@@ -2184,14 +2184,14 @@ Running email campaigns to re-engage Ghanaian hotel guests is like sending lette
 
 ## WhatsApp as Your Primary Loyalty Channel
 
-WhatsApp penetration among business travelers in Ghana exceeds 87%. It is the dominant professional and personal communication tool in Accra, Kumasi, and Takoradi.
+WhatsApp is widely regarded as the dominant professional and personal communication tool in Accra, Kumasi, and Takoradi.
 
-The numbers speak for themselves:
+The general pattern looks like this:
 
 | Channel | Open Rate | Response Rate | Time to Open |
 |---------|-----------|---------------|--------------|
-| Email | 12–18% | 2–5% | 24–72 hours |
-| WhatsApp | High | 35–60% | Under 5 minutes |
+| Email | Low | Low | Hours to days |
+| WhatsApp | High | Higher | Minutes |
 
 A well-crafted WhatsApp message sent to a guest who stayed at your hotel 4 months ago will be read in minutes. The same offer sent by email will likely go unread.
 
@@ -2244,16 +2244,9 @@ Without a tool, doing this manually in Excel and WhatsApp would take several hou
 
 The difference between "running a loyalty program" and "occasionally thinking about re-engagement" is having the right system in place.
 
-## Expected Results for Ghanaian Hotels
+## What This Can Look Like for Ghanaian Hotels
 
-Based on hotels using this approach in West Africa:
-
-- **Taux d'ouverture WhatsApp**: 90%+ on re-engagement messages
-- **Booking conversion per campaign**: 8–18% of contacted guests make a direct booking
-- **Average OTA dependency reduction**: 30–35% after 3 months of consistent campaigns
-- **Average additional direct bookings per campaign**: 10–25, depending on database size
-
-A 50-room hotel in Accra running 3 campaigns per month to a database of 400 guests can realistically generate 30 to 50 additional direct bookings per month — bookings that would otherwise have gone through Booking.com at 15–20% commission.
+WhatsApp's open rate is consistently reported as far higher than email across messaging-industry benchmarks, which is why re-engagement campaigns sent this way tend to reach guests who would otherwise never see a marketing email. The exact conversion rate, OTA-dependency reduction, and number of additional direct bookings you get from a given campaign will depend on your database size, offer, and market — Baobab Loyalty is still new in Ghana, so we don't yet have a published track record of results specific to Ghanaian hotels to share here.
 
 ## Getting Started Today
 
@@ -2293,9 +2286,9 @@ This guide shows you how to build a WhatsApp hotel marketing strategy that actua
 No other channel comes close to WhatsApp's reach and engagement in West Africa:
 
 - A significantly higher open rate on WhatsApp messages than on email
-- **40–60% response rate** when guests receive a personalized offer
-- **87% of business travelers** in Accra use WhatsApp as their primary business communication tool
-- Messages are read within **90 seconds** on average
+- A meaningfully higher response rate when guests receive a personalized offer
+- WhatsApp is widely used by business travelers in Accra as their primary communication tool
+- Messages are typically read within minutes, not hours
 
 When you send a WhatsApp message to a past guest in Accra, they will read it. That is the fundamental advantage that no other marketing channel can match.
 
@@ -2310,7 +2303,7 @@ Win-back campaigns target guests who stayed with you 3, 6, or 9 months ago and h
 
 **Why this works:** The guest has recent positive memory of your hotel. The personalization (using their name, referencing their last stay) triggers recognition. The time-limited offer creates urgency.
 
-**Realistic results:** Hotels using win-back campaigns typically recover 8–15% of contacted guests within 30 days.
+**What to expect:** results vary by database size, offer, and hotel — but a well-targeted win-back campaign is one of the highest-ROI things you can send, since you're reaching guests who already chose your hotel once.
 
 ### 2. Seasonal Promotion Campaigns
 
@@ -2495,14 +2488,15 @@ The guests who have already stayed with you are your most valuable direct bookin
 
 The challenge: after checkout, most hotels lose contact with past guests. The solution: capture WhatsApp numbers during check-in or check-out, and use them.
 
-A systematic win-back program targeting guests who haven't returned in 3–6 months typically converts 8–15% of contacts into bookings — at a fraction of OTA commission costs.
+A systematic win-back program targeting guests who haven't returned in 3–6 months can turn a portion of contacts into direct bookings — at a fraction of OTA commission costs, since these are guests who already know and chose your hotel once.
 
-**Typical win-back campaign economics for an Accra hotel:**
+**Illustrative example, for a hotel wanting to estimate its own numbers:**
 - 200 past guest contacts reached
-- 15% booking conversion = 30 direct bookings
-- Average 2-night stay at GHS 650 = GHS 39,000 revenue
-- Campaign cost (tools + time): GHS 500
-- Savings vs. OTA at 18%: GHS 7,020 per campaign
+- If 15% book directly = 30 direct bookings
+- At an average 2-night stay of GHS 650 = GHS 39,000 in revenue
+- Compare that to the OTA commission (typically 15–20%) you would have paid on the same bookings
+
+Your own conversion rate will depend on your database quality, offer, and timing — use this as a framework to model your own numbers, not as a guaranteed outcome.
 
 ### Strategy 4: Leverage Google Hotel Ads
 

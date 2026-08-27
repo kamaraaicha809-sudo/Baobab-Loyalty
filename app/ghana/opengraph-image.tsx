@@ -76,13 +76,13 @@ export default function OgImage() {
           }}
         >
           Automatic segmentation · Targeted campaigns · Starting at{" "}
-          <span style={{ color: "rgba(255,255,255,0.9)" }}>GHS 299/month</span>
+          <span style={{ color: "rgba(255,255,255,0.9)" }}>39,000 FCFA/month</span>
         </p>
 
         <div style={{ display: "flex", gap: 16 }}>
           {[
             { value: "0%", label: "OTA commission" },
-            { value: "GHS", label: "local currency" },
+            { value: "FCFA", label: "billed currency" },
             { value: "10 min", label: "first campaign" },
           ].map((stat) => (
             <div

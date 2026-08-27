@@ -46,7 +46,7 @@ const data: CountryPageData = {
     { value: "0%", label: "de commission sur vos réservations directes" },
     { value: "10 min", label: "pour lancer votre première campagne WhatsApp" },
     { value: "FCFA", label: "facturation en devise locale" },
-    { value: "30 jours", label: "garantis ou le mois suivant est offert" },
+    { value: "2 réservations", label: "garanties ou le mois suivant est offert" },
   ],
   problemTitle: "Les hôtels camerounais dépendent trop des intermédiaires",
   problemSubtitle:
@@ -87,8 +87,8 @@ const data: CountryPageData = {
   ],
   guarantee: {
     title: "Pourquoi on peut se permettre de garantir des résultats",
-    text: "Baobab Loyalty est encore jeune au Cameroun — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 réservations directes supplémentaires le premier mois, on vous offre le mois suivant.",
-    points: ["Sans engagement", "Données 100% à vous", "Support 30 jours offert"],
+    text: "Baobab Loyalty est encore jeune au Cameroun — on n'a pas des centaines d'avis à vous montrer. Alors on préfère vous le prouver autrement : si vous ne récupérez pas au moins 2 réservations directes supplémentaires au cours de votre premier mois complet d'utilisation, on vous offre le mois suivant, à condition que votre base clients ait été correctement importée et qu'au moins une campagne ait été envoyée.",
+    points: ["Sans engagement", "Données 100% à vous", "Accompagnement inclus le premier mois"],
   },
   pricingTitle: "Tarifs adaptés aux hôtels camerounais",
   pricingSubtitle: "Prix en FCFA, sans engagement. Résiliable à tout moment.",

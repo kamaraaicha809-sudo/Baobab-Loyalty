@@ -12,7 +12,7 @@ const faqList: FAQItem[] = [
     question: "Est-ce que ça vaut vraiment le coût ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Et si ça ne marche pas, nous t&apos;offrons le mois suivant.
+        Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Et si tu ne récupères pas au moins 2 réservations directes supplémentaires le premier mois, on t&apos;offre le mois suivant.
       </div>
     ),
   },

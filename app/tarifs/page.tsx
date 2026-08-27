@@ -84,11 +84,15 @@ const faqs = [
   },
   {
     q: "Les prix sont-ils en FCFA pour tous les pays ?",
-    a: "Les plans FCFA s'appliquent aux hôtels en Côte d'Ivoire, au Sénégal, au Cameroun, au Bénin et dans les pays de la zone FCFA. Pour le Ghana, des plans en GHS sont disponibles.",
+    a: "Oui. Tous les plans sont facturés en FCFA (XOF), y compris pour les hôtels situés hors de la zone FCFA comme le Ghana.",
   },
   {
     q: "Comment fonctionne le support ?",
     a: "Le support est assuré par email en français pour tous les plans, avec des délais de réponse selon le plan : sous 24 heures pour Starter, sous 16 heures pour Pro, et sous 4 à 12 heures pour Premium, qui inclut aussi un account manager dédié.",
+  },
+  {
+    q: "Y a-t-il une garantie de résultats ?",
+    a: "Oui. Si Baobab Loyalty ne vous génère pas au moins 2 réservations directes supplémentaires au cours de votre premier mois complet d'utilisation, le mois suivant vous est offert automatiquement — à condition que votre base clients ait été correctement importée et qu'au moins une campagne ait été envoyée.",
   },
 ];
 

@@ -45,7 +45,7 @@ export default function MentionsLegalesPage() {
             </div>
             <div>
               <p className="font-medium text-slate-700">Supabase Inc. (base de données)</p>
-              <p className="text-slate-600 text-sm">970 Toa Payoh North, Singapour</p>
+              <p className="text-slate-600 text-sm">Société éditrice basée aux États-Unis — données hébergées en Irlande (Union européenne)</p>
               <p className="text-slate-600 text-sm">Site : <a href="https://supabase.com" className="text-primary hover:underline">supabase.com</a></p>
             </div>
           </div>

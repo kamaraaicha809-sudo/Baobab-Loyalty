@@ -49,7 +49,7 @@ export default function CookiesPage() {
                 <p className="font-medium text-slate-700">Cookies d&apos;analyse (PostHog)</p>
               </div>
               <p className="text-slate-600 text-sm">
-                Nous aident à comprendre comment les visiteurs utilisent le site (pages vues, parcours). Les données sont anonymisées. Durée : 12 mois. Vous pouvez les refuser.
+                Nous aident à comprendre comment les visiteurs utilisent nos pages publiques (pages vues, clics). Ces cookies ne sont déposés que si vous cliquez sur « Accepter » dans le bandeau, et jamais dans votre espace hôtelier (tableau de bord). Durée : 12 mois. Vous pouvez les refuser à tout moment.
               </p>
             </div>
           </div>
@@ -61,8 +61,8 @@ export default function CookiesPage() {
             Certains cookies sont déposés par des services tiers que nous utilisons :
           </p>
           <ul className="mt-3 space-y-2 text-slate-600 list-disc list-inside">
-            <li><strong>Stripe :</strong> cookies nécessaires au traitement sécurisé des paiements</li>
-            <li><strong>PostHog :</strong> cookies d&apos;analyse d&apos;usage (anonymisés)</li>
+            <li><strong>Moneroo :</strong> cookies nécessaires au traitement sécurisé des paiements</li>
+            <li><strong>PostHog :</strong> cookies de mesure d&apos;audience, déposés uniquement avec votre consentement</li>
           </ul>
         </section>
 

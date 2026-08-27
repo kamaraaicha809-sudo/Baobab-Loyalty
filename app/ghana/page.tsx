@@ -31,8 +31,8 @@ const localBusinessSchema = {
     { "@type": "City", name: "Accra" },
   ],
   serviceType: "Hotel loyalty software",
-  priceRange: "GHS 299 - GHS 699/month",
-  currenciesAccepted: "GHS",
+  priceRange: "39,000 - 189,000 FCFA/month",
+  currenciesAccepted: "XOF",
   knowsLanguage: "en",
 };
 
@@ -49,8 +49,8 @@ const data: CountryPageData = {
   statsItems: [
     { value: "0%", label: "commission on your direct bookings" },
     { value: "10 min", label: "to launch your first WhatsApp campaign" },
-    { value: "GHS", label: "billed in your local currency" },
-    { value: "30 days", label: "guaranteed or next month is free" },
+    { value: "FCFA", label: "billed in West African CFA francs (XOF)" },
+    { value: "2 bookings", label: "guaranteed or next month is free" },
   ],
   problemTitle: "Ghanaian hotels are losing revenue every month",
   problemSubtitle:
@@ -58,7 +58,7 @@ const data: CountryPageData = {
   problemPoints: [
     {
       title: "Guests leave and never come back",
-      desc: "Your guest had a great stay in Accra. But without follow-up, they will book somewhere else next time. 70% of hotel guests don't return without proactive re-engagement.",
+      desc: "Your guest had a great stay in Accra. But without follow-up, they are far more likely to book somewhere else next time.",
     },
     {
       title: "15–20% OTA commission on every booking",
@@ -66,12 +66,12 @@ const data: CountryPageData = {
     },
     {
       title: "No tools built for the Ghanaian market",
-      desc: "International CRMs are expensive, complex, and designed for Europe. They don't support WhatsApp as a primary channel, nor GHS pricing or local market realities.",
+      desc: "International CRMs are expensive, complex, and designed for Europe. They don't support WhatsApp as a primary channel, nor West African market realities.",
     },
   ],
   solutionTitle: "The guest loyalty platform built for Ghanaian hotels",
   solutionSubtitle:
-    "WhatsApp-first, English and French support, GHS pricing — Baobab Loyalty is designed for the West African hospitality market.",
+    "WhatsApp-first, English and French support — Baobab Loyalty is designed for the West African hospitality market.",
   solutionSteps: [
     {
       step: "01",
@@ -91,15 +91,15 @@ const data: CountryPageData = {
   ],
   guarantee: {
     title: "Why we can afford to guarantee results",
-    text: "Baobab Loyalty is still new in Ghana — we don't have hundreds of reviews to show you. So instead, we prove it differently: if you don't recover at least 2 extra nights in your first month, we give you the next month free.",
+    text: "Baobab Loyalty is still new in Ghana — we don't have hundreds of reviews to show you. So instead, we prove it differently: if you don't recover at least 2 extra direct bookings in your first full month, we give you the next month free, provided your guest database was correctly imported and at least one campaign was sent.",
     points: ["No commitment", "Your data stays 100% yours", "30-day personal support included"],
   },
-  pricingTitle: "Pricing built for Ghanaian hotels",
-  pricingSubtitle: "Billed in GHS. No long-term commitment. Cancel anytime.",
+  pricingTitle: "Pricing built for West African hotels",
+  pricingSubtitle: "Billed in FCFA (XOF), the currency used across our payment platform. No long-term commitment. Cancel anytime.",
   plans: [
     {
-      name: "Essential",
-      price: "GHS 299",
+      name: "Starter",
+      price: "39,000 FCFA",
       priceDetail: "/ month",
       rooms: "Up to 30 rooms",
       highlighted: false,
@@ -108,17 +108,17 @@ const data: CountryPageData = {
         "Auto-segmentation (3, 6, 9 months)",
         "Targeted WhatsApp campaigns",
         "Bookings dashboard",
-        "Email support in English",
+        "Email support",
       ],
     },
     {
-      name: "Growth",
-      price: "GHS 499",
+      name: "Pro",
+      price: "69,000 FCFA",
       priceDetail: "/ month",
-      rooms: "Up to 100 rooms",
+      rooms: "Up to 60 rooms",
       highlighted: true,
       features: [
-        "Everything in Essential",
+        "Everything in Starter",
         "AI message generation",
         "Real-time booking tracking",
         "Advanced campaign analytics",
@@ -127,12 +127,12 @@ const data: CountryPageData = {
     },
     {
       name: "Premium",
-      price: "GHS 699",
+      price: "189,000 FCFA",
       priceDetail: "/ month",
       rooms: "Unlimited rooms",
       highlighted: false,
       features: [
-        "Everything in Growth",
+        "Everything in Pro",
         "Dedicated WhatsApp API",
         "Multi-user access",
         "Personalized onboarding",
