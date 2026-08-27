@@ -2,26 +2,24 @@
 
 import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
-
-const COOKIE_KEY = "cookies_accepted";
+import { getStoredConsent, setStoredConsent } from "@/src/lib/cookieConsent";
 
 const CookieBanner = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(COOKIE_KEY);
-    if (!stored) {
+    if (getStoredConsent() === null) {
       startTransition(() => setVisible(true));
     }
   }, []);
 
   const accept = () => {
-    localStorage.setItem(COOKIE_KEY, "true");
+    setStoredConsent("granted");
     setVisible(false);
   };
 
   const decline = () => {
-    localStorage.setItem(COOKIE_KEY, "false");
+    setStoredConsent("denied");
     setVisible(false);
   };
 
@@ -32,7 +30,9 @@ const CookieBanner = () => {
       <div className="max-w-2xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex-1 min-w-0">
           <p className="text-sm text-slate-700 leading-relaxed">
-            Nous utilisons des cookies pour améliorer votre expérience.{" "}
+            Nous utilisons des cookies de mesure d&apos;audience uniquement si vous les acceptez.
+            Aucun cookie non essentiel n&apos;est déposé tant que vous n&apos;avez pas cliqué sur
+            &laquo;&nbsp;Accepter&nbsp;&raquo;.{" "}
             <Link href="/legal/cookies" className="text-primary hover:underline font-medium">
               En savoir plus
             </Link>
