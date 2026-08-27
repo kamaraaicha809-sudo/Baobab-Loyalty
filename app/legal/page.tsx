@@ -31,6 +31,11 @@ const pages = [
     title: "Conditions Générales de Vente",
     desc: "Tarifs, paiements, garanties et conditions de résiliation.",
   },
+  {
+    href: "/legal/dpa",
+    title: "Accord de sous-traitance (DPA)",
+    desc: "Rôles et obligations entre l'hôtel (responsable de traitement) et Baobab Loyalty (sous-traitant) concernant les données de vos clients.",
+  },
 ];
 
 export default function LegalIndexPage() {

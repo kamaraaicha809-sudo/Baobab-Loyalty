@@ -328,13 +328,17 @@ function SignUpContent() {
                 En créant un compte, vous acceptez nos{" "}
                 <Link href="/legal/cgu" className="text-primary hover:underline">
                   conditions d&apos;utilisation
-                </Link>{" "}
-                et notre{" "}
+                </Link>
+                , notre{" "}
                 <Link
                   href="/legal/confidentialite"
                   className="text-primary hover:underline"
                 >
                   politique de confidentialité
+                </Link>{" "}
+                et notre{" "}
+                <Link href="/legal/dpa" className="text-primary hover:underline">
+                  accord de sous-traitance des données
                 </Link>
                 .
               </p>

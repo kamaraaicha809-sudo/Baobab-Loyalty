@@ -126,6 +126,10 @@ const Footer = () => {
           <Link href="/legal/cgv" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             CGV
           </Link>
+          <span className="text-slate-300 text-xs">·</span>
+          <Link href="/legal/dpa" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+            DPA
+          </Link>
         </div>
       </div>
     </footer>
