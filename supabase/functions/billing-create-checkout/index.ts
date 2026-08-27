@@ -64,23 +64,29 @@ Deno.serve(async (req) => {
     }
 
     // Seul le propriétaire du compte gère la facturation (pas les membres invités)
-    const { profile, teamRole } = await resolveProfile<{ id: string; email: string | null; name: string | null }>(
+    const { profile, teamRole } = await resolveProfile<{ id: string; email: string | null; full_name: string | null }>(
       userClient,
       user.id,
-      "id, email, name"
+      "id, email, full_name"
     );
     if (teamRole !== "owner") {
       return errors.forbidden("Seul le propriétaire du compte peut gérer la facturation.");
     }
 
     const email = profile?.email || user.email || "";
-    const fullName = (profile?.name || email.split("@")[0] || "Client").trim();
+    const fullName = (profile?.full_name || email.split("@")[0] || "Client").trim();
     const nameParts = fullName.split(" ");
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ") || firstName;
 
-    const apiKey = Deno.env.get("MONEROO_API_KEY");
-    if (!apiKey) return errors.internal("Payment service not configured");
+    // Toujours la cle LIVE : ce parcours est celui utilise par de vrais
+    // hoteliers pour de vrais paiements. Aucune variable de mode ici — un
+    // hotel reel ne doit jamais pouvoir atterrir sur une page de paiement
+    // Sandbox, meme par une erreur de configuration. Les tests Sandbox
+    // passent par un script separe qui appelle l'API Moneroo directement
+    // avec MONEROO_API_KEY_SANDBOX (voir scripts/regression-tests/).
+    const apiKey = Deno.env.get("MONEROO_API_KEY_LIVE");
+    if (!apiKey) return errors.internal("Les paiements ne sont pas encore disponibles. Réessayez plus tard.");
 
     const response = await fetch(`${MONEROO_API_URL}/payments/initialize`, {
       method: "POST",

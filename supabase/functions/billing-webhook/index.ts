@@ -2,6 +2,13 @@
  * billing-webhook
  * Handles Moneroo webhook events
  *
+ * Recoit indifferemment les evenements Sandbox (tests) et Live (vrais
+ * paiements) sur la meme URL : MONEROO_WEBHOOK_SECRET_LIVE et
+ * MONEROO_WEBHOOK_SECRET_SANDBOX coexistent en permanence dans le Vault,
+ * jamais l'un a la place de l'autre. Le secret qui valide la signature
+ * determine le mode (voir verifyMonerooSignature) ; un paiement Sandbox ne
+ * declenche jamais de facture FNE reelle.
+ *
  * Auth: Moneroo HMAC-SHA256 signature (no JWT)
  * Method: POST
  */
@@ -31,19 +38,45 @@ async function verifySignature(body: string, signature: string, secret: string):
   }
 }
 
+type MonerooMode = "live" | "sandbox";
+
+// Sandbox et Live partagent la meme URL de webhook (les deux secrets sont
+// configures en permanence, jamais l'un a la place de l'autre) : on
+// determine l'origine d'un evenement par le secret qui valide sa signature,
+// jamais par une donnee du payload (falsifiable). Un paiement Sandbox reste
+// ainsi cryptographiquement impossible a faire passer pour un paiement Live,
+// et inversement.
+async function verifyMonerooSignature(
+  body: string,
+  signature: string
+): Promise<{ valid: boolean; mode: MonerooMode | null }> {
+  const liveSecret = Deno.env.get("MONEROO_WEBHOOK_SECRET_LIVE");
+  if (liveSecret && (await verifySignature(body, signature, liveSecret))) {
+    return { valid: true, mode: "live" };
+  }
+  const sandboxSecret = Deno.env.get("MONEROO_WEBHOOK_SECRET_SANDBOX");
+  if (sandboxSecret && (await verifySignature(body, signature, sandboxSecret))) {
+    return { valid: true, mode: "sandbox" };
+  }
+  return { valid: false, mode: null };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
   if (req.method !== "POST") return errors.badRequest("Method not allowed");
 
-  const webhookSecret = Deno.env.get("MONEROO_WEBHOOK_SECRET");
-  if (!webhookSecret) return errors.internal("Server configuration error");
+  const liveSecretConfigured = !!Deno.env.get("MONEROO_WEBHOOK_SECRET_LIVE");
+  const sandboxSecretConfigured = !!Deno.env.get("MONEROO_WEBHOOK_SECRET_SANDBOX");
+  if (!liveSecretConfigured && !sandboxSecretConfigured) {
+    return errors.internal("Server configuration error");
+  }
 
   const body = await req.text();
   const signature = req.headers.get("x-moneroo-signature");
 
   if (!signature) return errors.badRequest("Missing x-moneroo-signature header");
 
-  const isValid = await verifySignature(body, signature, webhookSecret);
+  const { valid: isValid, mode: paymentMode } = await verifyMonerooSignature(body, signature);
   if (!isValid) {
     return errors.badRequest("Invalid signature");
   }
@@ -70,6 +103,7 @@ Deno.serve(async (req) => {
   }
 
   const supabase = getServiceClient();
+  console.log(`[billing-webhook] Evenement "${event.event}" verifie via secret ${paymentMode}.`);
 
   try {
     switch (event.event) {
@@ -111,18 +145,28 @@ Deno.serve(async (req) => {
 
         if (error) throw error;
 
-        // FNE : best-effort, ne doit jamais faire echouer l'accuse de reception
-        // du webhook Moneroo (l'acces hotelier ci-dessus doit toujours passer).
-        try {
-          const monerooData = event.data as Record<string, unknown>;
-          await enqueueFneInvoice(supabase, {
-            userId,
-            planSlug: plan,
-            monerooPaymentId: typeof monerooData.id === "string" ? monerooData.id : null,
-            monerooMethod: typeof monerooData.method === "string" ? monerooData.method : undefined,
-          });
-        } catch (fneErr) {
-          console.error("[billing-webhook] Mise en file FNE echouee (non bloquant):", fneErr);
+        // FNE : jamais pour un paiement Sandbox — aucune facture fiscale
+        // reelle ne doit etre emise pour un paiement de test. Pour un
+        // paiement Live, best-effort : ne doit jamais faire echouer l'accuse
+        // de reception du webhook Moneroo (l'acces hotelier ci-dessus doit
+        // toujours passer).
+        if (paymentMode === "sandbox") {
+          console.log(
+            "[billing-webhook] Paiement Sandbox : acces de TEST accorde, aucune facture FNE emise.",
+            JSON.stringify({ userId, plan })
+          );
+        } else {
+          try {
+            const monerooData = event.data as Record<string, unknown>;
+            await enqueueFneInvoice(supabase, {
+              userId,
+              planSlug: plan,
+              monerooPaymentId: typeof monerooData.id === "string" ? monerooData.id : null,
+              monerooMethod: typeof monerooData.method === "string" ? monerooData.method : undefined,
+            });
+          } catch (fneErr) {
+            console.error("[billing-webhook] Mise en file FNE echouee (non bloquant):", fneErr);
+          }
         }
         break;
       }
