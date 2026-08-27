@@ -10,6 +10,7 @@ import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { getServiceClient } from "../_shared/auth.ts";
 import { enqueueFneInvoice } from "../_shared/fne/enqueue.ts";
+import { PLAN_PRICES_XOF } from "../_shared/plan.ts";
 
 async function verifySignature(body: string, signature: string, secret: string): Promise<boolean> {
   try {
@@ -78,6 +79,24 @@ Deno.serve(async (req) => {
         const plan = metadata?.plan;
 
         if (!userId) {
+          break;
+        }
+
+        // Le serveur est la seule source de verite sur le prix : on ne
+        // credite jamais un plan simplement parce que Moneroo dit "success".
+        // Le montant et la devise reellement payes doivent correspondre au
+        // prix connu du plan demande, sinon on rejette et on journalise
+        // plutot que d'accorder un acces potentiellement obtenu pour moins
+        // cher que son prix reel (metadata falsifiee, plan inconnu, etc).
+        const expectedAmount = plan ? PLAN_PRICES_XOF[plan.toLowerCase()] : undefined;
+        const paidAmount = typeof event.data.amount === "number" ? event.data.amount : Number(event.data.amount);
+        const paidCurrency = typeof event.data.currency === "string" ? event.data.currency : undefined;
+
+        if (!expectedAmount || paidCurrency !== "XOF" || paidAmount !== expectedAmount) {
+          console.error(
+            "[billing-webhook] Montant/devise payes incoherents avec le plan demande — acces NON accorde:",
+            JSON.stringify({ userId, plan, expectedAmount, paidAmount, paidCurrency })
+          );
           break;
         }
 

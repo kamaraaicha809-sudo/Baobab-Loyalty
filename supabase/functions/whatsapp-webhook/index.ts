@@ -5,8 +5,13 @@
  *  - messages entrants -> detecte un mot-cle STOP et desinscrit le client
  *
  * Pas d'authentification JWT (endpoint public appele par Meta/360dialog) :
- * la verification GET (hub.verify_token) et la signature POST
- * (X-Hub-Signature-256, secret Meta) font office d'authentification.
+ * la verification GET (hub.verify_token) et la signature POST font office
+ * d'authentification. Meta signe avec X-Hub-Signature-256 (secret META_APP_SECRET) ;
+ * 360dialog signe AUSSI ses webhooks, avec x-360dialog-signature (secret
+ * DIALOG360_WEBHOOK_SECRET, "Platform Secret" recupere depuis leur Partner Hub) —
+ * cf. https://docs.360dialog.com/partner/onboarding/webhook-events-and-setup/signature-validation.
+ * Toute requete sans l'un de ces deux en-tetes, ou dont la signature ne
+ * correspond pas, est rejetee SANS etre traitee (echec ferme, jamais ouvert).
  *
  * Method: GET (verification d'abonnement) / POST (evenements)
  */
@@ -14,6 +19,11 @@
 import { getServiceClient } from "../_shared/auth.ts";
 
 const STOP_KEYWORDS = ["stop", "arret", "arreter", "desabonner", "desinscrire", "unsubscribe"];
+
+// Un message entrant plus vieux que ce delai est ignore : protection anti-rejeu
+// si une requete legitime capturee etait rejouee (impact deja limite par
+// l'idempotence des operations ci-dessous, ceci est une couche supplementaire).
+const MAX_MESSAGE_AGE_SECONDS = 10 * 60;
 
 function normalizeText(text: string): string {
   return text
@@ -29,38 +39,56 @@ function isOptOutMessage(text: string | undefined): boolean {
   return STOP_KEYWORDS.some((kw) => normalized === kw || normalized.startsWith(kw + " ") || normalized.startsWith(kw + "!"));
 }
 
-// Verifie la signature Meta (HMAC SHA-256 du corps brut avec META_APP_SECRET).
-// 360dialog ne signe pas ses webhooks de la meme facon : si l'entete est
-// absente, on laisse passer (BSP) plutot que de rejeter des evenements
-// legitimes, mais on le journalise pour visibilite.
-async function verifyMetaSignature(rawBody: string, signatureHeader: string | null): Promise<boolean> {
-  const appSecret = Deno.env.get("META_APP_SECRET");
-  if (!signatureHeader || !appSecret) return signatureHeader === null;
-
-  const expectedPrefix = "sha256=";
-  if (!signatureHeader.startsWith(expectedPrefix)) return false;
-
+async function hmacHex(secret: string, body: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(appSecret),
+    new TextEncoder().encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
   );
-  const signatureBuffer = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(rawBody));
-  const computedHex = Array.from(new Uint8Array(signatureBuffer))
+  const signatureBuffer = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
+  return Array.from(new Uint8Array(signatureBuffer))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+}
 
-  const providedHex = signatureHeader.slice(expectedPrefix.length);
-  if (computedHex.length !== providedHex.length) return false;
-
-  // Comparaison en temps constant pour eviter une attaque par timing
+// Comparaison en temps constant pour eviter une attaque par timing.
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
   let diff = 0;
-  for (let i = 0; i < computedHex.length; i++) {
-    diff |= computedHex.charCodeAt(i) ^ providedHex.charCodeAt(i);
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   }
   return diff === 0;
+}
+
+type SignatureCheck = { valid: boolean; provider: "meta" | "360dialog" | "none" };
+
+// Verifie la signature du fournisseur presente sur la requete. Si AUCUN des
+// deux en-tetes de signature connus n'est present, ou si le secret attendu
+// n'est pas configure cote serveur, la requete est refusee : contrairement a
+// l'implementation precedente, l'absence de signature n'est plus jamais
+// interpretee comme "provient forcement du BSP, donc ok".
+async function verifyWebhookSignature(rawBody: string, headers: Headers): Promise<SignatureCheck> {
+  const metaSignature = headers.get("x-hub-signature-256");
+  if (metaSignature) {
+    const appSecret = Deno.env.get("META_APP_SECRET");
+    const prefix = "sha256=";
+    if (!appSecret || !metaSignature.startsWith(prefix)) return { valid: false, provider: "meta" };
+    const expected = await hmacHex(appSecret, rawBody);
+    return { valid: timingSafeEqualHex(expected, metaSignature.slice(prefix.length)), provider: "meta" };
+  }
+
+  const dialogSignature = headers.get("x-360dialog-signature");
+  if (dialogSignature) {
+    const platformSecret = Deno.env.get("DIALOG360_WEBHOOK_SECRET");
+    if (!platformSecret) return { valid: false, provider: "360dialog" };
+    const expected = await hmacHex(platformSecret, rawBody);
+    return { valid: timingSafeEqualHex(expected, dialogSignature), provider: "360dialog" };
+  }
+
+  return { valid: false, provider: "none" };
 }
 
 const STATUS_RANK: Record<string, number> = { sent: 1, delivered: 2, read: 3 };
@@ -112,6 +140,7 @@ interface InboundMessage {
   from: string; // digits, sans "+"
   text?: { body?: string };
   type?: string;
+  timestamp?: string; // secondes Unix, fourni par Meta/360dialog
 }
 
 async function applyInboundOptOut(
@@ -170,14 +199,19 @@ Deno.serve(async (req) => {
   // Meta desactive un webhook qui echoue/timeout trop souvent.
   try {
     const rawBody = await req.text();
-    const signatureValid = await verifyMetaSignature(rawBody, req.headers.get("x-hub-signature-256"));
+
+    // Verification d'authenticite AVANT tout parsing/traitement du payload :
+    // une requete sans signature reconnue, ou dont la signature ne correspond
+    // pas, ne doit jamais atteindre la logique metier ci-dessous.
+    const { valid: signatureValid, provider } = await verifyWebhookSignature(rawBody, req.headers);
     if (!signatureValid) {
-      console.error("whatsapp-webhook: invalid signature");
+      console.error(`whatsapp-webhook: signature manquante ou invalide (provider=${provider})`);
       return new Response("ok", { status: 200 });
     }
 
     const payload = JSON.parse(rawBody);
     const db = getServiceClient();
+    const nowSeconds = Date.now() / 1000;
 
     const entries = payload?.entry || [];
     for (const entry of entries) {
@@ -196,6 +230,14 @@ Deno.serve(async (req) => {
 
         const messages: InboundMessage[] = value.messages || [];
         for (const message of messages) {
+          // Protection anti-rejeu : un message dont l'horodatage fourni par
+          // le provider est trop ancien est ignore (requete legitime capturee
+          // et rejouee plus tard).
+          const messageTimestamp = message.timestamp ? Number(message.timestamp) : undefined;
+          if (messageTimestamp && nowSeconds - messageTimestamp > MAX_MESSAGE_AGE_SECONDS) {
+            console.error("whatsapp-webhook: message ignore (horodatage trop ancien, rejeu possible)");
+            continue;
+          }
           try {
             await applyInboundOptOut(db, value.metadata?.phone_number_id, message);
           } catch (err) {
