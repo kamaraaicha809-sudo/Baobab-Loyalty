@@ -12,6 +12,7 @@
     "test:whatsapp-webhook-security": "node scripts/regression-tests/whatsapp-webhook-security.mjs",
     "test:billing-webhook-security": "node scripts/regression-tests/billing-webhook-security.mjs",
     "test:posthog-entrypoint": "node scripts/regression-tests/posthog-single-entrypoint.mjs",
+    "test:beta-trial-activation": "node scripts/regression-tests/beta-trial-activation.mjs",
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
     "build": "next build",

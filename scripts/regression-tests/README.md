@@ -22,12 +22,18 @@ suite `whatsapp-consent` configure volontairement une fausse clé BSP
   `whatsapp-webhook` (vérification de signature Meta/360dialog, protection
   anti-rejeu).
 - `billing-webhook-security` : avant toute modification de `billing-webhook`
-  (vérification de signature Moneroo, contrôle serveur du montant/devise,
-  payload falsifié, événement invalide).
+  (vérification de signature Moneroo Sandbox/Live, contrôle serveur du
+  montant/devise, payload falsifié, événement invalide, non-déclenchement de
+  facture FNE pour un paiement Sandbox).
 - `posthog-entrypoint` : avant toute modification touchant le tracking
   analytics — garde-fou statique qui empêche un futur import de `posthog-js`
   en dehors de `PostHogProvider.tsx` (le seul endroit où l'initialisation est
   subordonnée au consentement).
+- `beta-trial-activation` : avant toute modification de
+  `profile-activate-beta-trial` ou de la migration
+  `044_restrict_profiles_columns.sql` (GRANT UPDATE sur `profiles`) —
+  vérifie l'activation réelle de l'essai bêta 14 jours, son idempotence
+  (pas de prolongation via appels répétés), et le rejet sans JWT.
 
 ## Lancer les tests
 
@@ -37,6 +43,7 @@ npm run test:whatsapp-consent
 npm run test:whatsapp-webhook-security
 npm run test:billing-webhook-security
 npm run test:posthog-entrypoint
+npm run test:beta-trial-activation
 ```
 
 Chaque script affiche un JSON avec un `pass: true/false` par vérification, et
@@ -57,9 +64,14 @@ importante, mais incomplète).
 Ajouter dans `.env.local` (fichier gitignore, jamais commité) :
 
 ```bash
-META_APP_SECRET=...            # même valeur que dans Supabase Vault
-MONEROO_WEBHOOK_SECRET=...     # même valeur que dans Supabase Vault
+META_APP_SECRET=...                  # même valeur que dans Supabase Vault
+MONEROO_WEBHOOK_SECRET_SANDBOX=...   # même valeur que MONEROO_WEBHOOK_SECRET_SANDBOX dans Supabase Vault
 ```
+
+`billing-webhook-security` ne signe **jamais** avec le secret Live
+(`MONEROO_WEBHOOK_SECRET_LIVE`) : ce script simule uniquement des paiements de
+test, il n'a donc besoin que du secret Sandbox en local, même une fois que
+Moneroo sera activé en production.
 
 `DIALOG360_WEBHOOK_SECRET` n'existe pas encore (aucun hôtel n'utilise
 360dialog à ce jour) : son test "signature valide" ne pourra être ajouté que

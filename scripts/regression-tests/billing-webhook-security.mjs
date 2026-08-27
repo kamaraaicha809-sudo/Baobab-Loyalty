@@ -3,32 +3,39 @@
 // Verifie en conditions reelles (vraie Edge Function deployee) que :
 //   1. requete sans signature -> jamais d'acces accorde
 //   2. requete avec signature incorrecte -> jamais d'acces accorde
-//   3. signature valide + montant correct -> abonnement active
+//   3. signature Sandbox valide + montant correct -> acces de TEST active
 //   4. signature valide + montant incorrect (!= prix reel du plan) -> jamais active
 //   5. signature valide + devise incorrecte -> jamais active
 //   6. payload falsifie apres signature (signature d'un autre corps) -> rejete
 //   7. evenement invalide/inconnu (signature valide) -> aucun acces accorde
+//   8. paiement Sandbox valide -> aucune facture FNE mise en file (jamais de facture reelle pour un test)
 //
-// Tant que MONEROO_WEBHOOK_SECRET n'est pas configure dans le Vault Supabase,
-// la fonction repond 500 "Server configuration error" a TOUTE requete (bug
-// connu, en attente de configuration cote utilisateur) : les tests 1 et 2
-// s'adaptent a cet etat (ils verifient "aucun acces jamais accorde", peu importe
-// le code HTTP exact renvoye). Les tests 3/4/5 necessitent en plus une copie
-// locale du meme secret dans .env.local (MONEROO_WEBHOOK_SECRET) pour pouvoir
-// signer un payload de test valide : ils sont annonces "SKIPPED" si absent.
+// billing-webhook accepte en permanence DEUX secrets independants :
+// MONEROO_WEBHOOK_SECRET_LIVE (vrais paiements) et MONEROO_WEBHOOK_SECRET_SANDBOX
+// (paiements de test) - jamais l'un a la place de l'autre. Ce script signe
+// TOUJOURS avec le secret Sandbox (MONEROO_WEBHOOK_SECRET_SANDBOX dans
+// .env.local) : il ne doit jamais avoir besoin du secret Live pour tourner.
+//
+// Tant qu'AUCUN des deux secrets n'est configure dans le Vault Supabase, la
+// fonction repond 500 "Server configuration error" a TOUTE requete : les
+// tests 1 et 2 s'adaptent a cet etat (ils verifient "aucun acces jamais
+// accorde", peu importe le code HTTP exact renvoye). Les tests 3 a 8
+// necessitent en plus une copie locale du secret Sandbox dans .env.local
+// (MONEROO_WEBHOOK_SECRET_SANDBOX) pour pouvoir signer un payload de test
+// valide : ils sont annonces "SKIPPED" si absent.
 //
 // Aucun paiement reel n'est jamais declenche : ce script appelle directement
 // billing-webhook avec un payload simule, jamais l'API Moneroo.
 //
 // A relancer avant toute modification de billing-webhook, et systematiquement
-// apres configuration du secret en production.
+// apres configuration des secrets en production.
 //
 // Usage : node scripts/regression-tests/billing-webhook-security.mjs
 
 import { svc, adminCreateUser, adminDeleteUser, makeReporter, hmacHex, envVarOptional, SUPABASE_URL, ANON_KEY } from "./_shared.mjs";
 
 const { log, printAndExit } = makeReporter();
-const MONEROO_WEBHOOK_SECRET = envVarOptional("MONEROO_WEBHOOK_SECRET");
+const MONEROO_WEBHOOK_SECRET = envVarOptional("MONEROO_WEBHOOK_SECRET_SANDBOX");
 
 // Source de verite : supabase/functions/_shared/plan.ts (PLAN_PRICES_XOF).
 const STARTER_PRICE_XOF = 39000;
@@ -89,7 +96,7 @@ try {
       "Test 1 : requete sans signature -> aucun acces accorde",
       rejectedProperly && !access,
       `httpStatus=${status} body=${JSON.stringify(respBody)} accesAccorde=${access}` +
-        (status === 500 ? " [MONEROO_WEBHOOK_SECRET non configure cote serveur - a configurer par l'utilisateur]" : "")
+        (status === 500 ? " [ni MONEROO_WEBHOOK_SECRET_LIVE ni MONEROO_WEBHOOK_SECRET_SANDBOX configures cote serveur - a configurer par l'utilisateur]" : "")
     );
   }
 
@@ -104,16 +111,19 @@ try {
       "Test 2 : signature incorrecte -> aucun acces accorde",
       rejectedProperly && !access,
       `httpStatus=${status} body=${JSON.stringify(respBody)} accesAccorde=${access}` +
-        (status === 500 ? " [MONEROO_WEBHOOK_SECRET non configure cote serveur - a configurer par l'utilisateur]" : "")
+        (status === 500 ? " [ni MONEROO_WEBHOOK_SECRET_LIVE ni MONEROO_WEBHOOK_SECRET_SANDBOX configures cote serveur - a configurer par l'utilisateur]" : "")
     );
   }
 
   if (!MONEROO_WEBHOOK_SECRET) {
-    log("Test 3 : signature valide + montant correct -> abonnement active", null, "SKIPPED - MONEROO_WEBHOOK_SECRET absent de .env.local, impossible de signer un payload valide localement");
+    log("Test 3 : signature Sandbox valide + montant correct -> acces de TEST active", null, "SKIPPED - MONEROO_WEBHOOK_SECRET_SANDBOX absent de .env.local, impossible de signer un payload valide localement");
     log("Test 4 : signature valide + montant incorrect -> jamais active", null, "SKIPPED - meme raison");
     log("Test 5 : signature valide + devise incorrecte -> jamais active", null, "SKIPPED - meme raison");
+    log("Test 6 : payload falsifie apres signature -> rejete", null, "SKIPPED - meme raison");
+    log("Test 7 : evenement invalide/inconnu -> aucun acces accorde", null, "SKIPPED - meme raison");
+    log("Test 8 : paiement Sandbox valide -> aucune facture FNE mise en file", null, "SKIPPED - meme raison");
   } else {
-    // --- Test 3 : signature valide + montant correct ---
+    // --- Test 3 : signature Sandbox valide + montant correct ---
     {
       await resetAccess();
       const body = paymentSuccessPayload({ amount: STARTER_PRICE_XOF, currency: "XOF", monerooId: `pay_sectest_${stamp}_3` });
@@ -121,7 +131,7 @@ try {
       const { status, body: respBody } = await postWebhook(body, { "x-moneroo-signature": sig });
       await new Promise((r) => setTimeout(r, 400));
       const access = await hasAccess();
-      log("Test 3 : signature valide + montant correct -> abonnement active", status === 200 && access, `httpStatus=${status} body=${JSON.stringify(respBody)} accesAccorde=${access}`);
+      log("Test 3 : signature Sandbox valide + montant correct -> acces de TEST active", status === 200 && access, `httpStatus=${status} body=${JSON.stringify(respBody)} accesAccorde=${access}`);
     }
 
     // --- Test 4 : signature valide + montant incorrect (paye 1 XOF au lieu de 39000) ---
@@ -181,6 +191,26 @@ try {
         "Test 7 : evenement invalide/inconnu (signature valide) -> aucun acces accorde",
         !access,
         `httpStatus=${status} accesAccorde=${access}`
+      );
+    }
+
+    // --- Test 8 : paiement Sandbox valide -> jamais de facture FNE reelle ---
+    // Un paiement Sandbox est un test technique, pas un vrai encaissement : il ne
+    // doit jamais generer de facture fiscale, meme si le montant/devise "collent".
+    {
+      await resetAccess();
+      const monerooId = `pay_sectest_${stamp}_8`;
+      const body = paymentSuccessPayload({ amount: STARTER_PRICE_XOF, currency: "XOF", monerooId });
+      const sig = await hmacHex(MONEROO_WEBHOOK_SECRET, body);
+      const { status } = await postWebhook(body, { "x-moneroo-signature": sig });
+      await new Promise((r) => setTimeout(r, 400));
+      const access = await hasAccess();
+      const invoiceCheck = await svc(`invoices?moneroo_payment_id=eq.${monerooId}&select=id`);
+      const noInvoiceCreated = Array.isArray(invoiceCheck.body) && invoiceCheck.body.length === 0;
+      log(
+        "Test 8 : paiement Sandbox valide -> acces de TEST accorde MAIS aucune facture FNE mise en file",
+        status === 200 && access && noInvoiceCreated,
+        `httpStatus=${status} accesAccorde=${access} factureCreee=${!noInvoiceCreated}`
       );
     }
   }
