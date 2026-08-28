@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { user } from "@/src/sdk";
-import { reservations, type RevenueGenerated } from "@/src/sdk/reservations";
+import { reservations, type RevenueGenerated, type RecentActivityItem } from "@/src/sdk/reservations";
 import { campaigns as campaignsSdk, type RecentCampaign } from "@/src/sdk/campaigns";
 import { funnel, type CampaignFunnelStats } from "@/src/sdk/funnel";
 import { opportunities as opportunitiesSdk, type RevenueOpportunity } from "@/src/sdk/opportunities";
@@ -33,6 +33,21 @@ function formatPercent(rate: number | null): string {
   if (rate === null) return "—";
   return `${Math.round(rate * 100)}%`;
 }
+
+function formatRelativeTime(iso: string): string {
+  const date = new Date(iso);
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 1) return "À l'instant";
+  if (diffMin < 60) return `Il y a ${diffMin} min`;
+  const isToday = date.toDateString() === new Date().toDateString();
+  if (isToday) return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const yesterday = new Date(Date.now() - 24 * 3600 * 1000);
+  const isYesterday = date.toDateString() === yesterday.toDateString();
+  const time = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  if (isYesterday) return `Hier ${time}`;
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+}
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 
 const maxChartFromData = (data: { directes: number; autres: number }[]) =>
@@ -50,12 +65,24 @@ export default function Dashboard() {
   const [revenueOpportunities, setRevenueOpportunities] = useState<RevenueOpportunity[] | null>(null);
   const [recommendation, setRecommendation] = useState<CampaignRecommendation | null>(null);
   const [recoLoading, setRecoLoading] = useState(false);
+  const [recentActivity, setRecentActivity] = useState<RecentActivityItem[] | null>(null);
 
   const displayName = isDemoMode
     ? demoUser.user_metadata.full_name
     : profile?.email?.split("@")[0] || "Utilisateur";
 
   const getDemoImpactCount = () => demoMetrics.impactToday;
+
+  const hasRealActivity = !isDemoMode && recentActivity !== null && recentActivity.length > 0;
+  const fluxItems = hasRealActivity
+    ? recentActivity!.map((a) => ({
+        client: a.client_name || "Client",
+        hotel: a.hotel_name || "votre hôtel",
+        offre: a.offer_name || "Réservation confirmée",
+        time: formatRelativeTime(a.confirmed_at),
+      }))
+    : demoFlux;
+  const isFluxExample = !hasRealActivity;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -87,6 +114,12 @@ export default function Dashboard() {
             setRevenue(revenueGenerated);
             setRecentCampaigns(campaignsRecent);
             setFunnelStats(funnelData);
+            try {
+              const activity = await reservations.getRecentActivity(data.id);
+              setRecentActivity(activity);
+            } catch {
+              setRecentActivity([]);
+            }
             try {
               // Dépend du taux de conversion du funnel ci-dessus : ne peut pas
               // être calculé dans le même Promise.all.
@@ -132,6 +165,25 @@ export default function Dashboard() {
             try {
               const count = await reservations.getReservationsTodayCount(profile.id!);
               setImpactCount(count);
+            } catch {
+              // Ignorer les erreurs de rafraîchissement
+            }
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "reservations",
+            filter: `profile_id=eq.${profile.id}`,
+          },
+          async () => {
+            // Une confirmation passe par UPDATE (status -> confirmed), pas
+            // INSERT — c'est ce qui alimente le "Flux en direct".
+            try {
+              const activity = await reservations.getRecentActivity(profile.id!);
+              setRecentActivity(activity);
             } catch {
               // Ignorer les erreurs de rafraîchissement
             }
@@ -505,12 +557,30 @@ export default function Dashboard() {
         <div className="space-y-4">
           {/* Flux en direct */}
           <div className="bg-white p-5 rounded-xl border border-slate-200">
-            <h2 className="font-bold text-base text-slate-900 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              Flux en direct
-            </h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${isFluxExample ? "bg-slate-300" : "bg-green-500"}`}></span>
+                Flux en direct
+              </h2>
+              {isFluxExample && (
+                <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                  Exemple
+                </span>
+              )}
+            </div>
+            {isFluxExample && (
+              <div className="mb-3 flex items-start gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#1d4ed8" className="w-4 h-4 mt-0.5 shrink-0">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                <p className="text-xs text-blue-800 leading-snug">
+                  Voici un exemple qui représente une possibilité réelle. Cet exemple sera remplacé par vos
+                  données en temps réel avec votre abonnement.
+                </p>
+              </div>
+            )}
             <div className="space-y-3">
-              {demoFlux.map((f, i) => (
+              {fluxItems.map((f, i) => (
                 <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">

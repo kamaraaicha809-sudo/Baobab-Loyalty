@@ -63,7 +63,10 @@ Deno.serve(async (req) => {
 
     const newStatus = action === "confirm" ? "confirmed" : "cancelled";
     const updatePayload: Record<string, unknown> = { status: newStatus };
-    if (action === "confirm") updatePayload.montant_fcfa = montantFcfa;
+    if (action === "confirm") {
+      updatePayload.montant_fcfa = montantFcfa;
+      updatePayload.confirmed_at = new Date().toISOString();
+    }
 
     const { error: updateError } = await db
       .from("reservations")

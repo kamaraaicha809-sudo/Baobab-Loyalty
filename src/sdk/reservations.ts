@@ -152,6 +152,44 @@ export async function cancelReservation(reservationId: string): Promise<ConfirmR
   });
 }
 
+export interface RecentActivityItem {
+  id: string;
+  client_name: string | null;
+  hotel_name: string | null;
+  offer_name: string | null;
+  confirmed_at: string;
+}
+
+/**
+ * Dernières réservations réellement confirmées par l'hôtelier, pour le
+ * widget "Flux en direct" du dashboard. Tant que cette liste est vide
+ * (aucune confirmation encore faite), l'UI affiche un exemple à la place.
+ */
+export async function getRecentActivity(profileId: string, limit = 5): Promise<RecentActivityItem[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("id, client_name, hotel_name, confirmed_at, offers(name)")
+    .eq("profile_id", profileId)
+    .eq("status", "confirmed")
+    .not("confirmed_at", "is", null)
+    .order("confirmed_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return (data ?? []).map((row) => {
+    const offer = row.offers as unknown as { name: string } | { name: string }[] | null;
+    const offerName = Array.isArray(offer) ? offer[0]?.name ?? null : offer?.name ?? null;
+    return {
+      id: row.id,
+      client_name: row.client_name,
+      hotel_name: row.hotel_name,
+      offer_name: offerName,
+      confirmed_at: row.confirmed_at as string,
+    };
+  });
+}
+
 export const reservations = {
   getReservationsChart,
   getReservationsTodayCount,
@@ -160,4 +198,5 @@ export const reservations = {
   getPendingReservations,
   confirmReservation,
   cancelReservation,
+  getRecentActivity,
 };
