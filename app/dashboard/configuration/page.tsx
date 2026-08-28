@@ -8,6 +8,7 @@ import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients, MAX_CSV_FILE_SIZE_BYTES, type Client, type ImportClientRow, type ImportPreview } from "@/src/sdk/clients";
 import { whatsapp } from "@/src/sdk/whatsapp";
+import { billing } from "@/src/sdk/billing";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
 
@@ -110,6 +111,8 @@ export default function ConfigurationPage() {
   const [aiSettings, setAiSettings] = useState<AiSettingsForm>(emptyAiSettings);
   const [savingAiSettings, setSavingAiSettings] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [onboardingFeePaidAt, setOnboardingFeePaidAt] = useState<string | null>(null);
+  const [payingOnboardingFee, setPayingOnboardingFee] = useState(false);
 
   const setAiField = (field: keyof AiSettingsForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setAiSettings((s) => ({ ...s, [field]: e.target.value }));
@@ -125,6 +128,7 @@ export default function ConfigurationPage() {
         setConfigComplete(demoProfile.config_complete);
         setCounts(demoSegmentCounts);
         setIsPremium(demoProfile.price_id === "premium");
+        setOnboardingFeePaidAt(demoProfile.onboarding_fee_paid_at);
         setAiSettings({
           ai_brand_voice: demoProfile.ai_brand_voice || "",
           ai_keywords_use: demoProfile.ai_keywords_use || "",
@@ -144,7 +148,7 @@ export default function ConfigurationPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, price_id, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature")
+      .select("hotel_name, config_complete, adresse_physique, adresse_postale, email_principal, telephone_officiel, nom_responsable, telephone_responsable, email_responsable, latitude, longitude, reception_whatsapp, reception_email, price_id, ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature, onboarding_fee_paid_at")
       .eq("id", user.id)
       .single();
 
@@ -165,6 +169,7 @@ export default function ConfigurationPage() {
       });
       setConfigComplete(profile.config_complete ?? false);
       setIsPremium((profile as Record<string, unknown>).price_id === "premium");
+      setOnboardingFeePaidAt(((profile as Record<string, unknown>).onboarding_fee_paid_at as string) || null);
       setAiSettings({
         ai_brand_voice: ((profile as Record<string, unknown>).ai_brand_voice as string) || "",
         ai_keywords_use: ((profile as Record<string, unknown>).ai_keywords_use as string) || "",
@@ -275,6 +280,24 @@ export default function ConfigurationPage() {
       toast.error("Erreur lors de l'enregistrement");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePayOnboardingFee = async () => {
+    if (isDemoMode) {
+      toast.error("Paiement désactivé en mode démo.");
+      return;
+    }
+    setPayingOnboardingFee(true);
+    try {
+      const { url } = await billing.createOnboardingFeeCheckout({
+        successUrl: `${window.location.origin}/dashboard/configuration?onboarding_fee=success`,
+        cancelUrl: `${window.location.origin}/dashboard/configuration`,
+      });
+      window.location.href = url;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Impossible de démarrer le paiement. Réessayez.");
+      setPayingOnboardingFee(false);
     }
   };
 
@@ -940,6 +963,46 @@ export default function ConfigurationPage() {
           initialPhone={waStatus.phone}
           onStatusChange={(connected) => setWaStatus((s) => ({ ...s, connected }))}
         />
+      </section>
+
+      {/* Frais d'intégration — hôtels sans base de données électronique */}
+      <section className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <Icons.Sparkles />
+            Frais d&apos;intégration
+          </h2>
+          {onboardingFeePaidAt && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Payé le {new Date(onboardingFeePaidAt).toLocaleDateString("fr-FR")}
+            </span>
+          )}
+        </div>
+        <p className="text-slate-600 text-sm mb-4">
+          {config.billing.onboardingFee.description} Une fois payé, vous avez accès au{" "}
+          <Link href="/dashboard/registre" className="text-primary font-medium hover:underline">
+            registre numérique
+          </Link>{" "}
+          pour continuer à ajouter vos nouveaux clients au fil de l&apos;eau — en plus de l&apos;import CSV ci-dessous pour vos anciens clients du cahier.
+        </p>
+        {!onboardingFeePaidAt && (
+          <button
+            type="button"
+            onClick={handlePayOnboardingFee}
+            disabled={payingOnboardingFee || isDemoMode}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {payingOnboardingFee
+              ? "Redirection..."
+              : `Payer les frais d'intégration — ${config.billing.onboardingFee.price.toLocaleString("fr-FR")} ${config.billing.currency}`}
+          </button>
+        )}
+        {isDemoMode && !onboardingFeePaidAt && (
+          <p className="text-xs text-slate-400 italic mt-2">Paiement désactivé en mode démo.</p>
+        )}
       </section>
 
       {/* Import base clients */}

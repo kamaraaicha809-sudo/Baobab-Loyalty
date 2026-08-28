@@ -11,7 +11,7 @@ import { requireAuth } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { resolveProfile } from "../_shared/team.ts";
-import { PLAN_PRICES_XOF } from "../_shared/plan.ts";
+import { PLAN_PRICES_XOF, ONBOARDING_FEE_XOF } from "../_shared/plan.ts";
 import { v } from "../_shared/deps.ts";
 
 const MONEROO_API_URL = "https://api.moneroo.io/v1";
@@ -19,6 +19,11 @@ const MONEROO_API_URL = "https://api.moneroo.io/v1";
 const CheckoutBodySchema = v.object({
   planSlug: v.string([v.minLength(1), v.maxLength(50)]),
   planName: v.optional(v.string([v.maxLength(100)])),
+  // "subscription" (defaut) = un des plans PLAN_PRICES_XOF, credite has_access
+  // dans le webhook. "onboarding_fee" = frais d'integration one-time (49 000
+  // FCFA), ne touche jamais has_access/price_id — voir billing-webhook.
+  // Valide manuellement plus bas (pas de v.picklist : version de valibot incertaine).
+  type: v.optional(v.string([v.maxLength(20)])),
   successUrl: v.string([v.minLength(1), v.maxLength(2000)]),
   cancelUrl: v.string([v.minLength(1), v.maxLength(2000)]),
 });
@@ -49,15 +54,17 @@ Deno.serve(async (req) => {
     if (!parsed.success) {
       return errors.badRequest("Missing or invalid required fields: planSlug, successUrl, cancelUrl");
     }
-    const { planSlug, planName, successUrl, cancelUrl } = parsed.output;
+    const { planSlug, planName, type, successUrl, cancelUrl } = parsed.output;
     if (!isValidHttpUrl(successUrl) || !isValidHttpUrl(cancelUrl)) {
       return errors.badRequest("successUrl et cancelUrl doivent être des URLs http(s) valides");
     }
+    const isOnboardingFee = type === "onboarding_fee";
 
     // Le montant n'est JAMAIS pris depuis le client : on le recalcule ici a
-    // partir du plan. Sinon n'importe quel appelant peut poster son propre
-    // prix (ex: 1 XOF pour le plan Premium) et l'obtenir a ce tarif.
-    const amount = PLAN_PRICES_XOF[String(planSlug).toLowerCase()];
+    // partir du plan (ou du frais d'integration, montant fixe). Sinon
+    // n'importe quel appelant peut poster son propre prix (ex: 1 XOF pour le
+    // plan Premium) et l'obtenir a ce tarif.
+    const amount = isOnboardingFee ? ONBOARDING_FEE_XOF : PLAN_PRICES_XOF[String(planSlug).toLowerCase()];
     const currency = "XOF";
     if (!amount) {
       return errors.badRequest(`Plan inconnu : "${planSlug}"`);
@@ -98,7 +105,9 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         amount,
         currency,
-        description: `Abonnement Baobab Loyalty - Plan ${planName || planSlug}`,
+        description: isOnboardingFee
+          ? "Frais d'intégration Baobab Loyalty - Digitalisation base clients (unique)"
+          : `Abonnement Baobab Loyalty - Plan ${planName || planSlug}`,
         return_url: successUrl,
         cancel_url: cancelUrl,
         customer: {
@@ -106,10 +115,9 @@ Deno.serve(async (req) => {
           first_name: firstName,
           last_name: lastName,
         },
-        metadata: {
-          user_id: user.id,
-          plan: planSlug,
-        },
+        metadata: isOnboardingFee
+          ? { user_id: user.id, type: "onboarding_fee" }
+          : { user_id: user.id, plan: planSlug },
       }),
     });
 

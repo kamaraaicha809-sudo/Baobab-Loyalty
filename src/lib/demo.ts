@@ -35,6 +35,7 @@ export const demoProfile = {
   config_complete: true,
   onboarding_completed: true,
   onboarding_step: 3,
+  onboarding_fee_paid_at: null,
   ai_brand_voice: "Chaleureux et familial",
   ai_keywords_use: "bienvenue, séjour inoubliable, à bientôt",
   ai_keywords_avoid: "promo, soldes",

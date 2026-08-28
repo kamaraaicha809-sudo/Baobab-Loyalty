@@ -9,7 +9,7 @@
  */
 
 import type { SupabaseClient } from "../deps.ts";
-import { buildInvoicePayload, resolveTaxCode, resolveTemplate } from "./mapper.ts";
+import { buildInvoicePayload, buildOneTimeItemPayload, resolveTaxCode, resolveTemplate } from "./mapper.ts";
 import type { PaymentMethod } from "./types.ts";
 import { PLAN_PRICES_XOF } from "../plan.ts";
 
@@ -136,6 +136,115 @@ export async function enqueueFneInvoice(supabase: SupabaseClient, args: EnqueueF
     quantity: 30,
     unit_amount_ht: totals.unitAmountHt,
     measurement_unit: "jour",
+    tax_code: taxCode,
+  });
+
+  if (itemError) {
+    console.error("[fne] Echec insertion invoice_items:", itemError.message);
+  }
+}
+
+export interface EnqueueOneTimeFneInvoiceArgs {
+  userId: string;
+  product: string; // ex. "onboarding_fee" — distingue cette facture d'un abonnement (product par defaut: baobab_loyalty_subscription)
+  amountXof: number;
+  description: string;
+  reference: string;
+  monerooPaymentId: string | null;
+  monerooMethod: string | undefined;
+}
+
+/**
+ * Variante de enqueueFneInvoice pour un article vendu a l'unite (quantite 1),
+ * plutot qu'un abonnement mensuel decoupe en 30 "jours". Utilise pour le
+ * frais d'integration (digitalisation cahier papier) — voir billing-webhook.
+ */
+export async function enqueueOneTimeFneInvoice(supabase: SupabaseClient, args: EnqueueOneTimeFneInvoiceArgs): Promise<void> {
+  const { data: config } = await supabase
+    .from("fne_config")
+    .select("*")
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!config) {
+    console.log("[fne] Aucune fne_config active - facture non mise en file (inscription DGI en cours).");
+    return;
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, hotel_name, email, ncc, country, whatsapp_display_phone")
+    .eq("id", args.userId)
+    .single();
+
+  if (profileError || !profile) {
+    console.error("[fne] Profil introuvable pour la facture FNE:", profileError?.message);
+    return;
+  }
+
+  const internalNumber = `BL-${Date.now()}-${args.userId.slice(0, 8)}`;
+  const template = resolveTemplate({ country: profile.country, ncc: profile.ncc });
+  const taxCode = resolveTaxCode(config.vat_registered);
+  const paymentMethod = mapMonerooPaymentMethod(args.monerooMethod);
+
+  const baseInvoiceRow = {
+    internal_number: internalNumber,
+    moneroo_payment_id: args.monerooPaymentId,
+    product: args.product,
+    plan_slug: null,
+    profile_id: args.userId,
+    template,
+    payment_method: paymentMethod,
+  };
+
+  let totals: { totalHt: number; totalTtc: number; vat: number };
+  try {
+    totals = buildOneTimeItemPayload({
+      template,
+      paymentMethod,
+      taxCode,
+      amountHt: args.amountXof,
+      description: args.description,
+      reference: args.reference,
+      pointOfSale: config.default_point_of_sale,
+      establishment: config.default_establishment,
+      ncc: profile.ncc,
+      hotelName: profile.hotel_name || profile.email,
+      clientPhone: profile.whatsapp_display_phone,
+      clientEmail: profile.email,
+      foreignCurrency: "",
+      foreignCurrencyRate: 0,
+    });
+  } catch (err) {
+    await insertInvoiceIgnoringDuplicate(supabase, {
+      ...baseInvoiceRow,
+      total_ht_local: 0,
+      total_ttc_local: 0,
+      vat_local: 0,
+      state: "NEEDS_FIX",
+      last_error: err instanceof Error ? err.message : "Erreur de mapping FNE inconnue",
+    });
+    return;
+  }
+
+  const invoiceId = await insertInvoiceIgnoringDuplicate(supabase, {
+    ...baseInvoiceRow,
+    total_ht_local: totals.totalHt,
+    total_ttc_local: totals.totalTtc,
+    vat_local: totals.vat,
+    state: "QUEUED",
+  });
+
+  if (!invoiceId) return; // deja traite (webhook Moneroo redelivre) ou echec deja logge
+
+  const { error: itemError } = await supabase.from("invoice_items").insert({
+    invoice_id: invoiceId,
+    line_no: 1,
+    reference: args.reference,
+    description: args.description,
+    quantity: 1,
+    unit_amount_ht: args.amountXof,
+    measurement_unit: "unité",
     tax_code: taxCode,
   });
 

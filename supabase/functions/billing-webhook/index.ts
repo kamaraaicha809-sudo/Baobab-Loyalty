@@ -16,8 +16,8 @@
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { getServiceClient } from "../_shared/auth.ts";
-import { enqueueFneInvoice } from "../_shared/fne/enqueue.ts";
-import { PLAN_PRICES_XOF } from "../_shared/plan.ts";
+import { enqueueFneInvoice, enqueueOneTimeFneInvoice } from "../_shared/fne/enqueue.ts";
+import { PLAN_PRICES_XOF, ONBOARDING_FEE_XOF } from "../_shared/plan.ts";
 
 async function verifySignature(body: string, signature: string, secret: string): Promise<boolean> {
   try {
@@ -111,8 +111,51 @@ Deno.serve(async (req) => {
         const metadata = event.data.metadata as Record<string, string> | undefined;
         const userId = metadata?.user_id;
         const plan = metadata?.plan;
+        const isOnboardingFee = metadata?.type === "onboarding_fee";
 
         if (!userId) {
+          break;
+        }
+
+        const paidAmount = typeof event.data.amount === "number" ? event.data.amount : Number(event.data.amount);
+        const paidCurrency = typeof event.data.currency === "string" ? event.data.currency : undefined;
+
+        // Frais d'integration : paiement one-time, distinct d'un abonnement.
+        // Ne touche jamais has_access/price_id/access_until — voir migration
+        // 054 (onboarding_fee_paid_at) et billing-create-checkout.
+        if (isOnboardingFee) {
+          if (paidCurrency !== "XOF" || paidAmount !== ONBOARDING_FEE_XOF) {
+            console.error(
+              "[billing-webhook] Montant/devise payes incoherents avec le frais d'integration — non credite:",
+              JSON.stringify({ userId, expectedAmount: ONBOARDING_FEE_XOF, paidAmount, paidCurrency })
+            );
+            break;
+          }
+
+          const { error: feeError } = await supabase
+            .from("profiles")
+            .update({ onboarding_fee_paid_at: new Date().toISOString() })
+            .eq("id", userId);
+          if (feeError) throw feeError;
+
+          if (paymentMode === "sandbox") {
+            console.log("[billing-webhook] Paiement Sandbox (frais d'integration) : aucune facture FNE emise.", JSON.stringify({ userId }));
+          } else {
+            try {
+              const monerooData = event.data as Record<string, unknown>;
+              await enqueueOneTimeFneInvoice(supabase, {
+                userId,
+                product: "onboarding_fee",
+                amountXof: ONBOARDING_FEE_XOF,
+                description: "Frais d'intégration Baobab Loyalty — digitalisation base clients (unique)",
+                reference: "BAOBAB-ONBOARDING",
+                monerooPaymentId: typeof monerooData.id === "string" ? monerooData.id : null,
+                monerooMethod: typeof monerooData.method === "string" ? monerooData.method : undefined,
+              });
+            } catch (fneErr) {
+              console.error("[billing-webhook] Mise en file FNE (frais d'integration) echouee (non bloquant):", fneErr);
+            }
+          }
           break;
         }
 
@@ -123,8 +166,6 @@ Deno.serve(async (req) => {
         // plutot que d'accorder un acces potentiellement obtenu pour moins
         // cher que son prix reel (metadata falsifiee, plan inconnu, etc).
         const expectedAmount = plan ? PLAN_PRICES_XOF[plan.toLowerCase()] : undefined;
-        const paidAmount = typeof event.data.amount === "number" ? event.data.amount : Number(event.data.amount);
-        const paidCurrency = typeof event.data.currency === "string" ? event.data.currency : undefined;
 
         if (!expectedAmount || paidCurrency !== "XOF" || paidAmount !== expectedAmount) {
           console.error(

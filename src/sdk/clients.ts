@@ -130,6 +130,60 @@ export async function unsubscribe(clientId: string): Promise<UnsubscribeResult> 
   });
 }
 
+export interface AddClientInput {
+  nom: string;
+  telephone?: string;
+  whatsapp?: string;
+  derniere_visite: string;
+  type_chambre_preferee?: string;
+  notes?: string;
+}
+
+/**
+ * Ajoute un client un par un depuis le registre numérique
+ * (/dashboard/registre) — la saisie continue qui remplace le cahier papier
+ * pour les nouveaux clients, au fil de l'eau. Dédoublonne par téléphone
+ * comme importClients() : un client déjà connu est mis à jour plutôt que
+ * dupliqué.
+ */
+export async function addClient(profileId: string, input: AddClientInput): Promise<Client> {
+  const supabase = createClient();
+  const nom = input.nom.trim();
+  if (!nom) throw new Error("Le nom du client est requis.");
+  if (!input.derniere_visite) throw new Error("La date de visite est requise.");
+
+  const telephone = input.telephone?.trim() || null;
+  const whatsapp = input.whatsapp?.trim() || null;
+  const notes = input.notes?.trim() || null;
+  const type_chambre_preferee = input.type_chambre_preferee?.trim() || null;
+
+  let existingId: string | null = null;
+  if (whatsapp) {
+    const { data } = await supabase.from("clients").select("id").eq("profile_id", profileId).eq("whatsapp", whatsapp).maybeSingle();
+    existingId = data?.id ?? null;
+  }
+  if (!existingId && telephone) {
+    const { data } = await supabase.from("clients").select("id").eq("profile_id", profileId).eq("telephone", telephone).maybeSingle();
+    existingId = data?.id ?? null;
+  }
+
+  const row = { nom, telephone, whatsapp, derniere_visite: input.derniere_visite, type_chambre_preferee, notes };
+
+  if (existingId) {
+    const { data, error } = await supabase.from("clients").update(row).eq("id", existingId).select().single();
+    if (error) throw error;
+    return data as Client;
+  }
+
+  const { data, error } = await supabase
+    .from("clients")
+    .insert({ ...row, profile_id: profileId })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Client;
+}
+
 export interface ImportClientRow {
   nom: string;
   email?: string;
@@ -544,6 +598,7 @@ export async function readCsvFileSmart(file: File): Promise<string> {
 export const clients = {
   getSegmentCounts,
   getClients,
+  addClient,
   importClients,
   previewImport,
   parseClientsCSV,

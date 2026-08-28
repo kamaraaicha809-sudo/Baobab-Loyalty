@@ -79,6 +79,52 @@ export interface BuildPayloadArgs {
   foreignCurrencyRate: number;
 }
 
+/** Champs communs aux deux types de facture (abonnement mensuel et article a l'unite). */
+interface EnvelopeArgs {
+  template: Template;
+  paymentMethod: PaymentMethod;
+  ncc: string | null;
+  hotelName: string;
+  clientPhone: string | null;
+  clientEmail: string | null;
+  pointOfSale: string;
+  establishment: string;
+  commercialMessage: string;
+  foreignCurrency: "" | "XOF";
+  foreignCurrencyRate: number;
+  item: FneInvoiceItemPayload;
+}
+
+function buildEnvelope(args: EnvelopeArgs): FneInvoicePayload {
+  if (args.template === "B2B" && !args.ncc) {
+    throw new Error("clientNcc obligatoire pour le template B2B");
+  }
+
+  return {
+    invoiceType: "sale",
+    paymentMethod: args.paymentMethod,
+    template: args.template,
+    isRne: false,
+    ...(args.template === "B2B" ? { clientNcc: args.ncc!, clientCompanyName: args.hotelName } : {}),
+    ...(args.clientPhone ? { clientPhone: args.clientPhone } : {}),
+    ...(args.clientEmail ? { clientEmail: args.clientEmail } : {}),
+    pointOfSale: args.pointOfSale,
+    establishment: args.establishment,
+    commercialMessage: args.commercialMessage,
+    footer: "Facture generee automatiquement - support@baobabloyalty.com",
+    foreignCurrency: args.foreignCurrency,
+    foreignCurrencyRate: args.foreignCurrencyRate,
+    items: [args.item],
+    discount: 0,
+  };
+}
+
+function computeTotals(taxCode: TaxCode, quantity: number, unitAmountHt: number): { totalHt: number; totalTtc: number; vat: number } {
+  const totalHt = quantity * unitAmountHt;
+  const vat = taxCode === "TVAD" || taxCode === "TVAC" ? 0 : roundHalfUp(totalHt * (taxCode === "TVA" ? 0.18 : 0.09));
+  return { totalHt, totalTtc: totalHt + vat, vat };
+}
+
 export function buildInvoicePayload(args: BuildPayloadArgs): {
   payload: FneInvoicePayload;
   totalHt: number;
@@ -86,10 +132,6 @@ export function buildInvoicePayload(args: BuildPayloadArgs): {
   vat: number;
 } {
   const { quantity, unitAmountHt } = computeDailyLineItem(args.planPriceXof);
-
-  if (args.template === "B2B" && !args.ncc) {
-    throw new Error("clientNcc obligatoire pour le template B2B");
-  }
 
   const item: FneInvoiceItemPayload = {
     taxes: [args.taxCode],
@@ -101,27 +143,57 @@ export function buildInvoicePayload(args: BuildPayloadArgs): {
     measurementUnit: "jour",
   };
 
-  const totalHt = quantity * unitAmountHt;
-  const vat = args.taxCode === "TVAD" || args.taxCode === "TVAC" ? 0 : roundHalfUp(totalHt * (args.taxCode === "TVA" ? 0.18 : 0.09));
-  const totalTtc = totalHt + vat;
+  const { totalHt, totalTtc, vat } = computeTotals(args.taxCode, quantity, unitAmountHt);
+  const payload = buildEnvelope({ ...args, commercialMessage: `Abonnement ${args.planName}`, item });
 
-  const payload: FneInvoicePayload = {
-    invoiceType: "sale",
-    paymentMethod: args.paymentMethod,
-    template: args.template,
-    isRne: false,
-    ...(args.template === "B2B" ? { clientNcc: args.ncc!, clientCompanyName: args.hotelName } : {}),
-    ...(args.clientPhone ? { clientPhone: args.clientPhone } : {}),
-    ...(args.clientEmail ? { clientEmail: args.clientEmail } : {}),
-    pointOfSale: args.pointOfSale,
-    establishment: args.establishment,
-    commercialMessage: `Abonnement ${args.planName}`,
-    footer: "Facture generee automatiquement - support@baobabloyalty.com",
-    foreignCurrency: args.foreignCurrency,
-    foreignCurrencyRate: args.foreignCurrencyRate,
-    items: [item],
+  return { payload, totalHt, totalTtc, vat };
+}
+
+export interface BuildOneTimeItemPayloadArgs {
+  template: Template;
+  paymentMethod: PaymentMethod;
+  taxCode: TaxCode;
+  amountHt: number;
+  description: string;
+  reference: string;
+  pointOfSale: string;
+  establishment: string;
+  ncc: string | null;
+  hotelName: string;
+  clientPhone: string | null;
+  clientEmail: string | null;
+  foreignCurrency: "" | "XOF";
+  foreignCurrencyRate: number;
+}
+
+/**
+ * Facture un article vendu a l'unite (quantite 1), par opposition a
+ * buildInvoicePayload qui decoupe toujours un prix mensuel en 30 "jours".
+ * Utilise pour le frais d'integration (digitalisation cahier papier) - un
+ * paiement one-time qui n'a pas de notion de periode d'abonnement.
+ */
+export function buildOneTimeItemPayload(args: BuildOneTimeItemPayloadArgs): {
+  payload: FneInvoicePayload;
+  totalHt: number;
+  totalTtc: number;
+  vat: number;
+} {
+  if (!Number.isInteger(args.amountHt) || args.amountHt <= 0) {
+    throw new Error(`Montant invalide (doit etre un entier XOF positif) : ${args.amountHt}`);
+  }
+
+  const item: FneInvoiceItemPayload = {
+    taxes: [args.taxCode],
+    reference: args.reference,
+    description: args.description,
+    quantity: 1,
+    amount: args.amountHt,
     discount: 0,
+    measurementUnit: "unité",
   };
+
+  const { totalHt, totalTtc, vat } = computeTotals(args.taxCode, 1, args.amountHt);
+  const payload = buildEnvelope({ ...args, commercialMessage: args.description, item });
 
   return { payload, totalHt, totalTtc, vat };
 }

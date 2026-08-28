@@ -85,6 +85,15 @@ const config = {
 
   billing: {
     currency: "FCFA",
+    onboardingFee: {
+      name: "Frais d'intégration",
+      price: 49000,
+      // → Doit rester synchronisé avec ONBOARDING_FEE_XOF
+      //   (supabase/functions/_shared/plan.ts), seule source de vérité
+      //   appliquée réellement — cette valeur ici n'est qu'informative pour l'UI.
+      description:
+        "Pour les hôtels sans base de données électronique : nous digitalisons votre cahier papier et vous donnons accès au registre numérique.",
+    },
     plans: [
       {
         name: "Starter",

@@ -20,6 +20,7 @@ export interface UserProfile {
   config_complete?: boolean;
   onboarding_completed?: boolean;
   onboarding_step?: number;
+  onboarding_fee_paid_at?: string | null;
   ai_brand_voice?: string | null;
   ai_keywords_use?: string | null;
   ai_keywords_avoid?: string | null;

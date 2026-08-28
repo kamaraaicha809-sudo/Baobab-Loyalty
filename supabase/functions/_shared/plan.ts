@@ -32,6 +32,14 @@ export const PLAN_PRICES_XOF: Record<string, number> = {
   premium: 189000,
 };
 
+/**
+ * Frais d'integration unique (digitalisation cahier papier + registre
+ * numerique) - voir config.js (billing.onboardingFee), qui doit rester
+ * synchronise avec cette valeur pour l'affichage cote marketing.
+ * Ce n'est pas un plan d'abonnement : paiement one-time, jamais recurrent.
+ */
+export const ONBOARDING_FEE_XOF = 49000;
+
 export function getMonthlyRelanceQuota(profile: {
   price_id?: string | null;
   has_access?: boolean | null;

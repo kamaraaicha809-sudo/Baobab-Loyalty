@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
         config_complete: true,
         customer_id: null,
         price_id: "premium",
+        onboarding_fee_paid_at: null,
       });
     }
 
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
       userClient,
       user.id,
       "id, email, has_access, access_until, trial_ends_at, customer_id, price_id, role, hotel_name, " +
-        "config_complete, onboarding_completed, onboarding_step, " +
+        "config_complete, onboarding_completed, onboarding_step, onboarding_fee_paid_at, " +
         "ai_brand_voice, ai_keywords_use, ai_keywords_avoid, ai_signature, " +
         "created_at, updated_at"
     );

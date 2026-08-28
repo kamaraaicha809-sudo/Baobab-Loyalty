@@ -11,6 +11,7 @@ export interface CreateCheckoutParams {
   amount: number;
   planName: string;
   currency?: string;
+  type?: "subscription" | "onboarding_fee";
   successUrl: string;
   cancelUrl: string;
 }
@@ -42,6 +43,24 @@ export async function createCheckout(
 }
 
 /**
+ * Démarre le paiement unique du frais d'intégration (49 000 FCFA) pour un
+ * hôtel sans base de données électronique — voir config.js (billing.onboardingFee).
+ */
+export async function createOnboardingFeeCheckout(
+  params: Pick<CreateCheckoutParams, "successUrl" | "cancelUrl">
+): Promise<CreateCheckoutResponse> {
+  return callEdgeFunction<CreateCheckoutResponse>("billing-create-checkout", {
+    method: "POST",
+    body: {
+      planSlug: "onboarding_fee",
+      planName: "Frais d'intégration",
+      type: "onboarding_fee",
+      ...params,
+    },
+  });
+}
+
+/**
  * Get billing management URL
  */
 export async function createPortal(
@@ -56,5 +75,6 @@ export async function createPortal(
 // Export as namespace
 export const billing = {
   createCheckout,
+  createOnboardingFeeCheckout,
   createPortal,
 };
