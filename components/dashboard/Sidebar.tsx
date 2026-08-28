@@ -16,6 +16,7 @@ interface NavItem {
   label: string;
   icon: ReactNode;
   href: string;
+  premiumOnly?: boolean;
 }
 
 interface SidebarProps {
@@ -39,27 +40,29 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
     { id: 'segments', label: 'Segments', icon: <Icons.Users />, href: '/dashboard/segments' },
     { id: 'templates', label: 'Templates', icon: <Icons.Template />, href: '/dashboard/templates' },
     { id: 'historique', label: 'Historique', icon: <Icons.Clock />, href: '/dashboard/historique' },
-    ...(isPremium
-      ? [
-          {
-            id: 'linkedin',
-            label: 'Posts LinkedIn',
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 shrink-0">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-              </svg>
-            ),
-            href: '/dashboard/linkedin'
-          },
-          {
-            id: 'equipe',
-            label: 'Équipe',
-            icon: <Icons.Users />,
-            href: '/dashboard/equipe',
-          },
-        ]
-      : []),
+    {
+      id: 'linkedin',
+      label: 'Posts LinkedIn',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 shrink-0">
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+        </svg>
+      ),
+      href: '/dashboard/linkedin',
+      premiumOnly: true,
+    },
+    {
+      id: 'equipe',
+      label: 'Équipe',
+      icon: <Icons.Users />,
+      href: '/dashboard/equipe',
+      premiumOnly: true,
+    },
   ];
+
+  const handlePremiumLockedClick = (item: NavItem) => {
+    toast.error(`Désolé, "${item.label}" n'est disponible qu'avec le forfait Premium.`);
+  };
 
   // Navigation admin (visible uniquement pour les admins)
   const adminNavItems: NavItem[] = [
@@ -87,20 +90,37 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
 
           {/* Navigation principale */}
           <nav className="space-y-1">
-            {mainNavItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
-              >
-                {item.icon}
-                {item.label}
-              </Link>
-            ))}
+            {mainNavItems.map((item) => {
+              const locked = item.premiumOnly && !isPremium;
+              if (locked) {
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handlePremiumLockedClick(item)}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed"
+                  >
+                    {item.icon}
+                    {item.label}
+                    <span className="ml-auto"><Icons.Lock /></span>
+                  </button>
+                );
+              }
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive(item.href)
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Section Admin */}
@@ -212,21 +232,41 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
 
             {/* Navigation principale */}
             <nav className="space-y-1">
-              {mainNavItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
-                    isActive(item.href)
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
-                >
-                  {item.icon}
-                  {item.label}
-                </Link>
-              ))}
+              {mainNavItems.map((item) => {
+                const locked = item.premiumOnly && !isPremium;
+                if (locked) {
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handlePremiumLockedClick(item);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-400 cursor-not-allowed"
+                    >
+                      {item.icon}
+                      {item.label}
+                      <span className="ml-auto"><Icons.Lock /></span>
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                      isActive(item.href)
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Section Admin - Mobile */}
