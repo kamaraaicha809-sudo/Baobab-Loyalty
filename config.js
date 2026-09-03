@@ -170,6 +170,7 @@ const config = {
   
   features: {
     payments: true,                   // Paiements Moneroo
+    signupsPaused: true,              // Coupe-circuit : bloque /beta et /signup sans toucher aux comptes déjà actifs. Repasser à false pour rouvrir.
     oauth: {
       google: false,                  // OAuth Google (configurer dans Supabase)
       github: false,                  // OAuth GitHub (configurer dans Supabase)

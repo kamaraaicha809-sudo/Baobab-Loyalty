@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/libs/supabase/client";
 import config from "@/config";
+import SignupsPausedNotice from "@/components/auth/SignupsPausedNotice";
 
 type Step = "email" | "code";
 
@@ -86,6 +87,24 @@ export default function BetaPage() {
       verifyCode(pasted);
     }
     e.preventDefault();
+  }
+
+  if (config.features.signupsPaused) {
+    return (
+      <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-10">
+            <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-14 h-14 rounded-2xl mb-4 inline-block" />
+            <p className="text-slate-400 text-sm font-medium tracking-widest uppercase mt-2">
+              {config.appName}
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl">
+            <SignupsPausedNotice />
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
 import PasswordStrength, { validatePassword, passwordsMatch } from "@/components/ui/PasswordStrength";
+import SignupsPausedNotice from "@/components/auth/SignupsPausedNotice";
 import { isDemoMode } from "@/src/lib/demo";
 
 function SignUpContent() {
@@ -29,6 +30,34 @@ function SignUpContent() {
   }, [searchParams]);
 
   // En mode démo, on laisse le formulaire s'afficher normalement
+
+  if (config.features.signupsPaused && !isDemoMode) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-8">
+        <div className="w-full max-w-md">
+          <Link
+            href="/signin"
+            className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-6 sm:mb-8 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+              <path
+                fillRule="evenodd"
+                d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Retour
+          </Link>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div className="text-center mb-2">
+              <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-12 h-12 rounded-xl mb-4 inline-block" />
+            </div>
+            <SignupsPausedNotice />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const validateForm = () => {
     if (!fullName.trim()) {
