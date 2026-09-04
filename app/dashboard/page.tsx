@@ -73,6 +73,12 @@ export default function Dashboard() {
 
   const getDemoImpactCount = () => demoMetrics.impactToday;
 
+  // Tant que l'hôtel n'a jamais eu de réservation via l'app, on montre un
+  // exemple étiqueté plutôt que des barres réelles à zéro (moins engageant,
+  // et à distinguer clairement d'une vraie semaine sans réservation).
+  const isChartExample = !isDemoMode && !loading && totalFromApp === 0;
+  const displayChartData = isChartExample ? demoChartData : chartData;
+
   const hasRealActivity = !isDemoMode && recentActivity !== null && recentActivity.length > 0;
   const fluxItems = hasRealActivity
     ? recentActivity!.map((a) => ({
@@ -107,8 +113,7 @@ export default function Dashboard() {
               campaignsSdk.listRecentCampaigns(data.id),
               funnel.getCampaignFunnelStats(data.id),
             ]);
-            const hasData = chart.some((d) => d.directes > 0 || d.autres > 0);
-            if (hasData) setChartData(chart);
+            setChartData(chart);
             setImpactCount(todayCount);
             setTotalFromApp(fromAppCount);
             setRevenue(revenueGenerated);
@@ -419,7 +424,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 space-y-6">
           {/* Performance */}
           <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-1">
               <h2 className="font-bold text-base text-slate-900">
                 Performance des réservations obtenues grâce à {config.appName}
               </h2>
@@ -434,9 +439,19 @@ export default function Dashboard() {
                 </span>
               </div>
             </div>
+            {isChartExample && (
+              <div className="mb-3 flex items-start gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#1d4ed8" className="w-4 h-4 mt-0.5 shrink-0">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                <p className="text-xs text-blue-800 leading-snug">
+                  Exemple — vos vraies données de réservations remplaceront ce graphique dès que {config.appName} aura généré vos premières réservations.
+                </p>
+              </div>
+            )}
             <div className="flex items-end justify-between gap-1 sm:gap-2 pt-2" style={{ height: 180 }}>
-              {chartData.map((d) => {
-                const maxChart = maxChartFromData(chartData);
+              {displayChartData.map((d) => {
+                const maxChart = maxChartFromData(displayChartData);
                 const total = d.directes + d.autres;
                 const barHeightPx = maxChart > 0 ? Math.max(20, Math.round((total / maxChart) * 140)) : 20;
                 const directesPx = total > 0 ? Math.round((d.directes / total) * barHeightPx) : 0;
