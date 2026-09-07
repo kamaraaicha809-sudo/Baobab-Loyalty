@@ -18,7 +18,8 @@ export default function MentionsLegalesPage() {
             Le site <strong>baobabloyalty.com</strong> est édité par :
           </p>
           <ul className="mt-3 space-y-1 text-slate-600">
-            <li><strong>Raison sociale :</strong> Baobab Loyalty SAS</li>
+            <li><strong>Raison sociale :</strong> First Digital Prod SARL</li>
+            <li><strong>Solution éditée :</strong> Baobab Loyalty (SaaS d&apos;engagement client pour hôtels)</li>
             <li><strong>Siège social :</strong> Plateau, Abidjan, Côte d&apos;Ivoire</li>
             <li><strong>Numéro RCCM :</strong> En cours d&apos;enregistrement</li>
             <li><strong>Email :</strong> <a href="mailto:legal@baobabloyalty.com" className="text-primary hover:underline">legal@baobabloyalty.com</a></li>
@@ -28,7 +29,7 @@ export default function MentionsLegalesPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">2. Directeur de la publication</h2>
           <p className="text-slate-600 leading-relaxed">
-            Le directeur de la publication est le représentant légal de Baobab Loyalty SAS.
+            Le directeur de la publication est le représentant légal de First Digital Prod SARL.
           </p>
         </section>
 
@@ -54,10 +55,10 @@ export default function MentionsLegalesPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">4. Propriété intellectuelle</h2>
           <p className="text-slate-600 leading-relaxed">
-            L&apos;ensemble des contenus présents sur ce site (textes, images, logos, graphismes, code source) est la propriété exclusive de Baobab Loyalty SAS et est protégé par les lois applicables en Côte d&apos;Ivoire relatives à la propriété intellectuelle.
+            L&apos;ensemble des contenus présents sur ce site (textes, images, logos, graphismes, code source) est la propriété exclusive de First Digital Prod SARL et est protégé par les lois applicables en Côte d&apos;Ivoire relatives à la propriété intellectuelle.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
-            Toute reproduction, distribution, modification ou utilisation de ces contenus, en tout ou en partie, sans autorisation écrite préalable de Baobab Loyalty SAS est strictement interdite.
+            Toute reproduction, distribution, modification ou utilisation de ces contenus, en tout ou en partie, sans autorisation écrite préalable de First Digital Prod SARL est strictement interdite.
           </p>
         </section>
 

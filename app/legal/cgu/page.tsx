@@ -15,7 +15,7 @@ export default function CGUPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Objet</h2>
           <p className="text-slate-600 leading-relaxed">
-            Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme <strong>Baobab Loyalty</strong>, éditée par Baobab Loyalty SAS, dont le siège est à Abidjan, Côte d&apos;Ivoire.
+            Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme <strong>Baobab Loyalty</strong>, éditée par First Digital Prod SARL, dont le siège est à Abidjan, Côte d&apos;Ivoire.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
             Baobab Loyalty est une solution SaaS d&apos;engagement client destinée aux hôtels et établissements d&apos;hébergement, permettant de gérer des campagnes WhatsApp, de segmenter une base clients et de générer des réservations directes.
@@ -48,7 +48,7 @@ export default function CGUPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">4. Responsabilités</h2>
           <p className="text-slate-600 leading-relaxed">
-            <strong>Baobab Loyalty SAS</strong> s&apos;engage à fournir la plateforme avec le meilleur niveau de disponibilité possible. Cependant, la société ne peut être tenue responsable des interruptions de service dues à des événements hors de son contrôle (pannes d&apos;infrastructure, force majeure).
+            <strong>First Digital Prod SARL</strong> s&apos;engage à fournir la plateforme avec le meilleur niveau de disponibilité possible. Cependant, la société ne peut être tenue responsable des interruptions de service dues à des événements hors de son contrôle (pannes d&apos;infrastructure, force majeure).
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
             <strong>L&apos;utilisateur</strong> est seul responsable des messages envoyés à ses clients via la plateforme et du respect des réglementations applicables (consentement des destinataires, etc.).
@@ -58,21 +58,21 @@ export default function CGUPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">5. Propriété des données</h2>
           <p className="text-slate-600 leading-relaxed">
-            Les données clients importées par l&apos;utilisateur (base clients hôtel) restent sa propriété exclusive. Baobab Loyalty SAS ne revendique aucun droit sur ces données et s&apos;engage à ne pas les utiliser à des fins commerciales propres.
+            Les données clients importées par l&apos;utilisateur (base clients hôtel) restent sa propriété exclusive. First Digital Prod SARL ne revendique aucun droit sur ces données et s&apos;engage à ne pas les utiliser à des fins commerciales propres.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">6. Modification du service</h2>
           <p className="text-slate-600 leading-relaxed">
-            Baobab Loyalty SAS se réserve le droit de modifier, suspendre ou interrompre tout ou partie du service, avec un préavis raisonnable sauf en cas d&apos;urgence. Les modifications substantielles des CGU seront notifiées par email.
+            First Digital Prod SARL se réserve le droit de modifier, suspendre ou interrompre tout ou partie du service, avec un préavis raisonnable sauf en cas d&apos;urgence. Les modifications substantielles des CGU seront notifiées par email.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">7. Résiliation</h2>
           <p className="text-slate-600 leading-relaxed">
-            L&apos;utilisateur peut résilier son compte à tout moment depuis la page de gestion de son abonnement. Baobab Loyalty SAS peut suspendre ou résilier un compte en cas de violation des présentes CGU.
+            L&apos;utilisateur peut résilier son compte à tout moment depuis la page de gestion de son abonnement. First Digital Prod SARL peut suspendre ou résilier un compte en cas de violation des présentes CGU.
           </p>
         </section>
 

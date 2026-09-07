@@ -15,7 +15,7 @@ export default function ConfidentialitePage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Responsable du traitement</h2>
           <p className="text-slate-600 leading-relaxed">
-            Le responsable du traitement des données personnelles est <strong>Baobab Loyalty SAS</strong>, dont le siège est à Abidjan, Côte d&apos;Ivoire.
+            Le responsable du traitement des données personnelles est <strong>First Digital Prod SARL</strong>, société éditrice et exploitante de la solution Baobab Loyalty, dont le siège est à Abidjan, Côte d&apos;Ivoire.
           </p>
           <p className="text-slate-600 leading-relaxed mt-2">
             Contact : <a href="mailto:legal@baobabloyalty.com" className="text-primary hover:underline">legal@baobabloyalty.com</a>

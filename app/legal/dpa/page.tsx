@@ -22,7 +22,7 @@ export default function DPAPage() {
           </p>
           <ul className="space-y-2 text-slate-600 list-disc list-inside">
             <li><strong>L&apos;hôtel</strong> (le client de Baobab Loyalty) est <strong>responsable du traitement</strong> : c&apos;est lui qui collecte les données de ses clients (à la réservation, à l&apos;accueil, etc.) et qui décide de la finalité (fidélisation, relance, campagnes).</li>
-            <li><strong>Baobab Loyalty SAS</strong> agit en tant que <strong>sous-traitant</strong> : elle traite ces données uniquement pour le compte de l&apos;hôtel, sur ses instructions, afin de fournir le service (segmentation, génération de messages, envoi de campagnes WhatsApp, suivi des réservations).</li>
+            <li><strong>First Digital Prod SARL</strong> (société éditrice et exploitante de Baobab Loyalty) agit en tant que <strong>sous-traitant</strong> : elle traite ces données uniquement pour le compte de l&apos;hôtel, sur ses instructions, afin de fournir le service (segmentation, génération de messages, envoi de campagnes WhatsApp, suivi des réservations).</li>
           </ul>
         </section>
 
@@ -109,6 +109,11 @@ export default function DPAPage() {
                   <td className="p-3 border border-slate-200">OpenRouter</td>
                   <td className="p-3 border border-slate-200">Génération assistée par IA des messages de campagne</td>
                   <td className="p-3 border border-slate-200">États-Unis</td>
+                </tr>
+                <tr className="bg-slate-50">
+                  <td className="p-3 border border-slate-200">Moneroo (Axa Zara LLC)</td>
+                  <td className="p-3 border border-slate-200">Traitement des paiements d&apos;abonnement et du frais d&apos;intégration</td>
+                  <td className="p-3 border border-slate-200">États-Unis (Delaware)</td>
                 </tr>
               </tbody>
             </table>

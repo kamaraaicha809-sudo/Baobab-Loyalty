@@ -15,7 +15,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Objet</h2>
           <p className="text-slate-600 leading-relaxed">
-            Les présentes Conditions Générales de Vente (CGV) régissent les ventes d&apos;abonnements à la plateforme Baobab Loyalty, éditée par Baobab Loyalty SAS, Abidjan, Côte d&apos;Ivoire.
+            Les présentes Conditions Générales de Vente (CGV) régissent les ventes d&apos;abonnements à la plateforme Baobab Loyalty, éditée par First Digital Prod SARL, Abidjan, Côte d&apos;Ivoire.
           </p>
         </section>
 
@@ -55,7 +55,10 @@ export default function CGVPage() {
           </div>
 
           <p className="text-slate-500 text-sm mt-3">
-            Les tarifs ci-dessus sont exprimés hors taxes (HT). Le régime fiscal de Baobab Loyalty SAS applicable à la TVA est en cours de confirmation auprès de l&apos;administration fiscale ivoirienne. Si la TVA est due, elle sera ajoutée au taux légal en vigueur et apparaîtra distinctement sur chaque facture, sans action requise de votre part. Baobab Loyalty SAS se réserve le droit de modifier ses tarifs, avec préavis de 30 jours.
+            Les tarifs ci-dessus sont exprimés hors taxes (HT). Le régime fiscal de First Digital Prod SARL applicable à la TVA est en cours de confirmation auprès de l&apos;administration fiscale ivoirienne. Si la TVA est due, elle sera ajoutée au taux légal en vigueur et apparaîtra distinctement sur chaque facture, sans action requise de votre part. First Digital Prod SARL se réserve le droit de modifier ses tarifs, avec préavis de 30 jours.
+          </p>
+          <p className="text-slate-600 leading-relaxed mt-4">
+            <strong>Frais d&apos;intégration (à titre unique) :</strong> pour les hôtels ne disposant pas d&apos;une base de données électronique (registre papier), un frais unique de <strong>49 000 FCFA HT</strong> s&apos;applique lors de la mise en place. Il couvre la digitalisation de l&apos;historique client (import CSV) et l&apos;accès au registre numérique. Ce frais est distinct de l&apos;abonnement mensuel, prélevé une seule fois, et n&apos;est pas reconduit automatiquement.
           </p>
         </section>
 
@@ -94,7 +97,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">6. Politique de remboursement</h2>
           <p className="text-slate-600 leading-relaxed">
-            Hors exercice du droit de rétractation, les abonnements ne sont pas remboursables. En cas d&apos;interruption de service imputable à Baobab Loyalty SAS d&apos;une durée supérieure à 48 heures consécutives, une compensation proportionnelle sera accordée sous forme d&apos;avoir.
+            Hors exercice du droit de rétractation, les abonnements ne sont pas remboursables. En cas d&apos;interruption de service imputable à First Digital Prod SARL d&apos;une durée supérieure à 48 heures consécutives, une compensation proportionnelle sera accordée sous forme d&apos;avoir.
           </p>
         </section>
 
