@@ -34,6 +34,11 @@ suite `whatsapp-consent` configure volontairement une fausse clé BSP
   `044_restrict_profiles_columns.sql` (GRANT UPDATE sur `profiles`) —
   vérifie l'activation réelle de l'essai bêta 14 jours, son idempotence
   (pas de prolongation via appels répétés), et le rejet sans JWT.
+- `pilot-journey` : avant d'onboarder un nouvel hôtel pilote, ou après toute
+  modification touchant la configuration hôtel, l'import CSV, la
+  segmentation, ou `campaign-send` — rejoue tout le parcours (compte →
+  connexion → configuration → import → segmentation → campagne → exclusion
+  d'un client désinscrit → suivi des résultats) de bout en bout.
 
 ## Lancer les tests
 
@@ -44,6 +49,7 @@ npm run test:whatsapp-webhook-security
 npm run test:billing-webhook-security
 npm run test:posthog-entrypoint
 npm run test:beta-trial-activation
+npm run test:pilot-journey
 ```
 
 Chaque script affiche un JSON avec un `pass: true/false` par vérification, et
