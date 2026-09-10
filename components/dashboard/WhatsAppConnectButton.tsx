@@ -19,6 +19,7 @@ declare global {
       login: (callback: (response: FacebookLoginResponse) => void, options: object) => void;
     };
     fbAsyncInit?: () => void;
+    __fbInitialized?: boolean;
   }
 }
 
@@ -67,17 +68,26 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
 
     window.addEventListener("message", handleMessage);
 
+    // Appelle FB.init() nous-memes plutot que de nous fier uniquement au
+    // callback fbAsyncInit du SDK : si le tag <script> existe deja (retour
+    // sur cette page sans rechargement complet) mais que fbAsyncInit n'a
+    // jamais reellement tourne dans ce cycle, FB.login() etait appele avant
+    // FB.init() ("FB.login() called before FB.init()"). FB.init() est
+    // idempotent, l'appeler nous-memes de facon deterministe elimine la course.
+    const initFb = () => {
+      window.FB.init({
+        appId: config.whatsapp?.metaAppId,
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: "v19.0",
+      });
+      window.__fbInitialized = true;
+      setFbReady(true);
+    };
+
     // Load Facebook SDK
     if (!document.getElementById("facebook-jssdk")) {
-      window.fbAsyncInit = () => {
-        window.FB.init({
-          appId: config.whatsapp?.metaAppId,
-          autoLogAppEvents: true,
-          xfbml: true,
-          version: "v19.0",
-        });
-        setFbReady(true);
-      };
+      window.fbAsyncInit = initFb;
 
       const script = document.createElement("script");
       script.id = "facebook-jssdk";
@@ -85,8 +95,10 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
       script.async = true;
       script.defer = true;
       document.body.appendChild(script);
-    } else if (window.FB) {
+    } else if (window.__fbInitialized) {
       startTransition(() => setFbReady(true));
+    } else if (window.FB) {
+      initFb();
     }
 
     return () => window.removeEventListener("message", handleMessage);
