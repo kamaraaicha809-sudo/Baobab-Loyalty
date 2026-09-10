@@ -283,7 +283,7 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
 export function WhatsAppDebugAppId() {
   return (
     <p className="text-xs text-gray-400 mt-2">
-      Debug appId: {config.whatsapp?.metaAppId || "(vide)"}
+      Debug appId (JSON): {JSON.stringify(config.whatsapp?.metaAppId ?? null)}
     </p>
   );
 }
