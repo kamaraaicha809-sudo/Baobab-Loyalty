@@ -278,12 +278,3 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
     </button>
   );
 }
-
-// DEBUG TEMPORAIRE — a retirer une fois le diagnostic termine.
-export function WhatsAppDebugAppId() {
-  return (
-    <p className="text-xs text-gray-400 mt-2">
-      Debug appId (JSON): {JSON.stringify(config.whatsapp?.metaAppId ?? null)}
-    </p>
-  );
-}

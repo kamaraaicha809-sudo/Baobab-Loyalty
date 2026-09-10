@@ -10,7 +10,7 @@ import { clients, MAX_CSV_FILE_SIZE_BYTES, type Client, type ImportClientRow, ty
 import { whatsapp } from "@/src/sdk/whatsapp";
 import { billing } from "@/src/sdk/billing";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
-import WhatsAppConnectButton, { WhatsAppDebugAppId } from "@/components/dashboard/WhatsAppConnectButton";
+import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
 
 const SEGMENT_LABELS: Record<string, string> = {
   "3-6mois":  "Clients 3 à 6 mois",
@@ -963,7 +963,6 @@ export default function ConfigurationPage() {
           initialPhone={waStatus.phone}
           onStatusChange={(connected) => setWaStatus((s) => ({ ...s, connected }))}
         />
-        <WhatsAppDebugAppId />
       </section>
 
       {/* Frais d'intégration — hôtels sans base de données électronique */}

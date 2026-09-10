@@ -158,7 +158,7 @@ const config = {
   // Obtenez ces valeurs dans developers.facebook.com après vérification Meta Business
 
   whatsapp: {
-    metaAppId: process.env.NEXT_PUBLIC_META_APP_ID || "",
+    metaAppId: (process.env.NEXT_PUBLIC_META_APP_ID || "").trim(),
     // → App ID Meta (ex: "1234567890123456") — vide jusqu'à validation Meta Business
   },
 
