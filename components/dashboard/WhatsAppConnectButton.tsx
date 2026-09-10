@@ -19,6 +19,7 @@ declare global {
       login: (callback: (response: FacebookLoginResponse) => void, options: object) => void;
     };
     fbAsyncInit?: () => void;
+    __fbSdkReady?: boolean;
   }
 }
 
@@ -67,17 +68,34 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
 
     window.addEventListener("message", handleMessage);
 
-    // fbReady signifie seulement "le SDK est charge" (window.FB existe). On
-    // n'essaie plus de retenir un etat "deja initialise" entre deux montages
-    // du composant (ex: apres Deconnecter/Reconnecter) : FB.init() est
-    // desormais rappele nous-memes, de facon synchrone, juste avant chaque
-    // FB.login() dans handleConnect (idempotent, sans danger a repeter). Cet
-    // etat memorise etait la cause du "FB.login() called before FB.init()."
-    // persistant malgre un fbReady=true correct.
-    if (window.FB) {
+    // window.FB existe QUASI IMMEDIATEMENT des l'insertion du <script> : le
+    // fichier sdk.js charge en premier n'est qu'un petit "bootstrap" qui cree
+    // tout de suite un objet FB temporaire (un stub qui met les appels en
+    // attente) pendant qu'il charge en arriere-plan le vrai module
+    // (bundle/sdk.js/, visible dans l'onglet Network comme "sdk.js/"). Se fier
+    // a la simple presence de window.FB pour marquer fbReady=true etait donc
+    // premature : la popup Facebook ne s'ouvrait jamais si l'utilisateur
+    // cliquait avant la fin de ce second chargement ("FB.login() called
+    // before FB.init()." — le "avant l'init" reel, pas celui du stub, qui
+    // accepte silencieusement les appels sans jamais les executer). On utilise
+    // desormais notre propre flag __fbSdkReady, mis a true UNIQUEMENT dans le
+    // vrai callback fbAsyncInit declenche par le SDK lui-meme une fois le
+    // module reel charge — le seul signal fiable.
+    const initFb = () => {
+      window.FB.init({
+        appId: config.whatsapp?.metaAppId,
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: "v19.0",
+      });
+      window.__fbSdkReady = true;
+      setFbReady(true);
+    };
+
+    if (window.__fbSdkReady) {
       setFbReady(true);
     } else if (!document.getElementById("facebook-jssdk")) {
-      window.fbAsyncInit = () => setFbReady(true);
+      window.fbAsyncInit = initFb;
 
       const script = document.createElement("script");
       script.id = "facebook-jssdk";
@@ -85,10 +103,10 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
       script.async = true;
       document.body.appendChild(script);
     } else {
-      // Le tag <script> existe deja mais window.FB n'est pas encore pret
-      // (chargement en cours depuis un mount precedent) : on patiente.
+      // Le tag <script> existe deja (charge par un mount precedent) mais le
+      // vrai module n'a pas encore fini de charger : on patiente.
       const poll = window.setInterval(() => {
-        if (window.FB) {
+        if (window.__fbSdkReady) {
           window.clearInterval(poll);
           setFbReady(true);
         }
@@ -127,18 +145,6 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
 
     setLoading(true);
     pendingDataRef.current = null;
-
-    // Rappelle FB.init() nous-memes, de facon synchrone, juste avant
-    // FB.login() (idempotent, sans danger a repeter) : ca elimine toute
-    // dependance a un etat "deja initialise" memorise entre deux montages
-    // du composant, seule source fiable de l'erreur persistante
-    // "FB.login() called before FB.init()." malgre un fbReady=true correct.
-    window.FB.init({
-      appId: config.whatsapp?.metaAppId,
-      autoLogAppEvents: true,
-      xfbml: true,
-      version: "v19.0",
-    });
 
     // Le callback passe a FB.login() doit etre une fonction synchrone : le SDK
     // Facebook rejette silencieusement une fonction declaree `async` ("Expression
