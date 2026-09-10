@@ -134,52 +134,66 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
     // Facebook rejette silencieusement une fonction declaree `async` ("Expression
     // is of type asyncfunction, not function"), ce qui empechait la popup de
     // s'ouvrir. La logique async reste identique, executee via une IIFE interne.
-    window.FB.login(
-      (response: FacebookLoginResponse) => {
-        void (async () => {
-          if (response.status !== "connected" || !response.authResponse?.code) {
-            setLoading(false);
-            toast.error("Connexion annulée");
-            return;
-          }
+    // FB.login() peut lancer une exception synchrone (ex: SDK pas reellement
+    // pret malgre fbReady=true). Sans ce try/catch, l'exception remontait non
+    // interceptee et le bouton restait bloque sur "Connexion en cours..." pour
+    // toujours, puisque setLoading(false) n'etait jamais atteint.
+    try {
+      window.FB.login(
+        (response: FacebookLoginResponse) => {
+          void (async () => {
+            if (response.status !== "connected" || !response.authResponse?.code) {
+              setLoading(false);
+              toast.error("Connexion annulée");
+              return;
+            }
 
-          const code = response.authResponse.code;
-          const extra = pendingDataRef.current;
+            const code = response.authResponse.code;
+            const extra = pendingDataRef.current;
 
-          if (!extra?.phone_number_id) {
-            setLoading(false);
-            toast.error("Identifiants WhatsApp non reçus — réessayez");
-            return;
-          }
+            if (!extra?.phone_number_id) {
+              setLoading(false);
+              toast.error("Identifiants WhatsApp non reçus — réessayez");
+              return;
+            }
 
-          try {
-            const result = await whatsapp.connect({
-              code,
-              phone_number_id: extra.phone_number_id,
-              waba_id: extra.waba_id,
-            });
-            setConnected(true);
-            setPhone(result.phone_number || extra.phone_number_id);
-            onStatusChange?.(true);
-            toast.success("WhatsApp Business connecté");
-          } catch {
-            toast.error("Erreur lors de la connexion — réessayez");
-          } finally {
-            setLoading(false);
-          }
-        })();
-      },
-      {
-        scope: "whatsapp_business_management,business_management",
-        response_type: "code",
-        override_default_response_type: true,
-        extras: {
-          setup: {},
-          featureType: "",
-          sessionInfoVersion: "3",
+            try {
+              const result = await whatsapp.connect({
+                code,
+                phone_number_id: extra.phone_number_id,
+                waba_id: extra.waba_id,
+              });
+              setConnected(true);
+              setPhone(result.phone_number || extra.phone_number_id);
+              onStatusChange?.(true);
+              toast.success("WhatsApp Business connecté");
+            } catch {
+              toast.error("Erreur lors de la connexion — réessayez");
+            } finally {
+              setLoading(false);
+            }
+          })();
         },
-      },
-    );
+        {
+          scope: "whatsapp_business_management,business_management",
+          response_type: "code",
+          override_default_response_type: true,
+          extras: {
+            setup: {},
+            featureType: "",
+            sessionInfoVersion: "3",
+          },
+        },
+      );
+    } catch (err) {
+      console.error("[Baobab] FB.login a échoué :", err, {
+        fbInitialized: window.__fbInitialized,
+        appId: config.whatsapp?.metaAppId,
+        fbExists: typeof window.FB,
+      });
+      setLoading(false);
+      toast.error("Erreur Facebook SDK — réessayez ou contactez le support");
+    }
   };
 
   const handleDisconnect = async () => {
