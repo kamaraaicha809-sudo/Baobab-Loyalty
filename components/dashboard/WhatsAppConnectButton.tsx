@@ -118,38 +118,44 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
     setLoading(true);
     pendingDataRef.current = null;
 
+    // Le callback passe a FB.login() doit etre une fonction synchrone : le SDK
+    // Facebook rejette silencieusement une fonction declaree `async` ("Expression
+    // is of type asyncfunction, not function"), ce qui empechait la popup de
+    // s'ouvrir. La logique async reste identique, executee via une IIFE interne.
     window.FB.login(
-      async (response: FacebookLoginResponse) => {
-        if (response.status !== "connected" || !response.authResponse?.code) {
-          setLoading(false);
-          toast.error("Connexion annulée");
-          return;
-        }
+      (response: FacebookLoginResponse) => {
+        void (async () => {
+          if (response.status !== "connected" || !response.authResponse?.code) {
+            setLoading(false);
+            toast.error("Connexion annulée");
+            return;
+          }
 
-        const code = response.authResponse.code;
-        const extra = pendingDataRef.current;
+          const code = response.authResponse.code;
+          const extra = pendingDataRef.current;
 
-        if (!extra?.phone_number_id) {
-          setLoading(false);
-          toast.error("Identifiants WhatsApp non reçus — réessayez");
-          return;
-        }
+          if (!extra?.phone_number_id) {
+            setLoading(false);
+            toast.error("Identifiants WhatsApp non reçus — réessayez");
+            return;
+          }
 
-        try {
-          const result = await whatsapp.connect({
-            code,
-            phone_number_id: extra.phone_number_id,
-            waba_id: extra.waba_id,
-          });
-          setConnected(true);
-          setPhone(result.phone_number || extra.phone_number_id);
-          onStatusChange?.(true);
-          toast.success("WhatsApp Business connecté");
-        } catch {
-          toast.error("Erreur lors de la connexion — réessayez");
-        } finally {
-          setLoading(false);
-        }
+          try {
+            const result = await whatsapp.connect({
+              code,
+              phone_number_id: extra.phone_number_id,
+              waba_id: extra.waba_id,
+            });
+            setConnected(true);
+            setPhone(result.phone_number || extra.phone_number_id);
+            onStatusChange?.(true);
+            toast.success("WhatsApp Business connecté");
+          } catch {
+            toast.error("Erreur lors de la connexion — réessayez");
+          } finally {
+            setLoading(false);
+          }
+        })();
       },
       {
         scope: "whatsapp_business_management,business_management",
