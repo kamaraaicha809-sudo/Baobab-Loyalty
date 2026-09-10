@@ -191,7 +191,7 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
           })();
         },
         {
-          scope: "whatsapp_business_management,business_management",
+          config_id: "1839189404344800",
           response_type: "code",
           override_default_response_type: true,
           extras: {
