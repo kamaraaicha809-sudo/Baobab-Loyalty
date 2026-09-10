@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, startTransition } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import config from "@/config";
 import { whatsapp } from "@/src/sdk/whatsapp";
@@ -19,7 +19,6 @@ declare global {
       login: (callback: (response: FacebookLoginResponse) => void, options: object) => void;
     };
     fbAsyncInit?: () => void;
-    __fbInitialized?: boolean;
   }
 }
 
@@ -68,37 +67,36 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
 
     window.addEventListener("message", handleMessage);
 
-    // Appelle FB.init() nous-memes plutot que de nous fier uniquement au
-    // callback fbAsyncInit du SDK : si le tag <script> existe deja (retour
-    // sur cette page sans rechargement complet) mais que fbAsyncInit n'a
-    // jamais reellement tourne dans ce cycle, FB.login() etait appele avant
-    // FB.init() ("FB.login() called before FB.init()"). FB.init() est
-    // idempotent, l'appeler nous-memes de facon deterministe elimine la course.
-    const initFb = () => {
-      window.FB.init({
-        appId: config.whatsapp?.metaAppId,
-        autoLogAppEvents: true,
-        xfbml: true,
-        version: "v19.0",
-      });
-      window.__fbInitialized = true;
+    // fbReady signifie seulement "le SDK est charge" (window.FB existe). On
+    // n'essaie plus de retenir un etat "deja initialise" entre deux montages
+    // du composant (ex: apres Deconnecter/Reconnecter) : FB.init() est
+    // desormais rappele nous-memes, de facon synchrone, juste avant chaque
+    // FB.login() dans handleConnect (idempotent, sans danger a repeter). Cet
+    // etat memorise etait la cause du "FB.login() called before FB.init()."
+    // persistant malgre un fbReady=true correct.
+    if (window.FB) {
       setFbReady(true);
-    };
-
-    // Load Facebook SDK
-    if (!document.getElementById("facebook-jssdk")) {
-      window.fbAsyncInit = initFb;
+    } else if (!document.getElementById("facebook-jssdk")) {
+      window.fbAsyncInit = () => setFbReady(true);
 
       const script = document.createElement("script");
       script.id = "facebook-jssdk";
       script.src = "https://connect.facebook.net/en_US/sdk.js";
       script.async = true;
-      script.defer = true;
       document.body.appendChild(script);
-    } else if (window.__fbInitialized) {
-      startTransition(() => setFbReady(true));
-    } else if (window.FB) {
-      initFb();
+    } else {
+      // Le tag <script> existe deja mais window.FB n'est pas encore pret
+      // (chargement en cours depuis un mount precedent) : on patiente.
+      const poll = window.setInterval(() => {
+        if (window.FB) {
+          window.clearInterval(poll);
+          setFbReady(true);
+        }
+      }, 200);
+      return () => {
+        window.clearInterval(poll);
+        window.removeEventListener("message", handleMessage);
+      };
     }
 
     return () => window.removeEventListener("message", handleMessage);
@@ -129,6 +127,18 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
 
     setLoading(true);
     pendingDataRef.current = null;
+
+    // Rappelle FB.init() nous-memes, de facon synchrone, juste avant
+    // FB.login() (idempotent, sans danger a repeter) : ca elimine toute
+    // dependance a un etat "deja initialise" memorise entre deux montages
+    // du composant, seule source fiable de l'erreur persistante
+    // "FB.login() called before FB.init()." malgre un fbReady=true correct.
+    window.FB.init({
+      appId: config.whatsapp?.metaAppId,
+      autoLogAppEvents: true,
+      xfbml: true,
+      version: "v19.0",
+    });
 
     // Le callback passe a FB.login() doit etre une fonction synchrone : le SDK
     // Facebook rejette silencieusement une fonction declaree `async` ("Expression
@@ -187,7 +197,6 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
       );
     } catch (err) {
       console.error("[Baobab] FB.login a échoué :", err, {
-        fbInitialized: window.__fbInitialized,
         appId: config.whatsapp?.metaAppId,
         fbExists: typeof window.FB,
       });
