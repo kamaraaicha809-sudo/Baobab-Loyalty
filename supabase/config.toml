@@ -63,6 +63,9 @@ verify_jwt = false
 [functions.fne-worker]
 verify_jwt = false
 
+[functions.birthday-worker]
+verify_jwt = false
+
 [functions.team-invite]
 verify_jwt = false
 
