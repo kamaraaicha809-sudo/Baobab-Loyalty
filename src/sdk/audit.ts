@@ -18,6 +18,7 @@ const ACTION_LABELS: Record<string, string> = {
   reservation_confirmed: "Réservation confirmée",
   reservation_cancelled: "Réservation annulée",
   campaign_sent: "Campagne envoyée",
+  birthday_message_sent: "Anniversaires envoyés",
   team_member_removed: "Membre retiré de l'équipe",
   team_invitation_revoked: "Invitation annulée",
 };

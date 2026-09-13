@@ -5,6 +5,7 @@
 
 import { callEdgeFunction } from "./_core";
 import { isDemoMode, demoProfile } from "@/src/lib/demo";
+import { createClient } from "@/libs/supabase/client";
 
 // Types
 export interface UserProfile {
@@ -25,6 +26,8 @@ export interface UserProfile {
   ai_keywords_use?: string | null;
   ai_keywords_avoid?: string | null;
   ai_signature?: string | null;
+  birthday_automation_enabled?: boolean;
+  birthday_template_key?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -62,8 +65,34 @@ export async function activateBetaTrial(): Promise<BetaTrialActivationResult> {
   });
 }
 
+export interface BirthdaySettingsInput {
+  enabled: boolean;
+  templateKey: string;
+}
+
+/**
+ * Met à jour les réglages d'automatisation anniversaire (activation + choix
+ * du template). Écriture directe sous RLS : birthday_automation_enabled et
+ * birthday_template_key sont des préférences hôtelières sans impact
+ * facturation/rôle, ouvertes en écriture comme hotel_name (migration 057).
+ * Ne pas chaîner .select() ici : whatsapp_access_token/bsp_api_key ne sont
+ * plus lisibles via REST (migration 055), un RETURNING * implicite échouerait.
+ */
+export async function updateBirthdaySettings(profileId: string, input: BirthdaySettingsInput): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      birthday_automation_enabled: input.enabled,
+      birthday_template_key: input.templateKey,
+    })
+    .eq("id", profileId);
+  if (error) throw error;
+}
+
 // Export as namespace
 export const user = {
   getProfile,
   activateBetaTrial,
+  updateBirthdaySettings,
 };

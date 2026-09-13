@@ -13,6 +13,9 @@ export interface Client {
   telephone: string | null;
   whatsapp: string | null; // Numéro WhatsApp dédié (ex. +221...)
   derniere_visite: string;
+  // Absent sur les données de démo (littéraux statiques, comme
+  // marketing_consent ci-dessous) : à traiter comme `null` en son absence.
+  date_naissance?: string | null;
   notes: string | null;
   nombre_reservations: number;
   montant_total_depense: number;
@@ -24,6 +27,27 @@ export interface Client {
   opted_out_at?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+/**
+ * Politique de consentement par environnement — miroir cote frontend de
+ * supabase/functions/_shared/consent-policy.ts (Deno ne peut pas etre importe
+ * ici, ni l'inverse : les deux copies doivent rester alignees).
+ *
+ * "legacy" (defaut, Afrique) : import ecrit seulement clients.marketing_consent,
+ * comportement strictement inchange.
+ * "channel_rgpd" (Europe, via NEXT_PUBLIC_CONSENT_MODEL="channel_rgpd") :
+ * l'import n'invente jamais de consentement. Seule une information de
+ * consentement explicitement presente dans le fichier (colonne
+ * whatsapp_consent/email_consent/sms_consent) est enregistree, canal par
+ * canal, dans communication_preferences avec sa preuve (consent_records).
+ * L'absence totale d'information laisse le contact non eligible tant qu'un
+ * consentement explicite n'a pas ete recueilli autrement.
+ */
+export type ConsentModel = "legacy" | "channel_rgpd";
+
+export function getConsentModel(): ConsentModel {
+  return process.env.NEXT_PUBLIC_CONSENT_MODEL === "channel_rgpd" ? "channel_rgpd" : "legacy";
 }
 
 export interface SegmentFilters {
@@ -87,7 +111,7 @@ export async function getClients(profileId: string, limit = 1000): Promise<Clien
   const { data, error } = await supabase
     .from("clients")
     .select(
-      "id, profile_id, nom, email, telephone, whatsapp, derniere_visite, notes, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle, marketing_consent, opted_out_at, created_at, updated_at"
+      "id, profile_id, nom, email, telephone, whatsapp, derniere_visite, date_naissance, notes, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle, marketing_consent, opted_out_at, created_at, updated_at"
     )
     .eq("profile_id", profileId)
     .order("derniere_visite", { ascending: false })
@@ -135,6 +159,7 @@ export interface AddClientInput {
   telephone?: string;
   whatsapp?: string;
   derniere_visite: string;
+  date_naissance?: string;
   type_chambre_preferee?: string;
   notes?: string;
 }
@@ -156,6 +181,7 @@ export async function addClient(profileId: string, input: AddClientInput): Promi
   const whatsapp = input.whatsapp?.trim() || null;
   const notes = input.notes?.trim() || null;
   const type_chambre_preferee = input.type_chambre_preferee?.trim() || null;
+  const date_naissance = input.date_naissance?.trim() || null;
 
   let existingId: string | null = null;
   if (whatsapp) {
@@ -167,7 +193,7 @@ export async function addClient(profileId: string, input: AddClientInput): Promi
     existingId = data?.id ?? null;
   }
 
-  const row = { nom, telephone, whatsapp, derniere_visite: input.derniere_visite, type_chambre_preferee, notes };
+  const row = { nom, telephone, whatsapp, derniere_visite: input.derniere_visite, date_naissance, type_chambre_preferee, notes };
 
   if (existingId) {
     const { data, error } = await supabase.from("clients").update(row).eq("id", existingId).select().single();
@@ -190,10 +216,20 @@ export interface ImportClientRow {
   telephone?: string;
   whatsapp?: string;
   derniere_visite: string;
+  date_naissance?: string;
   nombre_reservations?: number;
   montant_total_depense?: number;
   type_chambre_preferee?: string;
   saison_habituelle?: string;
+  // Consentement par canal, uniquement si des colonnes dediees existent dans
+  // le CSV (voir parseClientsCSV) — `undefined` signifie "aucune information
+  // dans le fichier", a ne jamais confondre avec `false` ("explicitement
+  // refuse"). Ignore en mode legacy (Afrique).
+  whatsappConsent?: boolean;
+  emailConsent?: boolean;
+  smsConsent?: boolean;
+  consentSource?: string;
+  consentDate?: string;
 }
 
 type PhoneIssue = "missing_country_code" | "invalid_characters" | "too_short" | null;
@@ -225,6 +261,7 @@ interface ValidRow {
   telephone: string | null;
   whatsapp: string | null;
   derniere_visite: string;
+  date_naissance?: string;
   nombre_reservations?: number;
   montant_total_depense?: number;
   type_chambre_preferee?: string;
@@ -239,6 +276,11 @@ export interface ImportPreview {
   possibleNameDuplicates: number;
   missingCountryCode: number;
   invalidPhoneFormat: number;
+  // Toujours 0 en mode legacy (Afrique). En mode channel_rgpd (Europe),
+  // nombre de lignes valides dont AUCUN canal (whatsapp/email/sms) n'a de
+  // consentement documenté dans le fichier — ces contacts seront importés
+  // dans le CRM mais non éligibles aux campagnes marketing correspondantes.
+  noConsentProofCount: number;
 }
 
 /**
@@ -286,6 +328,7 @@ function validateAndDedupeRows(profileId: string, rows: ImportClientRow[]) {
       telephone: row.telephone?.trim() || null,
       whatsapp: row.whatsapp?.trim() || null,
       derniere_visite: row.derniere_visite,
+      date_naissance: row.date_naissance?.trim() || undefined,
       nombre_reservations: row.nombre_reservations,
       montant_total_depense: row.montant_total_depense,
       type_chambre_preferee: row.type_chambre_preferee?.trim() || undefined,
@@ -326,6 +369,25 @@ function validateAndDedupeRows(profileId: string, rows: ImportClientRow[]) {
     warnings.push(`${possibleNameDuplicates} nom(s) apparaissent plusieurs fois avec des numéros différents — vérifiez qu'il ne s'agit pas du même client mal saisi.`);
   }
 
+  // Uniquement pertinent en mode channel_rgpd : une ligne "sans preuve" est
+  // une ligne ou aucun des 3 canaux n'a de valeur explicite (ni true ni
+  // false) dans le fichier source — on ne doit jamais confondre "pas
+  // d'information" avec un consentement implicite.
+  const noConsentProofCount =
+    getConsentModel() === "channel_rgpd"
+      ? validRows.filter(
+          (row) =>
+            row.source.whatsappConsent === undefined &&
+            row.source.emailConsent === undefined &&
+            row.source.smsConsent === undefined
+        ).length
+      : 0;
+  if (noConsentProofCount > 0) {
+    warnings.push(
+      `${noConsentProofCount} contact(s) n'ont aucune preuve de consentement marketing exploitable dans ce fichier — ils seront importés mais ne pourront pas être ciblés par les campagnes correspondantes tant qu'une base légale/autorisation appropriée n'aura pas été enregistrée.`
+    );
+  }
+
   return {
     validRows,
     errors,
@@ -336,6 +398,7 @@ function validateAndDedupeRows(profileId: string, rows: ImportClientRow[]) {
     possibleNameDuplicates,
     missingCountryCode,
     invalidPhoneFormat,
+    noConsentProofCount,
   };
 }
 
@@ -356,6 +419,7 @@ export function previewImport(rows: ImportClientRow[]): ImportPreview {
     possibleNameDuplicates: result.possibleNameDuplicates,
     missingCountryCode: result.missingCountryCode,
     invalidPhoneFormat: result.invalidPhoneFormat,
+    noConsentProofCount: result.noConsentProofCount,
   };
 }
 
@@ -370,12 +434,47 @@ export function previewImport(rows: ImportClientRow[]): ImportPreview {
  * quelles dans failedRows, pour permettre de les corriger et de ré-importer
  * seulement celles-là au lieu de tout recommencer.
  */
+/**
+ * Enregistre le consentement documenté dans une ligne de CSV, canal par
+ * canal — jamais appelé en mode legacy (Afrique). Une valeur `undefined`
+ * (canal absent du fichier) ne déclenche aucun écrit : on n'invente jamais
+ * un consentement, un contact sans information reste non éligible sur ce
+ * canal (voir communication_preferences, aucune ligne = non consentant).
+ */
+async function recordImportConsent(
+  supabase: ReturnType<typeof createClient>,
+  profileId: string,
+  clientId: string,
+  source: ImportClientRow
+): Promise<void> {
+  const channels: { channel: "whatsapp" | "email" | "sms"; consent: boolean | undefined }[] = [
+    { channel: "whatsapp", consent: source.whatsappConsent },
+    { channel: "email", consent: source.emailConsent },
+    { channel: "sms", consent: source.smsConsent },
+  ];
+  for (const { channel, consent } of channels) {
+    if (consent === undefined) continue;
+    await supabase.rpc("set_communication_preference", {
+      p_profile_id: profileId,
+      p_client_id: clientId,
+      p_channel: channel,
+      p_opted_in: consent,
+      p_method: source.consentSource?.trim() || "import_csv",
+      p_policy_version: null,
+      p_ip: null,
+      p_user_agent: null,
+      p_original_consent_date: source.consentDate || null,
+    });
+  }
+}
+
 export async function importClients(
   profileId: string,
   rows: ImportClientRow[]
 ): Promise<{ inserted: number; errors: string[]; warnings: string[]; failedRows: ImportClientRow[] }> {
   const supabase = createClient();
   const { validRows, errors, warnings, failedRows } = validateAndDedupeRows(profileId, rows);
+  const consentModel = getConsentModel();
 
   const phones = [...new Set(validRows.map((r) => r.telephone).filter((t): t is string => !!t))];
   const existingByPhone = new Map<string, string>();
@@ -400,21 +499,40 @@ export async function importClients(
     else toInsert.push(row);
   }
 
-  const BATCH = 100;
   let inserted = 0;
 
-  for (let i = 0; i < toInsert.length; i += BATCH) {
-    const batch = toInsert.slice(i, i + BATCH);
-    const { data, error } = await supabase
-      .from("clients")
-      .insert(batch.map(({ source: _source, ...r }) => r))
-      .select("id");
+  if (consentModel === "channel_rgpd") {
+    // Insertion ligne par ligne (pas en lot) : chaque contact peut porter un
+    // consentement par canal à enregistrer avec preuve, il faut donc
+    // connaître l'id exact retourné pour CETTE ligne précise. Volumes Europe
+    // faibles en phase actuelle — le chemin par lot ci-dessous (Afrique)
+    // reste inchangé et n'est jamais emprunté ici.
+    for (const row of toInsert) {
+      const { source: _source, ...r } = row;
+      const { data, error } = await supabase.from("clients").insert(r).select("id").single();
+      if (error || !data) {
+        errors.push(`${row.nom} : ${error?.message ?? "erreur inconnue"}`);
+        failedRows.push(row.source);
+        continue;
+      }
+      inserted++;
+      await recordImportConsent(supabase, profileId, data.id, row.source);
+    }
+  } else {
+    const BATCH = 100;
+    for (let i = 0; i < toInsert.length; i += BATCH) {
+      const batch = toInsert.slice(i, i + BATCH);
+      const { data, error } = await supabase
+        .from("clients")
+        .insert(batch.map(({ source: _source, ...r }) => r))
+        .select("id");
 
-    if (error) {
-      errors.push(`Lot ${Math.floor(i / BATCH) + 1} : ${error.message}`);
-      failedRows.push(...batch.map((r) => r.source));
-    } else {
-      inserted += data?.length ?? 0;
+      if (error) {
+        errors.push(`Lot ${Math.floor(i / BATCH) + 1} : ${error.message}`);
+        failedRows.push(...batch.map((r) => r.source));
+      } else {
+        inserted += data?.length ?? 0;
+      }
     }
   }
 
@@ -430,6 +548,7 @@ export async function importClients(
         email: row.email,
         whatsapp: row.whatsapp,
         derniere_visite: row.derniere_visite,
+        date_naissance: row.date_naissance,
         nombre_reservations: row.nombre_reservations,
         montant_total_depense: row.montant_total_depense,
         type_chambre_preferee: row.type_chambre_preferee,
@@ -441,10 +560,50 @@ export async function importClients(
       failedRows.push(row.source);
     } else {
       inserted++;
+      if (consentModel === "channel_rgpd") {
+        await recordImportConsent(supabase, profileId, id, row.source);
+      }
     }
   }
 
   return { inserted, errors, warnings, failedRows };
+}
+
+/**
+ * Comme parseDate(), mais pour une date de consentement : une valeur non
+ * reconnue doit rester `undefined` ("date inconnue"), jamais retomber
+ * silencieusement sur la date du jour comme le fait parseDate() pour
+ * derniere_visite — ça fabriquerait une fausse preuve de date de consentement.
+ */
+function parseConsentDate(input: string): string | undefined {
+  const trimmed = input.trim();
+  if (!trimmed) return undefined;
+  const d = new Date(trimmed);
+  if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
+  const fr = trimmed.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  if (fr) {
+    const year = fr[3].length === 2 ? 2000 + parseInt(fr[3], 10) : parseInt(fr[3], 10);
+    const month = parseInt(fr[2], 10) - 1;
+    const day = parseInt(fr[1], 10);
+    const d2 = new Date(year, month, day);
+    if (!isNaN(d2.getTime())) return d2.toISOString().split("T")[0];
+  }
+  return undefined;
+}
+
+/**
+ * Interprète une colonne de consentement CSV. `undefined` (case vide ou
+ * valeur non reconnue) signifie explicitement "aucune information" — à ne
+ * jamais confondre avec `false` ("non", refus documenté). Cette distinction
+ * est ce qui permet de ne jamais inventer un consentement lors d'un import.
+ */
+function parseConsentBoolean(raw: string | undefined): boolean | undefined {
+  if (raw == null) return undefined;
+  const v = raw.trim().toLowerCase();
+  if (!v) return undefined;
+  if (["oui", "yes", "true", "1", "o", "y"].includes(v)) return true;
+  if (["non", "no", "false", "0", "n"].includes(v)) return false;
+  return undefined;
 }
 
 /**
@@ -462,6 +621,13 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
   const colEmail = headers.findIndex((h) => /^email$/i.test(h));
   const colTel = headers.findIndex((h) => /^(tel|telephone|phone|téléphone)$/i.test(h));
   const colWhatsapp = headers.findIndex((h) => /^whatsapp$/i.test(h));
+  // Calculé AVANT colDate et exclu de sa recherche ci-dessous : le regex
+  // large de colDate (qui matche n'importe quel header contenant "date")
+  // confondrait sinon "date_naissance" avec "derniere_visite" si la colonne
+  // anniversaire apparaît avant la date de visite dans le fichier.
+  const colNaissance = headers.findIndex((h) =>
+    /^(date[_ ]?de[_ ]?naissance|date[_ ]?naissance|naissance|anniversaire|birthdate|birth[_ ]?date)$/i.test(h)
+  );
   // Non ancré (contrairement aux autres colonnes) : "derniere_visite" est le
   // nom de la colonne interne (voir migrations), un hôtelier ou un export
   // Baobab a de bonnes chances de nommer sa colonne CSV ainsi. Un match
@@ -469,8 +635,8 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
   // "derniere" seul) et ferait retomber silencieusement sur la dernière
   // colonne du fichier — devenu plus probable après l'ajout des colonnes
   // de segmentation P5 en fin de CSV.
-  const colDate = headers.findIndex((h) =>
-    /derniere|dernière|visite|date|last|sejour|séjour/i.test(h)
+  const colDate = headers.findIndex((h, idx) =>
+    idx !== colNaissance && /derniere|dernière|visite|date|last|sejour|séjour/i.test(h)
   );
   const colNbReservations = headers.findIndex((h) =>
     /^(nombre[_ ]?reservations?|nb[_ ]?reservations?|reservations?)$/i.test(h)
@@ -482,6 +648,24 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
     /^(type[_ ]?chambre[_ ]?preferee|type[_ ]?chambre|chambre[_ ]?preferee|room[_ ]?type)$/i.test(h)
   );
   const colSaison = headers.findIndex((h) => /^(saison[_ ]?habituelle|saison|season)$/i.test(h));
+  // Colonnes de consentement, optionnelles — utilisées uniquement en mode
+  // channel_rgpd (Europe). Absentes du CSV = undefined pour chaque ligne,
+  // jamais interprété comme un consentement (voir recordImportConsent).
+  const colConsentWhatsapp = headers.findIndex((h) =>
+    /^(consentement[_ ]?whatsapp|whatsapp[_ ]?consent(ement)?|whatsapp[_ ]?marketing)$/i.test(h)
+  );
+  const colConsentEmail = headers.findIndex((h) =>
+    /^(consentement[_ ]?email|email[_ ]?consent(ement)?|email[_ ]?marketing)$/i.test(h)
+  );
+  const colConsentSms = headers.findIndex((h) =>
+    /^(consentement[_ ]?sms|sms[_ ]?consent(ement)?|sms[_ ]?marketing)$/i.test(h)
+  );
+  const colConsentSource = headers.findIndex((h) =>
+    /^(source[_ ]?consentement|consent[_ ]?source)$/i.test(h)
+  );
+  const colConsentDate = headers.findIndex((h) =>
+    /^(date[_ ]?consentement|consent[_ ]?date)$/i.test(h)
+  );
 
   const fallbackNom = colNom < 0 ? 0 : colNom;
   const fallbackDate = colDate < 0 ? headers.length - 1 : colDate;
@@ -493,10 +677,16 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
     const telephone = colTel >= 0 ? parts[colTel] : undefined;
     const whatsapp = colWhatsapp >= 0 ? parts[colWhatsapp] : undefined;
     const derniere_visite = (colDate >= 0 ? parts[colDate] : parts[fallbackDate]) || "";
+    const dateNaissanceRaw = colNaissance >= 0 ? parts[colNaissance] : undefined;
     const nbReservationsRaw = colNbReservations >= 0 ? parts[colNbReservations] : undefined;
     const montantRaw = colMontant >= 0 ? parts[colMontant] : undefined;
     const typeChambre = colChambre >= 0 ? parts[colChambre] : undefined;
     const saison = colSaison >= 0 ? parts[colSaison] : undefined;
+    const whatsappConsentRaw = colConsentWhatsapp >= 0 ? parts[colConsentWhatsapp] : undefined;
+    const emailConsentRaw = colConsentEmail >= 0 ? parts[colConsentEmail] : undefined;
+    const smsConsentRaw = colConsentSms >= 0 ? parts[colConsentSms] : undefined;
+    const consentSource = colConsentSource >= 0 ? parts[colConsentSource] : undefined;
+    const consentDateRaw = colConsentDate >= 0 ? parts[colConsentDate] : undefined;
 
     const nbReservations = nbReservationsRaw ? parseInt(nbReservationsRaw.replace(/[^\d-]/g, ""), 10) : NaN;
     const montant = montantRaw ? parseInt(montantRaw.replace(/[^\d-]/g, ""), 10) : NaN;
@@ -511,10 +701,19 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
       telephone: telephone || undefined,
       whatsapp: whatsapp || undefined,
       derniere_visite: derniere_visite ? parseDate(derniere_visite) : "",
+      // parseConsentDate (pas parseDate) : une date de naissance manquante ou
+      // illisible doit rester `undefined`, jamais retomber sur la date du
+      // jour comme le fait parseDate() pour derniere_visite.
+      date_naissance: dateNaissanceRaw ? parseConsentDate(dateNaissanceRaw) : undefined,
       nombre_reservations: Number.isFinite(nbReservations) ? nbReservations : undefined,
       montant_total_depense: Number.isFinite(montant) ? montant : undefined,
       type_chambre_preferee: typeChambre || undefined,
       saison_habituelle: saison || undefined,
+      whatsappConsent: parseConsentBoolean(whatsappConsentRaw),
+      emailConsent: parseConsentBoolean(emailConsentRaw),
+      smsConsent: parseConsentBoolean(smsConsentRaw),
+      consentSource: consentSource || undefined,
+      consentDate: consentDateRaw ? parseConsentDate(consentDateRaw) : undefined,
     });
   }
 
@@ -528,7 +727,7 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
  * (aucun accès réseau) : le déclenchement du téléchargement reste côté UI.
  */
 export function buildClientsCSV(clientsList: Client[]): string {
-  const header = "nom,email,telephone,whatsapp,derniere_visite,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
+  const header = "nom,email,telephone,whatsapp,derniere_visite,date_naissance,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
   const escape = (v: string): string =>
     /[,"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
   const lines = clientsList.map((c) =>
@@ -538,6 +737,7 @@ export function buildClientsCSV(clientsList: Client[]): string {
       escape(c.telephone || ""),
       escape(c.whatsapp || ""),
       c.derniere_visite || "",
+      c.date_naissance || "",
       c.nombre_reservations ?? "",
       c.montant_total_depense ?? "",
       escape(c.type_chambre_preferee || ""),
@@ -607,4 +807,5 @@ export const clients = {
   buildClientsCSV,
   setMarketingConsent,
   unsubscribe,
+  getConsentModel,
 };

@@ -16,6 +16,7 @@ import { getServiceClient } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 import { logAudit } from "../_shared/audit.ts";
+import { getConsentModel } from "../_shared/consent-policy.ts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -58,6 +59,23 @@ Deno.serve(async (req) => {
       .eq("id", clientId);
 
     if (updateError) return errors.internal(updateError.message);
+
+    // En mode channel_rgpd (Europe), le retrait doit aussi apparaitre dans
+    // communication_preferences (source de verite utilisee par campaign-send
+    // pour ce canal) -- pas seulement dans l'ancien champ global. Sans effet
+    // en Afrique (getConsentModel() y reste "legacy", aucun appel).
+    if (getConsentModel() === "channel_rgpd") {
+      await db.rpc("set_communication_preference", {
+        p_profile_id: client.profile_id,
+        p_client_id: clientId,
+        p_channel: "whatsapp",
+        p_opted_in: false,
+        p_method: "unsubscribe_link",
+        p_policy_version: null,
+        p_ip: null,
+        p_user_agent: null,
+      });
+    }
 
     await logAudit(db, {
       profileId: client.profile_id,

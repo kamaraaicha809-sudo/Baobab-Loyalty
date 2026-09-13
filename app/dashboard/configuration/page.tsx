@@ -461,7 +461,7 @@ export default function ConfigurationPage() {
 
   const handleDownloadFailedRows = () => {
     if (failedImportRows.length === 0) return;
-    const header = "nom,email,telephone,whatsapp,derniere_visite,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
+    const header = "nom,email,telephone,whatsapp,derniere_visite,date_naissance,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
     const lines = failedImportRows.map((r) =>
       [
         r.nom,
@@ -469,6 +469,7 @@ export default function ConfigurationPage() {
         r.telephone || "",
         r.whatsapp || "",
         r.derniere_visite,
+        r.date_naissance || "",
         r.nombre_reservations ?? "",
         r.montant_total_depense ?? "",
         r.type_chambre_preferee || "",
@@ -1015,7 +1016,7 @@ export default function ConfigurationPage() {
           Importez votre liste clients (CSV) avec les colonnes : <strong>nom</strong>, <strong>email</strong>, <strong>téléphone</strong>, <strong>dernière visite</strong> (format JJ/MM/AAAA ou AAAA-MM-JJ).
         </p>
         <p className="text-slate-500 text-xs mb-4">
-          Colonnes optionnelles pour affiner vos segments : <strong>nombre_reservations</strong>, <strong>montant_total_depense</strong>, <strong>type_chambre_preferee</strong>, <strong>saison_habituelle</strong>. Taille maximale : {MAX_CSV_FILE_SIZE_BYTES / (1024 * 1024)} Mo. Les fichiers Excel accentués (Windows ou Mac) sont pris en charge automatiquement.
+          Colonnes optionnelles pour affiner vos segments : <strong>nombre_reservations</strong>, <strong>montant_total_depense</strong>, <strong>type_chambre_preferee</strong>, <strong>saison_habituelle</strong>. Ajoutez une colonne <strong>date_naissance</strong> (JJ/MM/AAAA) pour activer les messages d&apos;anniversaire automatiques (voir Anniversaires). Taille maximale : {MAX_CSV_FILE_SIZE_BYTES / (1024 * 1024)} Mo. Les fichiers Excel accentués (Windows ou Mac) sont pris en charge automatiquement.
         </p>
         {!csvPreview && (
           <form onSubmit={handleAnalyzeCSV} className="flex flex-wrap items-end gap-4">
@@ -1089,6 +1090,16 @@ export default function ConfigurationPage() {
                 </li>
               )}
             </ul>
+            {/* Uniquement affiché quand le modèle de consentement par canal
+                (Europe) est actif — toujours 0 en Afrique, donc jamais rendu
+                là-bas. Voir getConsentModel() dans src/sdk/clients.ts. */}
+            {csvPreview.noConsentProofCount > 0 && (
+              <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                Ces contacts ne disposent pas d&apos;une preuve de consentement marketing exploitable.
+                Ils ne pourront pas être ciblés par les campagnes correspondantes tant qu&apos;une base
+                légale/autorisation appropriée n&apos;aura pas été enregistrée.
+              </p>
+            )}
             <div className="flex items-center gap-3">
               <button
                 type="button"

@@ -13,12 +13,25 @@
  * 4. Configurez les emails dans resend
  */
 
+// Région de déploiement : lue une seule fois ici, jamais de "if (europe)"
+// disséminé ailleurs dans le code. "africa" reste le défaut implicite
+// (NEXT_PUBLIC_REGION absent en production Afrique) : zéro changement de
+// comportement pour l'app existante tant que cette variable n'est pas
+// définie sur un déploiement.
+const region = (process.env.NEXT_PUBLIC_REGION || "africa").trim();
+
 const config = {
+  region,
+  // → "africa" (défaut) ou "europe". Seul point de lecture de
+  //   NEXT_PUBLIC_REGION dans tout le projet ; tout le reste du code lit
+  //   config.region (ou config.billing.currency) plutôt que l'env var
+  //   directement, pour garder un unique point de bascule.
+
   // ============================================
   // 1. INFORMATIONS GÉNÉRALES
   // ============================================
   // Ces valeurs apparaissent dans l'UI, le SEO et les emails
-  
+
   appName: "Baobab Loyalty",
   // → Nom de votre application (header, footer, emails)
   
@@ -78,13 +91,19 @@ const config = {
   },
 
   // ============================================
-  // 5. PLANS BILLING (Moneroo)
+  // 5. PLANS BILLING (Moneroo = Afrique / Stripe = Europe)
   // ============================================
-  // Plans disponibles pour les hôteliers
-  // Prix en FCFA — marché Afrique francophone
+  // Plans disponibles pour les hôteliers.
+  // billing.plans reste la liste Afrique (FCFA, Moneroo), utilisée telle
+  // quelle par /tarifs, /checkout et le dashboard tant que region="africa".
+  // billing.plansEurope ne contient QUE ce qui a été validé (prix HT) —
+  // monthlyRelances/maxRooms/maxTeamMembers restent null ("draft") tant que
+  // le découpage fonctionnalités par plan Europe n'est pas décidé. Ne pas
+  // deviner ces valeurs : voir supabase/migrations-europe/012_billing_core.sql
+  // (plan_prices, status='draft'), seule source de vérité còté serveur.
 
   billing: {
-    currency: "FCFA",
+    currency: region === "europe" ? "EUR" : "FCFA",
     onboardingFee: {
       name: "Frais d'intégration",
       price: 49000,
@@ -148,6 +167,14 @@ const config = {
           { name: "Bonus : génération de posts LinkedIn (IA)" },
         ],
       },
+    ],
+    // Prix HT validés (79/149/349 EUR) — voir migrations-europe/012. Les
+    // quotas restent null tant que non tranchés ; ne pas les afficher comme
+    // des limites réelles dans l'UI avant validation.
+    plansEurope: [
+      { planId: "starter", name: "Starter", priceExclTax: 79, monthlyRelances: null, maxRooms: null, trialDays: 14 },
+      { planId: "professional", name: "Professional", priceExclTax: 149, monthlyRelances: null, maxRooms: null, trialDays: 14 },
+      { planId: "business", name: "Business", priceExclTax: 349, monthlyRelances: null, maxRooms: null, trialDays: 14 },
     ],
   },
 

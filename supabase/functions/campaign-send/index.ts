@@ -14,6 +14,8 @@ import { success, errors } from "../_shared/response.ts";
 import { getMonthlyRelanceQuota, startOfCurrentMonthIso } from "../_shared/plan.ts";
 import { resolveProfile } from "../_shared/team.ts";
 import { logAudit } from "../_shared/audit.ts";
+import { filterConsentedClients, isClientStillConsented, getConsentModel } from "../_shared/consent-policy.ts";
+import { buildUnsubscribeSuffix, formatE164, sendViaBsp, sendViaMeta } from "../_shared/whatsapp-send.ts";
 
 interface Client {
   id: string;
@@ -26,6 +28,9 @@ interface Client {
   montant_total_depense: number;
   type_chambre_preferee: string | null;
   saison_habituelle: string | null;
+  // Presents uniquement en mode channel_rgpd (Europe) — voir select ci-dessous.
+  anonymized?: boolean;
+  processing_restricted?: boolean;
 }
 
 interface AdvancedFilters {
@@ -52,37 +57,6 @@ function clientMatchesAdvancedFilters(client: Client, filters: AdvancedFilters):
   return true;
 }
 
-// Lien de desinscription individuel ajoute a la fin de chaque message envoye
-// (audit juridique 2026-08 : consentement/desinscription WhatsApp). L'UUID du
-// client (122 bits aleatoires) sert de jeton non devinable, sans colonne
-// dediee ni infrastructure de signature supplementaire.
-function buildUnsubscribeSuffix(clientId: string): string {
-  const siteUrl = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
-  return `\n\nPour ne plus recevoir nos offres : ${siteUrl}/desinscription?c=${clientId}`;
-}
-
-function formatE164(raw: string): string | null {
-  // Remove spaces and special chars except leading +
-  let cleaned = raw.replace(/[\s\-().]/g, "");
-
-  // "00" prefix → "+"
-  if (cleaned.startsWith("00")) {
-    cleaned = "+" + cleaned.slice(2);
-  }
-
-  // Ensure starts with +
-  if (!cleaned.startsWith("+")) {
-    cleaned = "+" + cleaned;
-  }
-
-  // Keep only digits after +
-  const digits = cleaned.slice(1).replace(/\D/g, "");
-
-  if (digits.length < 7 || digits.length > 15) return null;
-
-  return "+" + digits;
-}
-
 function clientMatchesSegment(client: Client, segmentCode: string, customMonths?: number): boolean {
   const now = Date.now();
   const last = new Date(client.derniere_visite).getTime();
@@ -102,155 +76,6 @@ function clientMatchesSegment(client: Client, segmentCode: string, customMonths?
   }
 
   return true;
-}
-
-// Extrait un message d'erreur lisible depuis une reponse d'echec Meta/360dialog.
-// Les deux APIs renvoient un corps JSON de la forme { error: { message, code } }
-// en cas de rejet (template refuse, numero invalide, quota depasse...). Si le
-// corps n'est pas du JSON exploitable, on garde le texte brut (tronque).
-function extractErrorInfo(rawBody: string): { code?: string; message: string } {
-  try {
-    const parsed = JSON.parse(rawBody);
-    const apiError = parsed?.error;
-    if (apiError?.message) {
-      return {
-        code: apiError.code !== undefined ? String(apiError.code) : undefined,
-        message: String(apiError.error_data?.details || apiError.message).slice(0, 500),
-      };
-    }
-  } catch {
-    // Corps non-JSON, on retombe sur le texte brut ci-dessous
-  }
-  return { message: rawBody.slice(0, 500) || "Erreur inconnue du fournisseur WhatsApp" };
-}
-
-interface SendResult {
-  ok: boolean;
-  providerMessageId?: string;
-  errorCode?: string;
-  errorMsg?: string;
-}
-
-async function sendViaMeta(
-  phoneNumberId: string,
-  accessToken: string,
-  to: string,
-  clientName: string,
-  templateName: string,
-  messageBody: string,
-): Promise<SendResult> {
-  try {
-    const firstName = clientName.split(" ")[0];
-    const res = await fetch(
-      `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          recipient_type: "individual",
-          to,
-          type: "template",
-          template: {
-            name: templateName,
-            language: { code: "fr" },
-            components: [
-              {
-                type: "body",
-                parameters: [
-                  { type: "text", text: firstName },
-                  { type: "text", text: messageBody },
-                ],
-              },
-            ],
-          },
-        }),
-      },
-    );
-
-    const body = await res.text();
-
-    if (!res.ok) {
-      const { code, message } = extractErrorInfo(body);
-      return { ok: false, errorCode: code, errorMsg: message };
-    }
-
-    let providerMessageId: string | undefined;
-    try {
-      providerMessageId = JSON.parse(body)?.messages?.[0]?.id;
-    } catch {
-      // Reponse succes non-JSON (improbable) : on garde providerMessageId undefined
-    }
-
-    return { ok: true, providerMessageId };
-  } catch (err) {
-    return { ok: false, errorMsg: err instanceof Error ? err.message : "Network error" };
-  }
-}
-
-// BSP path: 360dialog v2 API
-// Header: D360-API-KEY (not Bearer)
-// Phone format: digits only, no + prefix
-async function sendViaBsp(
-  bspApiKey: string,
-  to: string,
-  clientName: string,
-  templateName: string,
-  messageBody: string,
-): Promise<SendResult> {
-  try {
-    const firstName = clientName.split(" ")[0];
-    // 360dialog v2 requires phone without + prefix
-    const toDigits = to.startsWith("+") ? to.slice(1) : to;
-
-    const res = await fetch("https://waba-v2.360dialog.io/messages", {
-      method: "POST",
-      headers: {
-        "D360-API-KEY": bspApiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        recipient_type: "individual",
-        to: toDigits,
-        type: "template",
-        template: {
-          name: templateName,
-          language: { code: "fr" },
-          components: [
-            {
-              type: "body",
-              parameters: [
-                { type: "text", text: firstName },
-                { type: "text", text: messageBody },
-              ],
-            },
-          ],
-        },
-      }),
-    });
-
-    const body = await res.text();
-
-    if (!res.ok) {
-      const { code, message } = extractErrorInfo(body);
-      return { ok: false, errorCode: code, errorMsg: message };
-    }
-
-    let providerMessageId: string | undefined;
-    try {
-      providerMessageId = JSON.parse(body)?.messages?.[0]?.id;
-    } catch {
-      // Reponse succes non-JSON (improbable) : on garde providerMessageId undefined
-    }
-
-    return { ok: true, providerMessageId };
-  } catch (err) {
-    return { ok: false, errorMsg: err instanceof Error ? err.message : "Network error" };
-  }
 }
 
 Deno.serve(async (req) => {
@@ -321,12 +146,15 @@ Deno.serve(async (req) => {
       return errors.badRequest("WhatsApp non configuré. Rendez-vous dans Configuration pour connecter votre compte WhatsApp.");
     }
 
-    // Quota mensuel de relances (une relance = une campagne envoyée), non reporté d'un mois à l'autre
+    // Quota mensuel de relances (une relance = une campagne envoyée), non reporté d'un mois à l'autre.
+    // Les envois automatiques d'anniversaire (campaign_type = 'birthday') ne
+    // sont jamais comptés ici — automatisation continue, pas une relance ponctuelle.
     const relanceQuota = getMonthlyRelanceQuota(profile);
     const { count: relancesUsed, error: quotaError } = await db
       .from("campaigns")
       .select("id", { count: "exact", head: true })
       .eq("profile_id", profileId)
+      .eq("campaign_type", "manual")
       .gte("created_at", startOfCurrentMonthIso());
 
     if (quotaError) return errors.internal(quotaError.message);
@@ -337,12 +165,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Fetch all clients for this profile
+    // Fetch all clients for this profile. anonymized/processing_restricted
+    // n'existent que sur le schema Europe (migrations-europe/007) : les
+    // demander sur Afrique ferait échouer la requête, d'où la sélection
+    // conditionnelle sur CONSENT_MODEL plutôt qu'un select toujours large.
+    const baseSelect = "id, nom, whatsapp, telephone, derniere_visite, marketing_consent, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle";
+    const select = getConsentModel() === "channel_rgpd" ? `${baseSelect}, anonymized, processing_restricted` : baseSelect;
     const { data: allClients, error: clientsError } = await db
       .from("clients")
-      .select(
-        "id, nom, whatsapp, telephone, derniere_visite, marketing_consent, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle"
-      )
+      .select(select)
       .eq("profile_id", profileId);
 
     if (clientsError) return errors.internal(clientsError.message);
@@ -352,11 +183,16 @@ Deno.serve(async (req) => {
       .filter((c) => clientMatchesSegment(c, segmentCode, customMonths))
       .filter((c) => clientMatchesAdvancedFilters(c, advancedFilters));
 
-    // Un client peut correspondre au segment mais avoir demande a ne plus
-    // recevoir de messages marketing (STOP recu via le webhook, ou opt-out
-    // manuel) : on ne doit jamais lui envoyer une campagne, meme par erreur.
-    const targets = segmentTargets.filter((c) => c.marketing_consent);
-    const excludedOptOut = segmentTargets.length - targets.length;
+    // Un client peut correspondre au segment mais ne pas (ou plus) etre
+    // autorise sur ce canal (STOP recu via le webhook, opt-out manuel, ou -
+    // en Europe - absence de consentement WhatsApp explicite dans
+    // communication_preferences) : on ne doit jamais lui envoyer une
+    // campagne, meme par erreur. filterConsentedClients() applique la
+    // politique legacy (marketing_consent) ou channel_rgpd selon
+    // CONSENT_MODEL (voir _shared/consent-policy.ts) - inchangee pour
+    // l'Afrique, qui ne definit jamais cette variable.
+    const { eligible: targets, excluded: excludedByConsent } = await filterConsentedClients(db, segmentTargets, "whatsapp");
+    const excludedOptOut = excludedByConsent.length;
 
     // Create campaign record (map custom segments to "tous")
     const dbSegmentCode = ["3-6mois", "6-9mois", "9-12mois", "1an+", "tous"].includes(segmentCode)
@@ -387,6 +223,7 @@ Deno.serve(async (req) => {
         profile_id: profileId,
         name: `Campagne ${templateId || "whatsapp"} — ${new Date().toLocaleDateString("fr-FR")}`,
         segment_code: dbSegmentCode,
+        campaign_type: "manual",
         status: "sending",
         recipient_count: targets.length,
       })
@@ -397,6 +234,7 @@ Deno.serve(async (req) => {
 
     let sent = 0;
     let failed = 0;
+    let revokedAtSendTime = 0;
 
     // Chaque sent_messages est inséré immédiatement (pas en un seul lot à la
     // fin) : si la fonction plante ou est tuée par un timeout au milieu de
@@ -404,6 +242,29 @@ Deno.serve(async (req) => {
     // journalisés au lieu d'être perdus.
     try {
       for (const client of targets) {
+        // Reverification au moment exact de l'envoi, pas seulement au moment
+        // du filtrage ci-dessus : un consentement retire entre la creation
+        // de la campagne et cet instant precis (campagne longue, plusieurs
+        // centaines de destinataires) doit bloquer ce client precisement,
+        // sans devoir relancer toute la campagne. Cout nul en mode legacy
+        // (Afrique) : reutilise la valeur deja chargee, aucune requete de plus.
+        const stillConsented = await isClientStillConsented(db, client, "whatsapp");
+        if (!stillConsented) {
+          revokedAtSendTime++;
+          await db.from("sent_messages").insert({
+            campaign_id: campaignId,
+            client_id: client.id,
+            profile_id: profileId,
+            channel: "whatsapp",
+            message_content: message,
+            template_id: templateId || null,
+            status: "failed",
+            error_message: "Consentement retiré après la création de la campagne",
+            failed_at: new Date().toISOString(),
+          });
+          continue;
+        }
+
         const personalizedMessage = message + buildUnsubscribeSuffix(client.id);
         const rawNumber = client.whatsapp || client.telephone;
         if (!rawNumber) {
@@ -485,10 +346,10 @@ Deno.serve(async (req) => {
       profileId,
       actorUserId,
       action: "campaign_sent",
-      details: { campaignId, segmentCode, sent, failed, total: targets.length },
+      details: { campaignId, segmentCode, sent, failed, revokedAtSendTime, total: targets.length },
     });
 
-    return success({ sent, failed, total: targets.length, campaignId, excludedOptOut });
+    return success({ sent, failed, total: targets.length, campaignId, excludedOptOut, revokedAtSendTime });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Erreur interne";
     return errors.internal(msg);

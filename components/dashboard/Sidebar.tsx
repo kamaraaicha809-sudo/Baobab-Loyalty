@@ -49,6 +49,16 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
     },
     { id: 'segments', label: 'Segments', icon: <Icons.Users />, href: '/dashboard/segments' },
     { id: 'templates', label: 'Templates', icon: <Icons.Template />, href: '/dashboard/templates' },
+    {
+      id: 'anniversaires',
+      label: 'Anniversaires',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 shrink-0">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v3m0 0c-1.5 0-3-1-3-2.5S10.5 4 12 4s3 1 3 2.5S13.5 8 12 8zm-7 5h14M5 13a2 2 0 00-2 2v5a1 1 0 001 1h16a1 1 0 001-1v-5a2 2 0 00-2-2M5 13V9a2 2 0 012-2h1m9 6V9a2 2 0 00-2-2h-1" />
+        </svg>
+      ),
+      href: '/dashboard/anniversaires',
+    },
     { id: 'historique', label: 'Historique', icon: <Icons.Clock />, href: '/dashboard/historique' },
     {
       id: 'linkedin',

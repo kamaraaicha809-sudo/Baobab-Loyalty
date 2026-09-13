@@ -11,6 +11,7 @@ const emptyForm = {
   telephone: "",
   whatsapp: "",
   derniere_visite: new Date().toISOString().split("T")[0],
+  date_naissance: "",
   type_chambre_preferee: "",
   notes: "",
 };
@@ -83,6 +84,7 @@ export default function RegistrePage() {
         telephone: form.telephone || undefined,
         whatsapp: form.whatsapp || undefined,
         derniere_visite: form.derniere_visite,
+        date_naissance: form.date_naissance || undefined,
         type_chambre_preferee: form.type_chambre_preferee || undefined,
         notes: form.notes || undefined,
       });
@@ -153,6 +155,16 @@ export default function RegistrePage() {
                 onChange={set("derniere_visite")}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Date de naissance</label>
+              <input
+                type="date"
+                value={form.date_naissance}
+                onChange={set("date_naissance")}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+              />
+              <p className="mt-1 text-xs text-slate-400">Optionnel — permet d&apos;envoyer un message d&apos;anniversaire automatique (voir Anniversaires).</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Type de chambre</label>

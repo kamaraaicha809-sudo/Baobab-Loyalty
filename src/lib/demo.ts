@@ -40,6 +40,8 @@ export const demoProfile = {
   ai_keywords_use: "bienvenue, séjour inoubliable, à bientôt",
   ai_keywords_avoid: "promo, soldes",
   ai_signature: "L'équipe de l'Hôtel Le Baobab",
+  birthday_automation_enabled: true,
+  birthday_template_key: "chaleureux",
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
@@ -52,7 +54,7 @@ export const demoClients = [
   { id: "c1", nom: "Moussa Diop", email: "moussa.diop@email.com", telephone: "+221 77 123 45 67", whatsapp: "+221771234567", derniere_visite: "2025-12-10", notes: "Client fidèle, préfère suite junior" },
   { id: "c2", nom: "Fatou Ndiaye", email: "fatou.ndiaye@email.com", telephone: "+221 78 234 56 78", whatsapp: "+221782345678", derniere_visite: "2025-11-05", notes: "Voyage en famille, 2 chambres" },
   { id: "c3", nom: "Omar Sy", email: "omar.sy@email.com", telephone: "+221 76 345 67 89", whatsapp: "+221763456789", derniere_visite: "2025-10-20", notes: "Séjour d'affaires régulier" },
-  { id: "c4", nom: "Aminata Ba", email: "aminata.ba@email.com", telephone: "+221 77 456 78 90", whatsapp: "+221774567890", derniere_visite: "2025-09-15", notes: "Anniversaire en mars" },
+  { id: "c4", nom: "Aminata Ba", email: "aminata.ba@email.com", telephone: "+221 77 456 78 90", whatsapp: "+221774567890", derniere_visite: "2025-09-15", date_naissance: "1990-03-12", notes: "Anniversaire en mars" },
   { id: "c5", nom: "Ibrahima Sow", email: "ibrahima.sow@email.com", telephone: "+221 78 567 89 01", whatsapp: "+221785678901", derniere_visite: "2025-08-22", notes: "Aime le restaurant de l'hôtel" },
   { id: "c6", nom: "Aissatou Fall", email: "aissatou.fall@email.com", telephone: "+221 76 678 90 12", whatsapp: "+221766789012", derniere_visite: "2025-07-10", notes: "Week-ends prolongés" },
   { id: "c7", nom: "Cheikh Mbaye", email: "cheikh.mbaye@email.com", telephone: "+221 77 789 01 23", whatsapp: "+221777890123", derniere_visite: "2025-06-01", notes: "Conférences et séminaires" },
@@ -212,6 +214,7 @@ export const demoFlux = [
 
 export const demoAuditLog = [
   { id: "demo-audit-1", action: "campaign_sent", details: { segmentCode: "6-9mois", sent: 64, failed: 1 }, created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString() },
+  { id: "demo-audit-birthday-1", action: "birthday_message_sent", details: { sent: 2, failed: 0, total: 2, templateKey: "chaleureux" }, created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
   { id: "demo-audit-2", action: "reservation_confirmed", details: { montantFcfa: 85000 }, created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString() },
   { id: "demo-audit-3", action: "reservation_cancelled", details: {}, created_at: new Date(Date.now() - 26 * 3600 * 1000).toISOString() },
   { id: "demo-audit-4", action: "team_member_removed", details: {}, created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
