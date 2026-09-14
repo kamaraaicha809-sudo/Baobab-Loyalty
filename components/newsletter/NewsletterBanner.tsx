@@ -1,3 +1,4 @@
+import config from "@/config";
 import { NewsletterForm } from "./NewsletterForm";
 
 /**
@@ -22,8 +23,10 @@ export function NewsletterBanner() {
 
         {/* Subtitle */}
         <p className="mb-8 text-base text-[#a3c4b5] leading-relaxed">
-          Rejoignez les directeurs d&apos;hôtels d&apos;Afrique de l&apos;Ouest qui reçoivent
-          nos stratégies exclusives pour remplir leurs chambres et fidéliser leurs clients.
+          {config.region === "europe"
+            ? "Rejoignez les hôteliers qui reçoivent nos stratégies exclusives pour remplir leurs chambres et fidéliser leurs clients."
+            : <>Rejoignez les directeurs d&apos;hôtels d&apos;Afrique de l&apos;Ouest qui reçoivent
+              nos stratégies exclusives pour remplir leurs chambres et fidéliser leurs clients.</>}
         </p>
 
         {/* Form */}

@@ -3,7 +3,11 @@ import config from "@/config";
 
 export const runtime = "edge";
 
-export const alt = `${config.appName} — Fidélisation client hôtel via WhatsApp en Afrique de l'Ouest`;
+const isEurope = config.region === "europe";
+
+export const alt = isEurope
+  ? `${config.appName} — Fidélisation client hôtel via WhatsApp`
+  : `${config.appName} — Fidélisation client hôtel via WhatsApp en Afrique de l'Ouest`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -49,7 +53,7 @@ export default function OgImage() {
           }}
         >
           <span style={{ color: "#EBC161", fontWeight: 700, fontSize: 17, letterSpacing: 1 }}>
-            BAOBAB LOYALTY
+            {config.appName.toUpperCase()}
           </span>
         </div>
 
@@ -80,30 +84,38 @@ export default function OgImage() {
             lineHeight: 1.5,
           }}
         >
-          La solution IA pour remplir vos chambres vides en{" "}
-          <span style={{ color: "rgba(255,255,255,0.9)" }}>
-            Côte d&apos;Ivoire, Sénégal et Cameroun
-          </span>
+          {isEurope ? (
+            "La solution IA pour remplir vos chambres vides"
+          ) : (
+            <>
+              La solution IA pour remplir vos chambres vides en{" "}
+              <span style={{ color: "rgba(255,255,255,0.9)" }}>
+                Côte d&apos;Ivoire, Sénégal et Cameroun
+              </span>
+            </>
+          )}
         </p>
 
-        {/* Market tags */}
-        <div style={{ display: "flex", gap: 12 }}>
-          {["Côte d'Ivoire", "Sénégal", "Cameroun", "Ghana"].map((market) => (
-            <div
-              key={market}
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                borderRadius: 8,
-                padding: "7px 16px",
-                color: "rgba(255,255,255,0.7)",
-                fontSize: 15,
-              }}
-            >
-              {market}
-            </div>
-          ))}
-        </div>
+        {/* Market tags — pas de liste de pays validee pour l'Europe */}
+        {!isEurope && (
+          <div style={{ display: "flex", gap: 12 }}>
+            {["Côte d'Ivoire", "Sénégal", "Cameroun", "Ghana"].map((market) => (
+              <div
+                key={market}
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: 8,
+                  padding: "7px 16px",
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: 15,
+                }}
+              >
+                {market}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Domain */}
         <div
