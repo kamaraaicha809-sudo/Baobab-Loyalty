@@ -18,7 +18,7 @@
 // (NEXT_PUBLIC_REGION absent en production Afrique) : zéro changement de
 // comportement pour l'app existante tant que cette variable n'est pas
 // définie sur un déploiement.
-const region = (process.env.NEXT_PUBLIC_REGION || "africa").trim();
+const region = (process.env.NEXT_PUBLIC_REGION || "africa").trim().toLowerCase();
 
 const config = {
   region,
@@ -32,8 +32,12 @@ const config = {
   // ============================================
   // Ces valeurs apparaissent dans l'UI, le SEO et les emails
 
-  appName: "Baobab Loyalty",
-  // → Nom de votre application (header, footer, emails)
+  appName: region === "europe" ? "Loyavia" : "Baobab Loyalty",
+  // → Nom de votre application (header, footer, emails). Marque officielle :
+  //   "Baobab Loyalty" (Afrique) / "Loyavia" (Europe), confirmée par
+  //   l'utilisatrice le 2026-09-14. domainName/colors/resend restent à
+  //   "Baobab Loyalty" pour l'instant tant qu'aucun domaine/email Loyavia
+  //   réel n'a été communiqué — ne pas inventer de valeurs ici.
   
   appDescription: "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et leur base de données clients en automatisant l'envoi via WhatsApp en 2 minutes",
   // → Description courte pour le SEO et la homepage
