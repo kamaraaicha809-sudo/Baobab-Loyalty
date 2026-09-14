@@ -12,7 +12,9 @@ const planSlugs: Record<string, string> = {
 };
 
 const Pricing = () => {
-  const plans = config.billing.plans;
+  // config.billing.plans reste la liste Afrique (FCFA) ; plansEurope est la
+  // seule autre source de vérité, jamais les mêmes montants relabellisés.
+  const plans = config.region === "europe" ? config.billing.plansEurope : config.billing.plans;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 

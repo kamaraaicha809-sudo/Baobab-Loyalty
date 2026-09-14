@@ -1,3 +1,5 @@
+import config from "@/config";
+
 const features = [
   {
     icon: (
@@ -33,7 +35,7 @@ const features = [
       </svg>
     ),
     title: "Tu vois les résultats en temps réel",
-    desc: "Ton dashboard affiche les réservations générées, les revenus récupérés et l'activité de tes campagnes. Tu sais exactement ce que Baobab Loyalty te rapporte.",
+    desc: `Ton dashboard affiche les réservations générées, les revenus récupérés et l'activité de tes campagnes. Tu sais exactement ce que ${config.appName} te rapporte.`,
   },
   {
     icon: (

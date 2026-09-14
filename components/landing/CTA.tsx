@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, startTransition } from "react";
 import { isDemoMode } from "@/src/lib/demo";
+import config from "@/config";
 
 const CTA = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,12 +61,23 @@ const CTA = () => {
           <h2 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight mb-4 sm:mb-6 text-white">
             Tes chambres vides ne t&apos;attendent pas.<br />Tes anciens clients, si.
           </h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-4 sm:mb-6 leading-relaxed px-2">
-            Jusqu&apos;à 600 000 FCFA de revenus additionnels potentiels chaque mois — sans Booking, sans commission, sans effort.
-          </p>
-          <p className="text-white/70 text-sm sm:text-base mb-8 sm:mb-10 px-2 italic">
-            Garantie : si on ne te génère pas au moins 2 réservations directes supplémentaires au cours de ton premier mois complet, on t&apos;offre le mois suivant (base clients importée et au moins une campagne envoyée).
-          </p>
+          {/* Le montant de revenus potentiels et la garantie "mois offert" sont
+              des engagements commerciaux propres au marché Afrique, jamais
+              validés pour l'Europe — pas d'équivalent EUR inventé ici. */}
+          {config.region === "europe" ? (
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-8 sm:mb-10 leading-relaxed px-2">
+              Des revenus additionnels potentiels chaque mois — sans Booking, sans commission, sans effort.
+            </p>
+          ) : (
+            <>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-4 sm:mb-6 leading-relaxed px-2">
+                Jusqu&apos;à 600 000 FCFA de revenus additionnels potentiels chaque mois — sans Booking, sans commission, sans effort.
+              </p>
+              <p className="text-white/70 text-sm sm:text-base mb-8 sm:mb-10 px-2 italic">
+                Garantie : si on ne te génère pas au moins 2 réservations directes supplémentaires au cours de ton premier mois complet, on t&apos;offre le mois suivant (base clients importée et au moins une campagne envoyée).
+              </p>
+            </>
+          )}
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             {isLoading ? (

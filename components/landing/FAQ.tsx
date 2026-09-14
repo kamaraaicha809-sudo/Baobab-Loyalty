@@ -1,20 +1,43 @@
 "use client";
 
 import { useState, ReactNode } from "react";
+import config from "@/config";
 
 interface FAQItem {
   question: string;
   answer: ReactNode;
 }
 
+// Le calcul de ROI par nuit et la garantie "mois offert" sont des
+// engagements commerciaux propres au marché Afrique (jamais validés pour
+// l'Europe) — jamais inventer d'équivalent EUR, se limiter au prix
+// réellement validé (config.billing.plansEurope).
+const valueForMoneyAnswer =
+  config.region === "europe" ? (
+    <div className="space-y-2 leading-relaxed">
+      Le plan Starter coûte {config.billing.plansEurope[0].price} € HT par mois, sans engagement. Tu peux résilier à tout moment si ça ne te convient pas.
+    </div>
+  ) : (
+    <div className="space-y-2 leading-relaxed">
+      Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Et si tu ne récupères pas au moins 2 réservations directes supplémentaires le premier mois, on t&apos;offre le mois suivant.
+    </div>
+  );
+
+const commitmentAnswer =
+  config.region === "europe" ? (
+    <div className="space-y-2 leading-relaxed">
+      Non, aucun engagement. Tu peux résilier à tout moment, sans frais ni justification.
+    </div>
+  ) : (
+    <div className="space-y-2 leading-relaxed">
+      Non, aucun engagement. Tu peux résilier à tout moment depuis ton dashboard, sans frais ni justification. Et pour être honnêtes : si tu ne récupères pas au moins 2 réservations directes supplémentaires le premier mois, on t&apos;offre le mois suivant. On préfère te prouver que ça marche plutôt que de te retenir par contrat.
+    </div>
+  );
+
 const faqList: FAQItem[] = [
   {
     question: "Est-ce que ça vaut vraiment le coût ?",
-    answer: (
-      <div className="space-y-2 leading-relaxed">
-        Le plan Starter coûte 39 000 FCFA par mois. Si une seule campagne te génère 3 nuits supplémentaires à 30 000 FCFA la nuit, tu as déjà rentabilisé 2,3x ton investissement — ce mois-là. Et si tu ne récupères pas au moins 2 réservations directes supplémentaires le premier mois, on t&apos;offre le mois suivant.
-      </div>
-    ),
+    answer: valueForMoneyAnswer,
   },
   {
     question: "Est-ce que mes clients vont vraiment répondre et réserver ?",
@@ -42,11 +65,7 @@ const faqList: FAQItem[] = [
   },
   {
     question: "Est-ce que je m'engage sur la durée ?",
-    answer: (
-      <div className="space-y-2 leading-relaxed">
-        Non, aucun engagement. Tu peux résilier à tout moment depuis ton dashboard, sans frais ni justification. Et pour être honnêtes : si tu ne récupères pas au moins 2 réservations directes supplémentaires le premier mois, on t&apos;offre le mois suivant. On préfère te prouver que ça marche plutôt que de te retenir par contrat.
-      </div>
-    ),
+    answer: commitmentAnswer,
   },
 ];
 

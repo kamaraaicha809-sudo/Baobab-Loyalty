@@ -31,18 +31,31 @@ export const getSEOTags = ({
   robots,
   extraTags,
 }: SEOTagsOptions = {}): Metadata => {
-  // Keywords Baobab Loyalty
-  const defaultKeywords = [
-    config.appName,
-    "fidélisation clients hôtel",
-    "campagnes WhatsApp hôtel",
-    "segmentation clients",
-    "CRM hôtelier Afrique",
-    "marketing hôtel FCFA",
-    "engagement client hôtellerie",
-    "automatisation WhatsApp",
-    "loyauté client Afrique francophone",
-  ];
+  // Mots-clés SEO : le marché ("Afrique"/"FCFA") est propre à l'Afrique,
+  // jamais vrai pour l'Europe — ne pas inventer un équivalent tant que les
+  // pages publiques Europe n'ont pas été rédigées (voir config.region).
+  const defaultKeywords =
+    config.region === "europe"
+      ? [
+          config.appName,
+          "fidélisation clients hôtel",
+          "campagnes WhatsApp hôtel",
+          "segmentation clients",
+          "CRM hôtelier",
+          "engagement client hôtellerie",
+          "automatisation WhatsApp",
+        ]
+      : [
+          config.appName,
+          "fidélisation clients hôtel",
+          "campagnes WhatsApp hôtel",
+          "segmentation clients",
+          "CRM hôtelier Afrique",
+          "marketing hôtel FCFA",
+          "engagement client hôtellerie",
+          "automatisation WhatsApp",
+          "loyauté client Afrique francophone",
+        ];
 
   return {
     // Title: up to 50 characters
@@ -103,9 +116,12 @@ export const getSEOTags = ({
  * @see https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data
  */
 export const renderSchemaTags = () => {
-  // Get the first plan price for offers
-  const firstPlan = config.billing?.plans?.[0];
-  const featuredPlan = config.billing?.plans?.find((p: { isFeatured?: boolean }) => p.isFeatured) || firstPlan;
+  // config.billing.plans reste la liste Afrique (FCFA) ; plansEurope est la
+  // seule autre source de vérité, jamais les mêmes montants relabellisés
+  // (même bug déjà corrigé dans components/landing/Pricing.tsx).
+  const plansForRegion = config.region === "europe" ? config.billing.plansEurope : config.billing.plans;
+  const firstPlan = plansForRegion?.[0];
+  const featuredPlan = plansForRegion?.find((p: { isFeatured?: boolean }) => p.isFeatured) || firstPlan;
 
   return (
     <script
@@ -138,7 +154,7 @@ export const renderSchemaTags = () => {
             ? {
                 "@type": "Offer",
                 price: String(featuredPlan.price),
-                priceCurrency: "XOF",
+                priceCurrency: config.region === "europe" ? "EUR" : "XOF",
                 availability: "https://schema.org/InStock",
                 priceValidUntil: new Date(
                   new Date().setFullYear(new Date().getFullYear() + 1)
@@ -176,19 +192,24 @@ export const renderOrganizationSchema = () => {
             url: `https://${config.domainName}/brand/baobab-tree.png`,
           },
           description: config.appDescription,
-          email: "support@baobabloyalty.com",
+          email: config.resend.supportEmail,
           ...(sameAs.length > 0 && { sameAs }),
-          areaServed: [
-            { "@type": "Country", name: "Côte d'Ivoire" },
-            { "@type": "Country", name: "Sénégal" },
-            { "@type": "Country", name: "Cameroun" },
-            { "@type": "Country", name: "Ghana" },
-          ],
+          // Pays desservis propres à l'Afrique — l'équivalent Europe (quels
+          // pays, dans quelle langue) n'a pas encore été décidé, ne pas
+          // inventer une liste ici tant que ce n'est pas validé.
+          ...(config.region !== "europe" && {
+            areaServed: [
+              { "@type": "Country", name: "Côte d'Ivoire" },
+              { "@type": "Country", name: "Sénégal" },
+              { "@type": "Country", name: "Cameroun" },
+              { "@type": "Country", name: "Ghana" },
+            ],
+          }),
           knowsLanguage: ["fr", "en"],
           contactPoint: {
             "@type": "ContactPoint",
             contactType: "customer support",
-            email: "support@baobabloyalty.com",
+            email: config.resend.supportEmail,
             availableLanguage: ["fr", "en"],
           },
         }),

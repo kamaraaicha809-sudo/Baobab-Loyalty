@@ -8,9 +8,10 @@ import Features from "@/components/landing/Features";
 import Footer from "@/components/landing/Footer";
 import { NewsletterBanner } from "@/components/newsletter/NewsletterBanner";
 import { getSEOTags, renderSchemaTags, renderOrganizationSchema, renderFAQSchema } from "@/libs/seo";
+import config from "@/config";
 
 export const metadata = getSEOTags({
-  title: "Baobab Loyalty — Remplissez vos chambres vides sans Booking.com",
+  title: `${config.appName} — Remplissez vos chambres vides sans Booking.com`,
   description: "Vos clients oublient votre hôtel ? Relancez-les via WhatsApp en 2 min — 0% commission sur vos réservations directes. Essai gratuit, résultats dès la 1ère campagne.",
   canonicalUrlRelative: "/",
 });
@@ -25,7 +26,12 @@ export default function Home() {
     <>
       {renderSchemaTags()}
       {renderOrganizationSchema()}
-      {renderFAQSchema([
+      {/* Ces questions affirment des faits propres à l'Afrique (pays desservis,
+          conformité ARTCI, prix FCFA) — jamais vrais pour l'Europe et jamais
+          inventer un équivalent RGPD non validé juridiquement ici. Suspendu
+          pour l'Europe tant qu'un contenu FAQ Europe réel n'a pas été rédigé
+          et validé (cf. audit Phase "pages publiques Europe", non commencé). */}
+      {config.region !== "europe" && renderFAQSchema([
         {
           question: "Qu'est-ce que Baobab Loyalty ?",
           answer:

@@ -5,13 +5,37 @@ import Footer from "@/components/landing/Footer";
 import config from "@/config";
 import { getSEOTags } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Tarifs Baobab Loyalty — À partir de 39 000 FCFA/mois",
-  description: "Plans Starter, Pro et Premium : 39 000, 69 000 et 189 000 FCFA/mois. Sans engagement, résiliable à tout moment. Pour hôtels d'Afrique de l'Ouest.",
+  title: isEurope
+    ? `Tarifs ${config.appName} — À partir de 79 €/mois`
+    : "Tarifs Baobab Loyalty — À partir de 39 000 FCFA/mois",
+  description: isEurope
+    ? "Plans Starter, Professional et Business : 79, 149 et 349 € HT/mois. Sans engagement, résiliable à tout moment."
+    : "Plans Starter, Pro et Premium : 39 000, 69 000 et 189 000 FCFA/mois. Sans engagement, résiliable à tout moment. Pour hôtels d'Afrique de l'Ouest.",
   canonicalUrlRelative: "/tarifs",
 });
 
-const plans = [
+// Quotas de campagnes/chambres et fonctionnalités par plan Europe non
+// décidés (voir config.billing.plansEurope, status='draft') — la carte
+// Europe n'affiche donc que le nom, le prix HT validé et l'essai 14 jours,
+// jamais de chiffres inventés ni le comparatif détaillé ci-dessous (propre
+// à la répartition de fonctionnalités Afrique).
+const plansEuropeDisplay = config.billing.plansEurope.map((p) => ({
+  name: p.name,
+  price: String(p.price),
+  priceRaw: String(p.price),
+  priceDetail: "€ HT / mois",
+  rooms: null as string | null,
+  relances: null as number | null,
+  trialDays: p.trialDays,
+  highlighted: !!p.isFeatured,
+  features: [] as string[],
+  notIncluded: [] as string[],
+}));
+
+const plansAfrica = [
   {
     name: "Starter",
     price: "39 000",
@@ -65,7 +89,9 @@ const plans = [
   },
 ];
 
-const faqs = [
+const plans = isEurope ? plansEuropeDisplay : plansAfrica;
+
+const faqsAfrica = [
   {
     q: "Est-ce qu'il y a un engagement ou une durée minimale ?",
     a: "Non. Baobab Loyalty est sans engagement. Vous êtes facturé mois par mois et pouvez résilier à tout moment depuis votre espace client, sans frais ni préavis.",
@@ -96,25 +122,47 @@ const faqs = [
   },
 ];
 
+// Quotas de campagnes, SLA de support et garantie de résultats non décidés
+// pour l'Europe (config.billing.plansEurope, status='draft') — ces
+// questions/réponses ne sont donc pas reprises ici tant qu'aucune valeur
+// n'est validée. Ne jamais inventer un équivalent.
+const faqsEurope = [
+  {
+    q: "Est-ce qu'il y a un engagement ou une durée minimale ?",
+    a: `Non. ${config.appName} est sans engagement. Vous êtes facturé mois par mois et pouvez résilier à tout moment, sans frais ni préavis.`,
+  },
+  {
+    q: "Est-ce que je peux changer de plan en cours d'abonnement ?",
+    a: "Oui, vous pouvez passer à un plan supérieur ou inférieur à tout moment. Le changement prend effet au prochain cycle de facturation.",
+  },
+  {
+    q: "Puis-je essayer avant de payer ?",
+    a: `Oui, chaque plan inclut un essai gratuit de ${config.billing.plansEurope[0].trialDays} jours, sans engagement.`,
+  },
+];
+
+const faqs = isEurope ? faqsEurope : faqsAfrica;
+
 const pricingSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: config.appName,
-  description:
-    "Logiciel de fidélisation clients pour hôtels en Afrique. Segmentation, campagnes WhatsApp et tableau de bord en temps réel.",
+  description: isEurope
+    ? "Logiciel de fidélisation clients pour hôtels. Segmentation, campagnes et tableau de bord en temps réel."
+    : "Logiciel de fidélisation clients pour hôtels en Afrique. Segmentation, campagnes WhatsApp et tableau de bord en temps réel.",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   url: `https://${config.domainName}`,
   offers: plans.map((plan) => ({
     "@type": "Offer",
     name: plan.name,
-    description: `Plan ${plan.name} — ${plan.rooms}, ${plan.relances} campagnes WhatsApp/mois`,
+    description: plan.rooms ? `Plan ${plan.name} — ${plan.rooms}, ${plan.relances} campagnes WhatsApp/mois` : `Plan ${plan.name}`,
     price: plan.priceRaw,
-    priceCurrency: "XOF",
+    priceCurrency: isEurope ? "EUR" : "XOF",
     priceSpecification: {
       "@type": "UnitPriceSpecification",
       price: plan.priceRaw,
-      priceCurrency: "XOF",
+      priceCurrency: isEurope ? "EUR" : "XOF",
       referenceQuantity: {
         "@type": "QuantitativeValue",
         value: 1,
@@ -183,10 +231,10 @@ export default function TarifsPage() {
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-5">
               Des prix pensés pour{" "}
-              <span className="text-[#1a2f2a]">les hôtels africains</span>
+              <span className="text-[#1a2f2a]">{isEurope ? "votre hôtel" : "les hôtels africains"}</span>
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-3">
-              Facturation en FCFA. Sans engagement. Résiliable à tout moment.
+              {isEurope ? "Facturation en euros. Sans engagement. Résiliable à tout moment." : "Facturation en FCFA. Sans engagement. Résiliable à tout moment."}
             </p>
             <p className="text-slate-400 text-sm">
               Vous démarrez avec un essai gratuit — aucune carte bancaire requise.
@@ -243,34 +291,41 @@ export default function TarifsPage() {
                     </span>
                   </div>
 
-                  {/* Quota de campagnes WhatsApp — mis en avant, distinct de la liste de fonctionnalités */}
-                  <div
-                    className={`mb-5 px-4 py-3 rounded-xl flex items-center justify-between ${
-                      plan.highlighted ? "bg-white/10" : "bg-[#1a2f2a]/5"
-                    }`}
-                  >
-                    <div>
-                      <p
-                        className={`text-2xl font-bold leading-none ${
-                          plan.highlighted ? "text-[#EBC161]" : "text-[#1a2f2a]"
-                        }`}
-                      >
-                        {plan.relances}
-                      </p>
-                      <p className={`text-xs mt-1 ${plan.highlighted ? "text-[#d4e8df]" : "text-slate-500"}`}>
-                        campagnes WhatsApp / mois
-                      </p>
-                    </div>
-                    <svg
-                      className={`w-8 h-8 shrink-0 ${plan.highlighted ? "text-[#EBC161]/60" : "text-[#1a2f2a]/20"}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
+                  {/* Quota de campagnes WhatsApp — non décidé pour l'Europe (plan.relances=null), boîte masquée plutôt que d'afficher un chiffre inventé */}
+                  {plan.relances !== null && (
+                    <div
+                      className={`mb-5 px-4 py-3 rounded-xl flex items-center justify-between ${
+                        plan.highlighted ? "bg-white/10" : "bg-[#1a2f2a]/5"
+                      }`}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15.75l6-6m-1.5-1.5l-3-3-6.75 6.75V21h4.5l6.75-6.75m-3-3l3 3m-6.75 3.75l3 3M3 21h18" />
-                    </svg>
-                  </div>
+                      <div>
+                        <p
+                          className={`text-2xl font-bold leading-none ${
+                            plan.highlighted ? "text-[#EBC161]" : "text-[#1a2f2a]"
+                          }`}
+                        >
+                          {plan.relances}
+                        </p>
+                        <p className={`text-xs mt-1 ${plan.highlighted ? "text-[#d4e8df]" : "text-slate-500"}`}>
+                          campagnes WhatsApp / mois
+                        </p>
+                      </div>
+                      <svg
+                        className={`w-8 h-8 shrink-0 ${plan.highlighted ? "text-[#EBC161]/60" : "text-[#1a2f2a]/20"}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15.75l6-6m-1.5-1.5l-3-3-6.75 6.75V21h4.5l6.75-6.75m-3-3l3 3m-6.75 3.75l3 3M3 21h18" />
+                      </svg>
+                    </div>
+                  )}
+                  {isEurope && "trialDays" in plan && (
+                    <p className="text-xs mb-5 text-[#1a2f2a] font-semibold">
+                      Essai gratuit {(plan as { trialDays: number }).trialDays} jours
+                    </p>
+                  )}
 
                   <ul className="space-y-2.5 mb-3 flex-1">
                     {plan.features.map((feature, j) => (
@@ -316,13 +371,15 @@ export default function TarifsPage() {
                       </li>
                     ))}
                   </ul>
-                  <p
-                    className={`text-[11px] mb-6 ${
-                      plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
-                    }`}
-                  >
-                    Campagnes non reportées d&apos;un mois à l&apos;autre.
-                  </p>
+                  {plan.relances !== null && (
+                    <p
+                      className={`text-[11px] mb-6 ${
+                        plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
+                      }`}
+                    >
+                      Campagnes non reportées d&apos;un mois à l&apos;autre.
+                    </p>
+                  )}
                   <Link
                     href="/demo"
                     className={`w-full text-center py-2.5 rounded-lg text-sm font-bold transition-colors ${
@@ -337,12 +394,18 @@ export default function TarifsPage() {
               ))}
             </div>
             <p className="text-center text-slate-400 text-xs mt-6">
-              Tous les prix sont en FCFA (XOF) et exprimés hors taxes (HT). Aucune TVA n&apos;est actuellement appliquée (régime d&apos;exonération) ; si ce régime évolue, la TVA sera ajoutée automatiquement au taux légal en vigueur. Facturation mensuelle.
+              {isEurope
+                ? "Tous les prix sont en euros (EUR) et exprimés hors taxes (HT). La TVA est calculée automatiquement selon votre pays et votre statut (Stripe Tax). Facturation mensuelle."
+                : "Tous les prix sont en FCFA (XOF) et exprimés hors taxes (HT). Aucune TVA n’est actuellement appliquée (régime d’exonération) ; si ce régime évolue, la TVA sera ajoutée automatiquement au taux légal en vigueur. Facturation mensuelle."}
             </p>
           </div>
         </section>
 
-        {/* What's included comparison */}
+        {/* What's included comparison — répartition des fonctionnalités par
+            plan non décidée pour l'Europe (config.billing.plansEurope,
+            status='draft') : section entière masquée plutôt que d'afficher
+            un comparatif inventé. */}
+        {!isEurope && (
         <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
@@ -403,6 +466,7 @@ export default function TarifsPage() {
             </div>
           </div>
         </section>
+        )}
 
         {/* FAQ */}
         <section className="py-16 sm:py-20 bg-[#F8F8F6]">

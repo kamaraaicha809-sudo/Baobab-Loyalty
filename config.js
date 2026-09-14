@@ -173,12 +173,15 @@ const config = {
       },
     ],
     // Prix HT validés (79/149/349 EUR) — voir migrations-europe/012. Les
-    // quotas restent null tant que non tranchés ; ne pas les afficher comme
-    // des limites réelles dans l'UI avant validation.
+    // quotas et la liste de fonctionnalités restent null/vides tant que non
+    // tranchés ; ne pas les afficher comme des limites ou promesses réelles
+    // dans l'UI avant validation. Mêmes noms de champs que `plans`
+    // (price/features/description) pour que les composants de pricing
+    // puissent lire l'un ou l'autre sans logique dupliquée.
     plansEurope: [
-      { planId: "starter", name: "Starter", priceExclTax: 79, monthlyRelances: null, maxRooms: null, trialDays: 14 },
-      { planId: "professional", name: "Professional", priceExclTax: 149, monthlyRelances: null, maxRooms: null, trialDays: 14 },
-      { planId: "business", name: "Business", priceExclTax: 349, monthlyRelances: null, maxRooms: null, trialDays: 14 },
+      { planId: "starter", name: "Starter", price: 79, description: "Pour démarrer", monthlyRelances: null, maxRooms: null, trialDays: 14, features: [] },
+      { planId: "professional", isFeatured: true, name: "Professional", price: 149, description: "Le plus populaire", monthlyRelances: null, maxRooms: null, trialDays: 14, features: [] },
+      { planId: "business", name: "Business", price: 349, description: "Pour les grands établissements", monthlyRelances: null, maxRooms: null, trialDays: 14, features: [] },
     ],
   },
 

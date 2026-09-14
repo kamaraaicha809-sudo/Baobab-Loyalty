@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, startTransition } from "react";
 import { isDemoMode } from "@/src/lib/demo";
+import config from "@/config";
 
 const Hero = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -52,7 +53,7 @@ const Hero = () => {
           Remplissez vos chambres vides.<br />Sans Booking. Sans effort.
         </h1>
         <p className="text-base sm:text-lg text-[#555] max-w-2xl mx-auto mb-10 leading-relaxed">
-          Baobab Loyalty utilise ta base de clients existants et WhatsApp pour générer des réservations directes en moins de 2 minutes — sans payer de commission à personne.
+          {config.appName} utilise ta base de clients existants et WhatsApp pour générer des réservations directes en moins de 2 minutes — sans payer de commission à personne.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
