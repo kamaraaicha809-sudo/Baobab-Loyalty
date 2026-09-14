@@ -10,6 +10,7 @@ import { opportunities as opportunitiesSdk, type RevenueOpportunity } from "@/sr
 import { ai, OFFER_TEMPLATE_NAMES, type CampaignRecommendation } from "@/src/sdk/ai";
 import config from "@/config";
 import { isDemoMode, demoUser, demoChartData, demoFlux, demoCampagnesSummary, demoOpportunities, demoRecommendation, demoMetrics } from "@/src/lib/demo";
+import { formatCurrency } from "@/src/lib/currency";
 import { Icons } from "@/components/common/Icons";
 import toast from "react-hot-toast";
 
@@ -290,9 +291,9 @@ export default function Dashboard() {
             <span className="text-xs text-slate-400">Derniers 3 jours</span>
           </div>
           {isDemoMode ? (
-            <p className="text-3xl font-bold text-slate-900">{demoMetrics.revenueFormatted} FCFA</p>
+            <p className="text-3xl font-bold text-slate-900">{formatCurrency(demoMetrics.revenueFromApp)}</p>
           ) : revenue?.hasConfirmedRevenueEver ? (
-            <p className="text-3xl font-bold text-slate-900">{revenue.total.toLocaleString("fr-FR")} FCFA</p>
+            <p className="text-3xl font-bold text-slate-900">{formatCurrency(revenue.total)}</p>
           ) : (
             <p className="text-xl font-semibold text-slate-400">Bientôt disponible</p>
           )}
@@ -348,7 +349,7 @@ export default function Dashboard() {
                       <p className="text-sm text-slate-600 mt-0.5">
                         Revenu potentiel estimé :{" "}
                         <span className="font-semibold text-green-600">
-                          {opp.potentialRevenueFcfa.toLocaleString("fr-FR")} FCFA
+                          {formatCurrency(opp.potentialRevenueFcfa)}
                         </span>
                       </p>
                     ) : (
@@ -522,7 +523,7 @@ export default function Dashboard() {
                             {c.bookedCount} résa{c.bookedCount > 1 ? "s" : ""} / {c.recipient_count} envoyés
                           </td>
                           <td className="py-3 pr-4 text-slate-900 font-medium">
-                            {c.revenueFcfa > 0 ? `${c.revenueFcfa.toLocaleString("fr-FR")} FCFA` : "—"}
+                            {c.revenueFcfa > 0 ? formatCurrency(c.revenueFcfa) : "—"}
                           </td>
                           <td className="py-3">
                             <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
@@ -559,7 +560,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${funnelStats.roiFcfa !== null && funnelStats.roiFcfa >= 0 ? "text-green-600" : "text-slate-900"}`}>
-                    {funnelStats.roiFcfa !== null ? `${funnelStats.roiFcfa.toLocaleString("fr-FR")} FCFA` : "—"}
+                    {funnelStats.roiFcfa !== null ? formatCurrency(funnelStats.roiFcfa) : "—"}
                   </p>
                   <p className="text-xs text-slate-500 mt-0.5">ROI (CA − abonnement)</p>
                 </div>

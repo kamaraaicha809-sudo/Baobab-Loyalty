@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { user } from "@/src/sdk";
 import { audit, auditActionLabel, type AuditLogEntry } from "@/src/sdk/audit";
 import { isDemoMode, demoAuditLog } from "@/src/lib/demo";
+import { formatCurrency } from "@/src/lib/currency";
 
 function formatDateTime(value: string): string {
   try {
@@ -21,7 +22,7 @@ function formatDetails(entry: AuditLogEntry): string | null {
   if (typeof d.segmentCode === "string") parts.push(`Segment : ${d.segmentCode}`);
   if (typeof d.sent === "number") parts.push(`${d.sent} envoyé(s)`);
   if (typeof d.failed === "number" && d.failed > 0) parts.push(`${d.failed} échec(s)`);
-  if (typeof d.montantFcfa === "number") parts.push(`${d.montantFcfa.toLocaleString("fr-FR")} FCFA`);
+  if (typeof d.montantFcfa === "number") parts.push(formatCurrency(d.montantFcfa));
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 

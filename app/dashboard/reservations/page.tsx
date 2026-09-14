@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { user } from "@/src/sdk";
 import { reservations, type PendingReservation } from "@/src/sdk/reservations";
 import { isDemoMode, demoUser, demoPendingReservations } from "@/src/lib/demo";
+import config from "@/config";
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -61,7 +62,7 @@ export default function ReservationsPage() {
   const handleConfirm = async (id: string) => {
     const montant = Number(montantInput);
     if (!montantInput || !Number.isFinite(montant) || montant < 0) {
-      toast.error("Indiquez un montant valide en FCFA.");
+      toast.error(`Indiquez un montant valide en ${config.billing.currency}.`);
       return;
     }
     if (isDemoMode) {
@@ -154,7 +155,7 @@ export default function ReservationsPage() {
 
               {confirmingId === r.id && (
                 <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center gap-3">
-                  <label className="text-sm font-medium text-slate-700 shrink-0">Montant réel (FCFA)</label>
+                  <label className="text-sm font-medium text-slate-700 shrink-0">Montant réel ({config.billing.currency})</label>
                   <input
                     type="number"
                     min={0}

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import config from "@/config";
 import { billing, user as userSdk } from "@/src/sdk";
 import { isDemoMode } from "@/src/lib/demo";
+import { formatCurrency } from "@/src/lib/currency";
 
 const PLANS = config.billing.plans;
 
@@ -160,9 +161,9 @@ export default function AbonnementPage() {
                 </div>
                 <div>
                   <span className="text-2xl font-bold text-slate-900">
-                    {plan.price.toLocaleString("fr-FR")}
+                    {formatCurrency(plan.price)}
                   </span>
-                  <span className="text-slate-400 text-sm ml-1">FCFA HT/mois</span>
+                  <span className="text-slate-400 text-sm ml-1">HT/mois</span>
                 </div>
                 <ul className="space-y-1.5 flex-1">
                   {PERKS[i].map((perk) => (
@@ -210,9 +211,9 @@ export default function AbonnementPage() {
               </div>
               <div className="text-right">
                 <p className="text-3xl font-bold text-slate-900">
-                  {currentPlan.price.toLocaleString("fr-FR")}
+                  {formatCurrency(currentPlan.price)}
                 </p>
-                <p className="text-slate-400 text-sm">FCFA HT / mois</p>
+                <p className="text-slate-400 text-sm">HT / mois</p>
               </div>
             </div>
 
@@ -266,8 +267,8 @@ export default function AbonnementPage() {
                           <p className="text-slate-500 text-xs">{plan.description}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="font-bold text-slate-900 text-lg">{plan.price.toLocaleString("fr-FR")}</p>
-                          <p className="text-slate-400 text-xs">FCFA HT/mois</p>
+                          <p className="font-bold text-slate-900 text-lg">{formatCurrency(plan.price)}</p>
+                          <p className="text-slate-400 text-xs">HT/mois</p>
                         </div>
                       </div>
                       <ul className="space-y-1.5">

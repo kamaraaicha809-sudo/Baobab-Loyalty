@@ -859,7 +859,7 @@ export default function ConfigurationPage() {
           Types de chambres
         </h2>
         <p className="text-slate-600 text-sm mb-6">
-          Renseignez le nombre de chambres et le prix normal par nuit (en FCFA) pour chaque type.
+          Renseignez le nombre de chambres et le prix normal par nuit (en {config.billing.currency}) pour chaque type.
         </p>
         <form onSubmit={handleSaveRooms}>
           <div className="overflow-x-auto">
@@ -868,7 +868,7 @@ export default function ConfigurationPage() {
                 <tr className="border-b border-slate-200">
                   <th className="text-left py-2 pr-4 font-medium text-slate-700">Type de chambre</th>
                   <th className="text-left py-2 pr-4 font-medium text-slate-700">Nombre de chambres</th>
-                  <th className="text-left py-2 font-medium text-slate-700">Prix / nuit (FCFA)</th>
+                  <th className="text-left py-2 font-medium text-slate-700">Prix / nuit ({config.billing.currency})</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -903,7 +903,7 @@ export default function ConfigurationPage() {
                           placeholder="Ex. 45000"
                           className="w-36 px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm"
                         />
-                        <span className="text-slate-500 text-xs">FCFA</span>
+                        <span className="text-slate-500 text-xs">{config.billing.currency}</span>
                       </div>
                     </td>
                   </tr>
@@ -966,45 +966,50 @@ export default function ConfigurationPage() {
         />
       </section>
 
-      {/* Frais d'intégration — hôtels sans base de données électronique */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-          <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-            <Icons.Sparkles />
-            Frais d&apos;intégration
-          </h2>
-          {onboardingFeePaidAt && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-              </svg>
-              Payé le {new Date(onboardingFeePaidAt).toLocaleDateString("fr-FR")}
-            </span>
+      {/* Frais d'intégration — produit Moneroo/Afrique uniquement (FCFA) ;
+          pas d'équivalent Europe tant que la facturation Europe (Stripe) est
+          en pause, donc section masquée pour éviter d'afficher un montant
+          FCFA relabellisé en EUR. */}
+      {config.region !== "europe" && (
+        <section className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <Icons.Sparkles />
+              Frais d&apos;intégration
+            </h2>
+            {onboardingFeePaidAt && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                Payé le {new Date(onboardingFeePaidAt).toLocaleDateString("fr-FR")}
+              </span>
+            )}
+          </div>
+          <p className="text-slate-600 text-sm mb-4">
+            {config.billing.onboardingFee.description} Une fois payé, vous avez accès au{" "}
+            <Link href="/dashboard/registre" className="text-primary font-medium hover:underline">
+              registre numérique
+            </Link>{" "}
+            pour continuer à ajouter vos nouveaux clients au fil de l&apos;eau — en plus de l&apos;import CSV ci-dessous pour vos anciens clients du cahier.
+          </p>
+          {!onboardingFeePaidAt && (
+            <button
+              type="button"
+              onClick={handlePayOnboardingFee}
+              disabled={payingOnboardingFee || isDemoMode}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {payingOnboardingFee
+                ? "Redirection..."
+                : `Payer les frais d'intégration — ${config.billing.onboardingFee.price.toLocaleString("fr-FR")} ${config.billing.currency}`}
+            </button>
           )}
-        </div>
-        <p className="text-slate-600 text-sm mb-4">
-          {config.billing.onboardingFee.description} Une fois payé, vous avez accès au{" "}
-          <Link href="/dashboard/registre" className="text-primary font-medium hover:underline">
-            registre numérique
-          </Link>{" "}
-          pour continuer à ajouter vos nouveaux clients au fil de l&apos;eau — en plus de l&apos;import CSV ci-dessous pour vos anciens clients du cahier.
-        </p>
-        {!onboardingFeePaidAt && (
-          <button
-            type="button"
-            onClick={handlePayOnboardingFee}
-            disabled={payingOnboardingFee || isDemoMode}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {payingOnboardingFee
-              ? "Redirection..."
-              : `Payer les frais d'intégration — ${config.billing.onboardingFee.price.toLocaleString("fr-FR")} ${config.billing.currency}`}
-          </button>
-        )}
-        {isDemoMode && !onboardingFeePaidAt && (
-          <p className="text-xs text-slate-400 italic mt-2">Paiement désactivé en mode démo.</p>
-        )}
-      </section>
+          {isDemoMode && !onboardingFeePaidAt && (
+            <p className="text-xs text-slate-400 italic mt-2">Paiement désactivé en mode démo.</p>
+          )}
+        </section>
+      )}
 
       {/* Import base clients */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">

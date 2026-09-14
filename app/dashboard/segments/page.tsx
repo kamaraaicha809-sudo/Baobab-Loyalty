@@ -8,6 +8,7 @@ import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients as clientsSDK, Client, SegmentFilters, matchesAdvancedFilters } from "@/src/sdk/clients";
 import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
+import { formatCurrency } from "@/src/lib/currency";
 
 interface SegmentDef {
   id: string;
@@ -72,7 +73,7 @@ const DEFAULT_SEGMENTS: SegmentDef[] = [
   {
     id: "vip",
     name: "Clients VIP",
-    description: `Ont dépensé au moins ${VIP_MONTANT_MIN_FCFA.toLocaleString("fr-FR")} FCFA au total`,
+    description: `Ont dépensé au moins ${formatCurrency(VIP_MONTANT_MIN_FCFA)} au total`,
     months: null,
     icon: "star",
     valueFilters: { minMontantDepense: VIP_MONTANT_MIN_FCFA },
@@ -412,7 +413,7 @@ export default function SegmentsPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1.5">
-                Montant dépensé minimum (FCFA)
+                Montant dépensé minimum ({config.billing.currency})
               </label>
               <input
                 type="number"
