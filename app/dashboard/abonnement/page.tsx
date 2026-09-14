@@ -8,6 +8,7 @@ import { billing, user as userSdk } from "@/src/sdk";
 import { isDemoMode } from "@/src/lib/demo";
 import { formatCurrency } from "@/src/lib/currency";
 
+const isEurope = config.region === "europe";
 const PLANS = config.billing.plans;
 
 const PLAN_SLUG_TO_INDEX: Record<string, number> = {
@@ -125,6 +126,18 @@ export default function AbonnementPage() {
         <p className="text-slate-500 text-sm mt-1">Gérez votre plan et vos options.</p>
       </div>
 
+      {/* Facturation Europe : Stripe pas encore actif, on n'affiche jamais les
+          tarifs Moneroo/Afrique (config.billing.plans) sous EUR. */}
+      {isEurope ? (
+        <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+          <p className="font-semibold text-slate-900 text-sm">Facturation Europe à venir</p>
+          <p className="text-slate-500 text-sm mt-2 max-w-md mx-auto">
+            La gestion de l&apos;abonnement en ligne n&apos;est pas encore activée pour l&apos;Europe.
+            Contactez-nous pour toute question sur votre accès.
+          </p>
+        </div>
+      ) : (
+        <>
       {/* Chargement */}
       {hasAccess === null && (
         <div className="bg-white rounded-2xl border border-slate-200 p-10 flex items-center justify-center">
@@ -339,6 +352,8 @@ export default function AbonnementPage() {
               </div>
             )}
           </div>
+        </>
+      )}
         </>
       )}
     </div>

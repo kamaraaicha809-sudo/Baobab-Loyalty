@@ -5,16 +5,18 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Contact — Baobab Loyalty",
-  description: "Une question sur Baobab Loyalty ? Contactez notre équipe par email ou via le formulaire. Réponse sous 24 à 48 heures ouvrées.",
+  title: `Contact — ${config.appName}`,
+  description: `Une question sur ${config.appName} ? Contactez notre équipe par email ou via le formulaire. Réponse sous 24 à 48 heures ouvrées.`,
   canonicalUrlRelative: "/contact",
 });
 
 const contactPageSchema = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
-  name: "Contact — Baobab Loyalty",
+  name: `Contact — ${config.appName}`,
   url: `https://${config.domainName}/contact`,
 };
 
@@ -60,8 +62,10 @@ export default function ContactPage() {
               Une question ? <span className="text-[#1a2f2a]">Parlons-en.</span>
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed">
-              Notre équipe est basée à Abidjan, Côte d&apos;Ivoire, et répond en français
-              sous 24 à 48 heures ouvrées.
+              {isEurope
+                ? "Notre équipe répond en français sous 24 à 48 heures ouvrées."
+                : <>Notre équipe est basée à Abidjan, Côte d&apos;Ivoire, et répond en français
+                  sous 24 à 48 heures ouvrées.</>}
             </p>
           </div>
         </section>
@@ -100,7 +104,7 @@ export default function ContactPage() {
                     Envie de tester avant d&apos;écrire ?
                   </p>
                   <p className="text-sm text-white/80 mb-4 leading-relaxed">
-                    Découvrez Baobab Loyalty en mode démonstration, sans carte bancaire.
+                    Découvrez {config.appName} en mode démonstration, sans carte bancaire.
                   </p>
                   <a
                     href="/demo"

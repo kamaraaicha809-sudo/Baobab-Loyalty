@@ -2,10 +2,13 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Réservations directes hôtel — Réduire la dépendance aux OTA | Baobab Loyalty",
+  title: `Réservations directes hôtel — Réduire la dépendance aux OTA | ${config.appName}`,
   description: "Booking.com et les OTAs prélèvent 15 à 20% de commission sur chaque réservation. Découvrez comment récupérer des réservations directes via WhatsApp, sans commission.",
   canonicalUrlRelative: "/reservations-directes-hotel",
 });
@@ -24,8 +27,10 @@ const faqItems = [
     answer: "La première étape est de collecter systématiquement le numéro WhatsApp de chaque client à son arrivée, quel que soit son canal de réservation initial. C'est cette base de contacts qui permet ensuite de le recontacter directement pour son prochain séjour.",
   },
   {
-    question: "Baobab Loyalty facture-t-il une commission sur les réservations générées ?",
-    answer: "Non. Chaque réservation obtenue via une campagne Baobab Loyalty se fait sans commission — vous payez uniquement votre abonnement mensuel, à partir de 39 000 FCFA.",
+    question: `${config.appName} facture-t-il une commission sur les réservations générées ?`,
+    answer: isEurope
+      ? `Non. Chaque réservation obtenue via une campagne ${config.appName} se fait sans commission — vous payez uniquement votre abonnement mensuel, à partir de ${config.billing.plansEurope[0].price} € HT.`
+      : `Non. Chaque réservation obtenue via une campagne ${config.appName} se fait sans commission — vous payez uniquement votre abonnement mensuel, à partir de 39 000 FCFA.`,
   },
 ];
 
@@ -73,9 +78,15 @@ export default function ReservationsDirectesHotelPage() {
               <div className="p-6 rounded-2xl bg-[#FDFDF9] border border-slate-100">
                 <h3 className="font-bold text-[#2C2C2C] mb-2 text-base">La commission visible</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  Les OTAs prélèvent généralement entre 15% et 20% sur chaque réservation.
-                  Sur un hôtel avec un volume significatif de réservations OTA, cela
-                  représente des millions de FCFA de commissions chaque année.
+                  {isEurope ? (
+                    <>Les OTAs prélèvent généralement entre 15% et 20% sur chaque réservation.
+                      Sur un hôtel avec un volume significatif de réservations OTA, cela
+                      représente un montant de commissions considérable chaque année.</>
+                  ) : (
+                    <>Les OTAs prélèvent généralement entre 15% et 20% sur chaque réservation.
+                      Sur un hôtel avec un volume significatif de réservations OTA, cela
+                      représente des millions de FCFA de commissions chaque année.</>
+                  )}
                 </p>
               </div>
               <div className="p-6 rounded-2xl bg-[#FDFDF9] border border-slate-100">
@@ -103,7 +114,7 @@ export default function ReservationsDirectesHotelPage() {
                 },
                 {
                   title: "Segmenter et identifier les clients inactifs",
-                  desc: "Une fois la base importée dans Baobab Loyalty, les clients sont automatiquement classés par ancienneté de dernière visite (3, 6, 9 mois).",
+                  desc: `Une fois la base importée dans ${config.appName}, les clients sont automatiquement classés par ancienneté de dernière visite (3, 6, 9 mois).`,
                 },
                 {
                   title: "Relancer avec une offre personnalisée",

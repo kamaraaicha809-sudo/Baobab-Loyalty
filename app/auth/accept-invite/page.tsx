@@ -104,7 +104,7 @@ function AcceptInviteContent() {
                 </svg>
               </div>
               <h1 className="text-xl font-bold text-slate-900 mb-2">Bienvenue dans l&apos;équipe !</h1>
-              <p className="text-slate-500 text-sm mb-6">Vous avez rejoint l&apos;espace Baobab Loyalty.</p>
+              <p className="text-slate-500 text-sm mb-6">Vous avez rejoint l&apos;espace {config.appName}.</p>
               <Link
                 href="/dashboard"
                 className="block w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-dark transition-all"

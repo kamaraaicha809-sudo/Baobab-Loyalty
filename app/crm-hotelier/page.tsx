@@ -2,15 +2,41 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "CRM hôtelier pour l'Afrique francophone — Baobab Loyalty",
-  description: "Les CRM internationaux (Salesforce, HubSpot) ne gèrent ni WhatsApp, ni le FCFA, ni le contexte hôtelier africain. Découvrez une alternative pensée pour les hôtels d'Afrique.",
+  title: isEurope
+    ? `CRM hôtelier — ${config.appName}`
+    : "CRM hôtelier pour l'Afrique francophone — Baobab Loyalty",
+  description: isEurope
+    ? `Les CRM internationaux (Salesforce, HubSpot) ne gèrent pas nativement WhatsApp ni le contexte hôtelier. Découvrez une alternative pensée pour les hôtels indépendants, avec ${config.appName}.`
+    : "Les CRM internationaux (Salesforce, HubSpot) ne gèrent ni WhatsApp, ni le FCFA, ni le contexte hôtelier africain. Découvrez une alternative pensée pour les hôtels d'Afrique.",
   canonicalUrlRelative: "/crm-hotelier",
 });
 
-const faqItems = [
+const faqItemsEurope = [
+  {
+    question: "Qu'est-ce qu'un CRM hôtelier ?",
+    answer: "Un CRM hôtelier (Customer Relationship Management) est un outil qui centralise les données de vos clients, les segmente selon des critères pertinents (fréquence de visite, ancienneté), et vous permet de communiquer avec eux de façon ciblée. Il est différent d'un PMS (Property Management System), qui gère les opérations quotidiennes comme le check-in et la facturation.",
+  },
+  {
+    question: "Pourquoi les CRM classiques (Salesforce, HubSpot) sont-ils souvent surdimensionnés pour un hôtel indépendant ?",
+    answer: "Ces outils sont conçus pour des équipes marketing dédiées, avec des semaines de configuration avant le moindre résultat, et des canaux de communication centrés sur l'email plutôt que WhatsApp. Résultat : complexité inutile et coûts élevés pour un hôtelier qui gère aussi la réception et la comptabilité.",
+  },
+  {
+    question: `${config.appName} est-il un CRM hôtelier ?`,
+    answer: `Oui, dans sa fonction : centraliser vos clients, les segmenter automatiquement (3, 6, 9 mois d'inactivité) et communiquer avec eux via WhatsApp. Ce n'est pas un PMS — ${config.appName} ne gère pas vos réservations ou votre facturation, il se concentre sur la relation client et la réactivation.`,
+  },
+  {
+    question: "Combien coûte un CRM hôtelier ?",
+    answer: `${config.appName} démarre à ${config.billing.plansEurope[0].price} € HT par mois. Sans engagement, résiliable à tout moment.`,
+  },
+];
+
+const faqItemsAfrica = [
   {
     question: "Qu'est-ce qu'un CRM hôtelier ?",
     answer: "Un CRM hôtelier (Customer Relationship Management) est un outil qui centralise les données de vos clients, les segmente selon des critères pertinents (fréquence de visite, ancienneté), et vous permet de communiquer avec eux de façon ciblée. Il est différent d'un PMS (Property Management System), qui gère les opérations quotidiennes comme le check-in et la facturation.",
@@ -28,6 +54,8 @@ const faqItems = [
     answer: "Baobab Loyalty démarre à 39 000 FCFA par mois pour les hôtels jusqu'à 30 chambres, contre 25 à 300 USD par utilisateur et par mois pour les CRM internationaux. Sans engagement, résiliable à tout moment.",
   },
 ];
+
+const faqItems = isEurope ? faqItemsEurope : faqItemsAfrica;
 
 export default function CrmHotelierPage() {
   return (
@@ -47,13 +75,24 @@ export default function CrmHotelierPage() {
               CRM hôtelier
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-5">
-              Un CRM hôtelier pensé pour{" "}
-              <span className="text-[#1a2f2a]">l&apos;Afrique francophone</span>
+              {isEurope ? (
+                <>Un CRM hôtelier pensé pour{" "}
+                  <span className="text-[#1a2f2a]">votre établissement</span></>
+              ) : (
+                <>Un CRM hôtelier pensé pour{" "}
+                  <span className="text-[#1a2f2a]">l&apos;Afrique francophone</span></>
+              )}
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
-              Salesforce, HubSpot, Zoho : la plupart des hôteliers africains les ont essayés
-              et abandonnés. Voici pourquoi — et ce qu&apos;un CRM adapté au marché local
-              devrait faire à la place.
+              {isEurope ? (
+                <>Salesforce, HubSpot, Zoho : de nombreux hôteliers indépendants les ont essayés
+                  et abandonnés. Voici pourquoi — et ce qu&apos;un CRM pensé pour un hôtel
+                  indépendant devrait faire à la place.</>
+              ) : (
+                <>Salesforce, HubSpot, Zoho : la plupart des hôteliers africains les ont essayés
+                  et abandonnés. Voici pourquoi — et ce qu&apos;un CRM adapté au marché local
+                  devrait faire à la place.</>
+              )}
             </p>
             <Link
               href="/demo"
@@ -67,15 +106,25 @@ export default function CrmHotelierPage() {
         <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-6">
-              Pourquoi les CRM internationaux échouent dans l&apos;hôtellerie africaine
+              {isEurope
+                ? "Pourquoi les CRM internationaux échouent pour un hôtel indépendant"
+                : "Pourquoi les CRM internationaux échouent dans l'hôtellerie africaine"}
             </h2>
             <div className="grid sm:grid-cols-2 gap-6">
-              {[
-                { title: "La complexité", desc: "Conçus pour des équipes marketing dédiées, ils demandent des semaines de configuration avant le moindre résultat — un luxe qu'un hôtelier qui gère aussi la réception et la comptabilité n'a pas." },
-                { title: "Les canaux inadaptés", desc: "Construits autour de l'email et du téléphone, alors qu'en Afrique de l'Ouest et centrale, WhatsApp est le canal de communication prioritaire des clients d'hôtel." },
-                { title: "Les prix en dollars", desc: "Entre 25 et 300 USD par utilisateur et par mois — souvent inabordable pour un hôtel de taille moyenne au budget marketing limité." },
-                { title: "L'absence de contexte local", desc: "Aucune logique FCFA, aucun repère sur les segments ou usages locaux : tout doit être configuré manuellement, avec un support en anglais basé à des milliers de kilomètres." },
-              ].map((item) => (
+              {(isEurope
+                ? [
+                    { title: "La complexité", desc: "Conçus pour des équipes marketing dédiées, ils demandent des semaines de configuration avant le moindre résultat — un luxe qu'un hôtelier qui gère aussi la réception et la comptabilité n'a pas." },
+                    { title: "Les canaux inadaptés", desc: "Construits autour de l'email et du téléphone, alors que WhatsApp est un canal de communication de plus en plus utilisé par les clients d'hôtel." },
+                    { title: "Les prix élevés", desc: "Souvent facturés par utilisateur et par mois — un modèle qui devient vite coûteux pour un hôtel indépendant au budget marketing limité." },
+                    { title: "L'absence de contexte hôtelier", desc: "Aucun repère sur les segments ou usages propres à l'hôtellerie : tout doit être configuré manuellement, avec un support généraliste plutôt que spécialisé." },
+                  ]
+                : [
+                    { title: "La complexité", desc: "Conçus pour des équipes marketing dédiées, ils demandent des semaines de configuration avant le moindre résultat — un luxe qu'un hôtelier qui gère aussi la réception et la comptabilité n'a pas." },
+                    { title: "Les canaux inadaptés", desc: "Construits autour de l'email et du téléphone, alors qu'en Afrique de l'Ouest et centrale, WhatsApp est le canal de communication prioritaire des clients d'hôtel." },
+                    { title: "Les prix en dollars", desc: "Entre 25 et 300 USD par utilisateur et par mois — souvent inabordable pour un hôtel de taille moyenne au budget marketing limité." },
+                    { title: "L'absence de contexte local", desc: "Aucune logique FCFA, aucun repère sur les segments ou usages locaux : tout doit être configuré manuellement, avec un support en anglais basé à des milliers de kilomètres." },
+                  ]
+              ).map((item) => (
                 <div key={item.title} className="p-6 rounded-2xl bg-[#FDFDF9] border border-slate-100">
                   <h3 className="font-bold text-[#2C2C2C] mb-2 text-base">{item.title}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
@@ -88,16 +137,25 @@ export default function CrmHotelierPage() {
         <section className="py-16 sm:py-20 bg-[#F8F8F6]">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-6 text-center">
-              Ce que fait Baobab Loyalty, concrètement
+              Ce que fait {config.appName}, concrètement
             </h2>
             <ul className="space-y-4">
-              {[
-                "Import de votre base clients existante (Excel ou CSV) en quelques minutes",
-                "Segmentation automatique selon la dernière visite (3, 6, 9 mois, tous)",
-                "Envoi de campagnes WhatsApp ciblées, avec messages rédigés par l'IA",
-                "Tableau de bord en temps réel : réservations générées, revenus en FCFA",
-                "Interface en français, facturation en FCFA, support francophone",
-              ].map((item) => (
+              {(isEurope
+                ? [
+                    "Import de votre base clients existante (Excel ou CSV) en quelques minutes",
+                    "Segmentation automatique selon la dernière visite (3, 6, 9 mois, tous)",
+                    "Envoi de campagnes WhatsApp ciblées, avec messages rédigés par l'IA",
+                    "Tableau de bord en temps réel : réservations générées, revenus en euros",
+                    "Interface en français",
+                  ]
+                : [
+                    "Import de votre base clients existante (Excel ou CSV) en quelques minutes",
+                    "Segmentation automatique selon la dernière visite (3, 6, 9 mois, tous)",
+                    "Envoi de campagnes WhatsApp ciblées, avec messages rédigés par l'IA",
+                    "Tableau de bord en temps réel : réservations générées, revenus en FCFA",
+                    "Interface en français, facturation en FCFA, support francophone",
+                  ]
+              ).map((item) => (
                 <li key={item} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-100">
                   <svg className="w-5 h-5 mt-0.5 shrink-0 text-[#1a2f2a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -106,16 +164,18 @@ export default function CrmHotelierPage() {
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-slate-400 mt-6 text-center">
-              Pour aller plus loin :{" "}
-              <Link href="/blog/crm-hotelier-afrique-solutions" className="underline hover:text-slate-600">
-                pourquoi les CRM classiques ne marchent pas
-              </Link>{" "}
-              ·{" "}
-              <Link href="/blog/crm-hotel-guide-directeur" className="underline hover:text-slate-600">
-                guide CRM hôtel pour directeurs
-              </Link>
-            </p>
+            {!isEurope && (
+              <p className="text-xs text-slate-400 mt-6 text-center">
+                Pour aller plus loin :{" "}
+                <Link href="/blog/crm-hotelier-afrique-solutions" className="underline hover:text-slate-600">
+                  pourquoi les CRM classiques ne marchent pas
+                </Link>{" "}
+                ·{" "}
+                <Link href="/blog/crm-hotel-guide-directeur" className="underline hover:text-slate-600">
+                  guide CRM hôtel pour directeurs
+                </Link>
+              </p>
+            )}
           </div>
         </section>
 

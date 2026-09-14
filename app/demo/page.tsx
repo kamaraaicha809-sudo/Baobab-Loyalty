@@ -2,6 +2,7 @@
 
 import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
+import config from "@/config";
 
 // ─── Données de la démo ──────────────────────────────────────────────────────
 
@@ -212,7 +213,7 @@ export default function DemoPage() {
     setLinkedinPost(null);
     await new Promise((r) => setTimeout(r, 1600));
     setLinkedinPost(
-      `Chez l'Hôtel Le Baobab, nous croyons que chaque client mérite de se sentir chez lui.\n\nC'est pourquoi nous offrons en ce moment une remise exceptionnelle de 20% sur vos réservations de chambre — une façon de vous dire merci pour votre fidélité.\n\nNous vous attendons avec le sourire.\n\n#HotelLeBaobab #Hospitalité #OffreSpéciale #Sénégal`
+      `Chez l'Hôtel Le Baobab, nous croyons que chaque client mérite de se sentir chez lui.\n\nC'est pourquoi nous offrons en ce moment une remise exceptionnelle de 20% sur vos réservations de chambre — une façon de vous dire merci pour votre fidélité.\n\nNous vous attendons avec le sourire.\n\n#HotelLeBaobab #Hospitalité #OffreSpéciale`
     );
     setLinkedinGenerating(false);
   };
@@ -495,7 +496,7 @@ export default function DemoPage() {
             <div>
               <h2 className="text-xl font-bold text-slate-900">Envoi en cours via WhatsApp...</h2>
               <p className="text-slate-500 text-sm mt-2">
-                Baobab Loyalty envoie votre message à{" "}
+                {config.appName} envoie votre message à{" "}
                 <strong className="text-slate-700">{selectedSegment.count} clients</strong> en temps réel.
               </p>
             </div>
@@ -584,8 +585,12 @@ export default function DemoPage() {
                   <p className="text-slate-500 text-xs mt-1">Réservation</p>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                  <p className="text-2xl font-bold text-primary">95 000</p>
-                  <p className="text-slate-500 text-xs mt-1">FCFA générés</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {config.billing.currency === "EUR" ? "95" : "95 000"}
+                  </p>
+                  <p className="text-slate-500 text-xs mt-1">
+                    {config.billing.currency === "EUR" ? "€ générés" : "FCFA générés"}
+                  </p>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
                   <p className="text-2xl font-bold text-slate-900">2 min</p>
@@ -659,7 +664,7 @@ export default function DemoPage() {
               {/* Message final */}
               <div className="bg-slate-900 rounded-2xl p-6 text-center mt-4">
                 <p className="text-white font-bold text-lg mb-1">
-                  C&apos;est exactement ce que Baobab Loyalty fait pour vous, chaque semaine.
+                  C&apos;est exactement ce que {config.appName} fait pour vous, chaque semaine.
                 </p>
                 <p className="text-slate-400 text-sm mb-6">
                   Créez votre compte gratuitement et lancez votre première vraie campagne en moins de 5 minutes.
@@ -699,10 +704,10 @@ export default function DemoPage() {
               Nouvelle fonctionnalité
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
-              Baobab Loyalty et LinkedIn : les deux ensemble
+              {config.appName} et LinkedIn : les deux ensemble
             </h2>
             <p className="text-slate-500 text-base max-w-xl mx-auto">
-              Grâce à l&apos;IA, vos campagnes voyagent dans les deux sens — depuis Baobab Loyalty vers votre page LinkedIn, ou depuis un post LinkedIn directement vers vos clients ciblés dans Baobab.
+              Grâce à l&apos;IA, vos campagnes voyagent dans les deux sens — depuis {config.appName} vers votre page LinkedIn, ou depuis un post LinkedIn directement vers vos clients ciblés dans {config.appName}.
             </p>
           </div>
 
@@ -716,8 +721,8 @@ export default function DemoPage() {
                   : "bg-slate-100 text-slate-500 hover:bg-slate-200"
               }`}
             >
-              <span className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-[10px] font-black">B</span>
-              Baobab
+              <span className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-[10px] font-black">{config.appName.charAt(0)}</span>
+              {config.appName}
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -741,17 +746,17 @@ export default function DemoPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
-              <span className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-[10px] font-black">B</span>
-              Baobab
+              <span className="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center text-[10px] font-black">{config.appName.charAt(0)}</span>
+              {config.appName}
             </button>
           </div>
 
-          {/* ── Mode Baobab → LinkedIn ── */}
+          {/* ── Mode produit → LinkedIn ── */}
           {linkedinTab === "wa-to-li" && (
             <div className="space-y-4">
               <div className="bg-slate-50 rounded-xl border border-slate-200 p-5">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                  Votre message Baobab Loyalty
+                  Votre message {config.appName}
                 </p>
                 <div className="rounded-xl bg-[#ECE5DD] p-3">
                   <div className="flex justify-end">
@@ -772,7 +777,7 @@ export default function DemoPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  Baobab IA reformule pour LinkedIn
+                  {config.appName} IA reformule pour LinkedIn
                 </div>
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
@@ -813,7 +818,7 @@ export default function DemoPage() {
                     </div>
                     <div>
                       <p className="font-bold text-slate-900 text-sm">Hôtel Le Baobab</p>
-                      <p className="text-slate-400 text-xs">Hôtellerie · Sénégal · 1 234 abonnés</p>
+                      <p className="text-slate-400 text-xs">Hôtellerie · 1 234 abonnés</p>
                       <p className="text-slate-400 text-xs">À l&apos;instant</p>
                     </div>
                     <div className="ml-auto">
@@ -878,7 +883,7 @@ export default function DemoPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  Baobab IA adapte pour vos clients ciblés
+                  {config.appName} IA adapte pour vos clients ciblés
                 </div>
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
@@ -901,7 +906,7 @@ export default function DemoPage() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    Importer ce post dans Baobab
+                    Importer ce post dans {config.appName}
                   </>
                 )}
               </button>

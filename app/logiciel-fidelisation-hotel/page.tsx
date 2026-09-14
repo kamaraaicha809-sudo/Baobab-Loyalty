@@ -2,15 +2,39 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Logiciel de fidélisation hôtel — Baobab Loyalty",
-  description: "Baobab Loyalty est un logiciel de fidélisation et de réactivation client pour hôtels, basé sur l'IA, la segmentation et WhatsApp. Pensé pour l'Afrique francophone.",
+  title: `Logiciel de fidélisation hôtel — ${config.appName}`,
+  description: isEurope
+    ? `${config.appName} est un logiciel de fidélisation et de réactivation client pour hôtels, basé sur l'IA, la segmentation et WhatsApp.`
+    : "Baobab Loyalty est un logiciel de fidélisation et de réactivation client pour hôtels, basé sur l'IA, la segmentation et WhatsApp. Pensé pour l'Afrique francophone.",
   canonicalUrlRelative: "/logiciel-fidelisation-hotel",
 });
 
-const faqItems = [
+const faqItemsEurope = [
+  {
+    question: "Qu'est-ce qu'un logiciel de fidélisation hôtel ?",
+    answer: "Un logiciel de fidélisation hôtel automatise la relance de vos anciens clients. Il identifie les clients inactifs depuis un certain temps, génère des messages personnalisés et vous permet de lancer une campagne ciblée en quelques minutes, sans compétence technique.",
+  },
+  {
+    question: `En quoi ${config.appName} diffère-t-il d'un logiciel marketing classique ?`,
+    answer: `${config.appName} est spécifiquement conçu pour l'hôtellerie : segmentation par ancienneté de séjour, canal WhatsApp natif, interface en français. Un logiciel marketing généraliste ne couvre généralement aucun de ces points nativement.`,
+  },
+  {
+    question: "Un logiciel de fidélisation remplace-t-il mon PMS ?",
+    answer: `Non. Le PMS (Property Management System) gère vos opérations quotidiennes — check-in, facturation, disponibilités. Un logiciel de fidélisation comme ${config.appName} se concentre sur la relation client avant, pendant et après le séjour. Les deux outils sont complémentaires.`,
+  },
+  {
+    question: "Combien coûte un logiciel de fidélisation hôtel ?",
+    answer: `${config.appName} propose trois formules : Starter à ${config.billing.plansEurope[0].price} € HT/mois, Professional à ${config.billing.plansEurope[1].price} € HT/mois et Business à ${config.billing.plansEurope[2].price} € HT/mois. Sans engagement.`,
+  },
+];
+
+const faqItemsAfrica = [
   {
     question: "Qu'est-ce qu'un logiciel de fidélisation hôtel ?",
     answer: "Un logiciel de fidélisation hôtel automatise la relance de vos anciens clients. Il identifie les clients inactifs depuis un certain temps, génère des messages personnalisés et vous permet de lancer une campagne ciblée en quelques minutes, sans compétence technique.",
@@ -33,11 +57,15 @@ const faqItems = [
   },
 ];
 
+const faqItems = isEurope ? faqItemsEurope : faqItemsAfrica;
+
 const pillars = [
   { title: "Segmentation automatique", desc: "Vos clients sont classés selon leur dernière visite : 3, 6, 9 mois ou plus.", href: "/reactivation-clients-hotel" },
-  { title: "Campagnes WhatsApp", desc: "Le canal de communication prioritaire de vos clients, avec messages générés par l'IA.", href: "/whatsapp-marketing-hotel" },
+  { title: "Campagnes WhatsApp", desc: "Un canal de communication apprécié de vos clients, avec messages générés par l'IA.", href: "/whatsapp-marketing-hotel" },
   { title: "Réservations sans commission", desc: "Chaque réservation directe obtenue via la plateforme ne vous coûte aucune commission.", href: "/reservations-directes-hotel" },
-  { title: "Alternative aux CRM internationaux", desc: "Pensé pour le FCFA, le français et WhatsApp — pas adapté après coup.", href: "/crm-hotelier" },
+  isEurope
+    ? { title: "Alternative aux CRM internationaux", desc: "Pensé pour le français et WhatsApp — pas adapté après coup.", href: "/crm-hotelier" }
+    : { title: "Alternative aux CRM internationaux", desc: "Pensé pour le FCFA, le français et WhatsApp — pas adapté après coup.", href: "/crm-hotelier" },
 ];
 
 export default function LogicielFidelisationHotelPage() {
@@ -58,11 +86,16 @@ export default function LogicielFidelisationHotelPage() {
               Logiciel de fidélisation hôtel
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-5">
-              Le logiciel de fidélisation pensé{" "}
-              <span className="text-[#1a2f2a]">pour l&apos;hôtellerie africaine</span>
+              {isEurope ? (
+                <>Le logiciel de fidélisation pensé{" "}
+                  <span className="text-[#1a2f2a]">pour l&apos;hôtellerie indépendante</span></>
+              ) : (
+                <>Le logiciel de fidélisation pensé{" "}
+                  <span className="text-[#1a2f2a]">pour l&apos;hôtellerie africaine</span></>
+              )}
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
-              Baobab Loyalty est une solution SaaS de fidélisation et de réactivation client
+              {config.appName} est une solution SaaS de fidélisation et de réactivation client
               destinée aux hôtels. Elle utilise l&apos;intelligence artificielle, la
               segmentation des données clients et WhatsApp pour aider les hôtels à réactiver
               leurs anciens clients et générer davantage de réservations directes.
@@ -98,28 +131,30 @@ export default function LogicielFidelisationHotelPage() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-20 bg-[#1a2f2a]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-              Disponible dans 4 marchés
-            </h2>
-            <p className="text-[#a3c4b5] text-sm sm:text-base mb-10 max-w-xl mx-auto leading-relaxed">
-              Baobab Loyalty s&apos;adapte à chaque marché : langue, devise, spécificités locales.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {[
-                { name: "Côte d'Ivoire", href: "/cote-divoire" },
-                { name: "Sénégal", href: "/senegal" },
-                { name: "Cameroun", href: "/cameroun" },
-                { name: "Ghana", href: "/ghana" },
-              ].map((market) => (
-                <Link key={market.href} href={market.href} className="px-5 py-2.5 rounded-full bg-white/10 text-white text-sm font-semibold hover:bg-white/20 transition-colors">
-                  {market.name}
-                </Link>
-              ))}
+        {!isEurope && (
+          <section className="py-16 sm:py-20 bg-[#1a2f2a]">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Disponible dans 4 marchés
+              </h2>
+              <p className="text-[#a3c4b5] text-sm sm:text-base mb-10 max-w-xl mx-auto leading-relaxed">
+                Baobab Loyalty s&apos;adapte à chaque marché : langue, devise, spécificités locales.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {[
+                  { name: "Côte d'Ivoire", href: "/cote-divoire" },
+                  { name: "Sénégal", href: "/senegal" },
+                  { name: "Cameroun", href: "/cameroun" },
+                  { name: "Ghana", href: "/ghana" },
+                ].map((market) => (
+                  <Link key={market.href} href={market.href} className="px-5 py-2.5 rounded-full bg-white/10 text-white text-sm font-semibold hover:bg-white/20 transition-colors">
+                    {market.name}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <section className="py-16 sm:py-20 bg-white border-t border-slate-100" id="faq">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
@@ -140,7 +175,7 @@ export default function LogicielFidelisationHotelPage() {
         <section className="py-16 sm:py-20 bg-[#F8F8F6] border-t border-slate-100">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-4">
-              Prêt à tester Baobab Loyalty ?
+              Prêt à tester {config.appName} ?
             </h2>
             <p className="text-slate-500 text-base mb-8 leading-relaxed">
               Sans carte bancaire. Opérationnel en 10 minutes.

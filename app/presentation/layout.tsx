@@ -1,10 +1,14 @@
+import config from "@/config";
 import { getSEOTags } from "@/libs/seo";
 import { ReactNode } from "react";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Présentation — Baobab Loyalty",
-  description:
-    "Découvrez Baobab Loyalty, la solution de fidélisation client pour hôtels en Afrique de l'Ouest.",
+  title: `Présentation — ${config.appName}`,
+  description: isEurope
+    ? `Découvrez ${config.appName}, la solution de fidélisation client pour hôtels.`
+    : `Découvrez ${config.appName}, la solution de fidélisation client pour hôtels en Afrique de l'Ouest.`,
   robots: { index: false, follow: false },
 });
 

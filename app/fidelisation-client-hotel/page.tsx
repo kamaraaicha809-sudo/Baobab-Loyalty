@@ -2,11 +2,16 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Fidélisation client hôtel — Baobab Loyalty",
-  description: "Construisez une vraie relation durable avec vos clients d'hôtel : segmentation, offres personnalisées et suivi continu via WhatsApp, en FCFA.",
+  title: `Fidélisation client hôtel — ${config.appName}`,
+  description: isEurope
+    ? "Construisez une vraie relation durable avec vos clients d'hôtel : segmentation, offres personnalisées et suivi continu via WhatsApp."
+    : "Construisez une vraie relation durable avec vos clients d'hôtel : segmentation, offres personnalisées et suivi continu via WhatsApp, en FCFA.",
   canonicalUrlRelative: "/fidelisation-client-hotel",
 });
 
@@ -20,12 +25,14 @@ const faqItems = [
     answer: "Un programme de fidélité n'a pas besoin d'être un système de points. Une segmentation claire de votre base, des offres pertinentes envoyées au bon moment sur WhatsApp, et un suivi des résultats suffisent pour construire une relation durable.",
   },
   {
-    question: "Quelle différence entre Baobab Loyalty et une agence marketing ?",
-    answer: "Une agence marketing facture un forfait mensuel pour gérer vos campagnes à votre place, souvent sans connaître les spécificités de l'hôtellerie africaine. Baobab Loyalty est un outil que vous utilisez vous-même, conçu spécifiquement pour ce secteur et ce marché, à partir de 39 000 FCFA/mois.",
+    question: `Quelle différence entre ${config.appName} et une agence marketing ?`,
+    answer: isEurope
+      ? `Une agence marketing facture un forfait mensuel pour gérer vos campagnes à votre place. ${config.appName} est un outil que vous utilisez vous-même, conçu spécifiquement pour l'hôtellerie, à partir de ${config.billing.plansEurope[0].price} € HT/mois.`
+      : `Une agence marketing facture un forfait mensuel pour gérer vos campagnes à votre place, souvent sans connaître les spécificités de l'hôtellerie africaine. ${config.appName} est un outil que vous utilisez vous-même, conçu spécifiquement pour ce secteur et ce marché, à partir de 39 000 FCFA/mois.`,
   },
   {
     question: "Qui reste propriétaire des données clients ?",
-    answer: "Vous. Baobab Loyalty ne partage jamais votre base clients avec des tiers, et vous pouvez l'exporter ou la supprimer à tout moment.",
+    answer: `Vous. ${config.appName} ne partage jamais votre base clients avec des tiers, et vous pouvez l'exporter ou la supprimer à tout moment.`,
   },
 ];
 
@@ -87,8 +94,13 @@ export default function FidelisationClientHotelPage() {
                   récurrent, sans que vous gardiez la main sur l&apos;outil.
                 </p>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  Baobab Loyalty est un outil que vous pilotez vous-même, conçu pour
-                  l&apos;hôtellerie d&apos;Afrique francophone, à partir de 39 000 FCFA/mois.
+                  {isEurope ? (
+                    <>{config.appName} est un outil que vous pilotez vous-même, conçu pour
+                      l&apos;hôtellerie, à partir de {config.billing.plansEurope[0].price} € HT/mois.</>
+                  ) : (
+                    <>{config.appName} est un outil que vous pilotez vous-même, conçu pour
+                      l&apos;hôtellerie d&apos;Afrique francophone, à partir de 39 000 FCFA/mois.</>
+                  )}
                 </p>
               </div>
             </div>

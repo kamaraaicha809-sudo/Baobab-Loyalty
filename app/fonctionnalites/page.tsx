@@ -5,9 +5,13 @@ import Footer from "@/components/landing/Footer";
 import config from "@/config";
 import { getSEOTags } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Fonctionnalités — Baobab Loyalty",
-  description: "Import CSV, segmentation 3-6-9 mois, campagnes WhatsApp IA, tableau de bord réservations, tracking temps réel. Tout pour fidéliser vos clients hôtel en Afrique.",
+  title: `Fonctionnalités — ${config.appName}`,
+  description: isEurope
+    ? "Import CSV, segmentation 3-6-9 mois, campagnes WhatsApp IA, tableau de bord réservations, tracking temps réel. Tout pour fidéliser vos clients hôtel."
+    : "Import CSV, segmentation 3-6-9 mois, campagnes WhatsApp IA, tableau de bord réservations, tracking temps réel. Tout pour fidéliser vos clients hôtel en Afrique.",
   canonicalUrlRelative: "/fonctionnalites",
 });
 
@@ -38,7 +42,7 @@ const features = [
       </svg>
     ),
     title: "Import clients en un clic",
-    desc: "Chargez votre fichier Excel ou CSV existant. Baobab Loyalty détecte automatiquement les colonnes (nom, téléphone, email, date de dernière visite) et importe votre base entière en moins de 2 minutes.",
+    desc: `Chargez votre fichier Excel ou CSV existant. ${config.appName} détecte automatiquement les colonnes (nom, téléphone, email, date de dernière visite) et importe votre base entière en moins de 2 minutes.`,
     points: [
       "Compatible Excel (.xlsx) et CSV",
       "Détection automatique des colonnes",
@@ -98,10 +102,10 @@ const features = [
       </svg>
     ),
     title: "Tableau de bord temps réel",
-    desc: "Suivez en direct l'impact de vos campagnes sur vos réservations. Revenus générés en FCFA, graphique des 7 derniers jours, comparaison réservations directes vs. autres canaux.",
+    desc: `Suivez en direct l'impact de vos campagnes sur vos réservations. Revenus générés en ${config.billing.currency === "EUR" ? "euros" : "FCFA"}, graphique des 7 derniers jours, comparaison réservations directes vs. autres canaux.`,
     points: [
-      "Réservations via Baobab (total + aujourd'hui)",
-      "Revenus générés en FCFA",
+      `Réservations via ${config.appName} (total + aujourd'hui)`,
+      `Revenus générés en ${config.billing.currency === "EUR" ? "euros" : "FCFA"}`,
       "Graphique 7 jours : directes vs. autres",
       "Activité live via Supabase Realtime",
     ],
@@ -128,8 +132,9 @@ const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: config.appName,
-  description:
-    "Logiciel de fidélisation clients pour hôtels en Afrique : import CSV, segmentation automatique, campagnes WhatsApp et tableau de bord temps réel.",
+  description: isEurope
+    ? "Logiciel de fidélisation clients pour hôtels : import CSV, segmentation automatique, campagnes WhatsApp et tableau de bord temps réel."
+    : "Logiciel de fidélisation clients pour hôtels en Afrique : import CSV, segmentation automatique, campagnes WhatsApp et tableau de bord temps réel.",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   url: `https://${config.domainName}`,
@@ -141,12 +146,19 @@ const softwareSchema = {
     "Tableau de bord réservations en temps réel",
     "Tracking des offres et des réservations",
   ],
-  offers: {
-    "@type": "Offer",
-    price: "39000",
-    priceCurrency: "XOF",
-    description: "À partir de 39 000 FCFA par mois",
-  },
+  offers: isEurope
+    ? {
+        "@type": "Offer",
+        price: String(config.billing.plansEurope[0].price),
+        priceCurrency: "EUR",
+        description: `À partir de ${config.billing.plansEurope[0].price} € HT par mois`,
+      }
+    : {
+        "@type": "Offer",
+        price: "39000",
+        priceCurrency: "XOF",
+        description: "À partir de 39 000 FCFA par mois",
+      },
 };
 
 export default function FonctionnalitesPage() {
@@ -175,9 +187,15 @@ export default function FonctionnalitesPage() {
               <span className="text-[#1a2f2a]">pour fidéliser</span>
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-              De l&apos;import de votre base clients à l&apos;envoi de campagnes WhatsApp ciblées —
-              Baobab Loyalty regroupe toutes les fonctionnalités pensées pour les hôtels
-              d&apos;Afrique, sans complexité inutile.
+              {isEurope ? (
+                <>De l&apos;import de votre base clients à l&apos;envoi de campagnes WhatsApp ciblées —
+                  {" "}{config.appName} regroupe toutes les fonctionnalités pensées pour les hôtels,
+                  sans complexité inutile.</>
+              ) : (
+                <>De l&apos;import de votre base clients à l&apos;envoi de campagnes WhatsApp ciblées —
+                  {" "}{config.appName} regroupe toutes les fonctionnalités pensées pour les hôtels
+                  d&apos;Afrique, sans complexité inutile.</>
+              )}
             </p>
             <Link
               href="/demo"
@@ -226,16 +244,16 @@ export default function FonctionnalitesPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold text-[#2C2C2C] mb-4">
-                Avant et après Baobab Loyalty
+                Avant et après {config.appName}
               </h2>
               <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto">
-                Ce que change concrètement l&apos;utilisation de Baobab Loyalty au quotidien.
+                Ce que change concrètement l&apos;utilisation de {config.appName} au quotidien.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="p-7 rounded-2xl bg-white border border-slate-100">
                 <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-5">
-                  Sans Baobab Loyalty
+                  Sans {config.appName}
                 </p>
                 <ul className="space-y-3">
                   {[
@@ -263,7 +281,7 @@ export default function FonctionnalitesPage() {
               </div>
               <div className="p-7 rounded-2xl bg-[#1a2f2a] ring-2 ring-[#EBC161]">
                 <p className="text-xs font-bold uppercase tracking-widest text-[#EBC161] mb-5">
-                  Avec Baobab Loyalty
+                  Avec {config.appName}
                 </p>
                 <ul className="space-y-3">
                   {[
@@ -272,7 +290,7 @@ export default function FonctionnalitesPage() {
                     "Campagnes en masse en moins de 10 minutes",
                     "Réservations directes sans commission",
                     "Tracking complet : clics, réservations, revenus",
-                    "Dashboard temps réel en FCFA",
+                    `Dashboard temps réel en ${config.billing.currency === "EUR" ? "euros" : "FCFA"}`,
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <svg

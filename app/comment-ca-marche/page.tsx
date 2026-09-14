@@ -5,8 +5,10 @@ import Footer from "@/components/landing/Footer";
 import config from "@/config";
 import { getSEOTags } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "Comment fonctionne Baobab Loyalty — Guide étape par étape",
+  title: `Comment fonctionne ${config.appName} — Guide étape par étape`,
   description: "Importez votre CSV → segmentez vos clients → lancez une campagne WhatsApp en 10 min. Zéro commission, zéro compétence technique. Résultats dès le premier envoi.",
   canonicalUrlRelative: "/comment-ca-marche",
 });
@@ -25,7 +27,7 @@ const steps = [
     title: "Importez votre base clients",
     desc: "Chargez votre fichier Excel ou CSV existant. Le système détecte automatiquement les colonnes et importe vos clients en quelques secondes.",
     detail:
-      "Baobab Loyalty reconnaît automatiquement les colonnes nom, prénom, téléphone WhatsApp, email et date de dernière visite. Si votre fichier a des noms de colonnes différents, vous pouvez les associer manuellement. Import par batch de 100 contacts.",
+      `${config.appName} reconnaît automatiquement les colonnes nom, prénom, téléphone WhatsApp, email et date de dernière visite. Si votre fichier a des noms de colonnes différents, vous pouvez les associer manuellement. Import par batch de 100 contacts.`,
     duration: "~2 minutes",
   },
   {
@@ -33,7 +35,7 @@ const steps = [
     title: "Consultez vos segments de clients",
     desc: "Le système analyse votre base et regroupe vos clients selon leur inactivité : 3 mois, 6 mois, 9 mois et tous les clients.",
     detail:
-      "Vous voyez immédiatement combien de clients sont dans chaque segment. Un client inactif depuis 3 mois est un client à reconquérir rapidement. Un client inactif depuis 9 mois nécessite une offre plus généreuse. Baobab Loyalty vous aide à calibrer votre approche.",
+      `Vous voyez immédiatement combien de clients sont dans chaque segment. Un client inactif depuis 3 mois est un client à reconquérir rapidement. Un client inactif depuis 9 mois nécessite une offre plus généreuse. ${config.appName} vous aide à calibrer votre approche.`,
     duration: "Instantané",
   },
   {
@@ -41,7 +43,7 @@ const steps = [
     title: "Créez votre offre et rédigez votre campagne",
     desc: "Choisissez un segment, créez une offre (réduction, upgrade, cocktail de bienvenue...) et rédigez votre message WhatsApp — ou laissez l'IA le faire.",
     detail:
-      "L'IA de Baobab Loyalty génère un message adapté au segment ciblé et à l'offre choisie. Vous pouvez l'accepter tel quel ou le modifier. Un aperçu du message est affiché avant envoi.",
+      `L'IA de ${config.appName} génère un message adapté au segment ciblé et à l'offre choisie. Vous pouvez l'accepter tel quel ou le modifier. Un aperçu du message est affiché avant envoi.`,
     duration: "~3 minutes",
   },
   {
@@ -49,7 +51,7 @@ const steps = [
     title: "Envoyez et suivez vos résultats",
     desc: "Confirmez l'envoi. Vos clients reçoivent le message directement sur WhatsApp. Suivez les clics, les réservations et les revenus générés en temps réel.",
     detail:
-      "Chaque lien envoyé est unique et traçable. Votre tableau de bord se met à jour en temps réel dès qu'un client clique sur l'offre ou effectue une réservation. Les revenus générés sont affichés directement en FCFA.",
+      `Chaque lien envoyé est unique et traçable. Votre tableau de bord se met à jour en temps réel dès qu'un client clique sur l'offre ou effectue une réservation. Les revenus générés sont affichés directement en ${config.region === "europe" ? "euros" : "FCFA"}.`,
     duration: "Continu",
   },
 ];
@@ -57,7 +59,7 @@ const steps = [
 const faqs = [
   {
     q: "Est-ce que j'ai besoin de compétences techniques ?",
-    a: "Non. Baobab Loyalty est conçu pour les hôteliers, pas pour les développeurs. Toute l'interface est en français et chaque étape est guidée. Si vous savez utiliser Excel, vous savez utiliser Baobab Loyalty.",
+    a: `Non. ${config.appName} est conçu pour les hôteliers, pas pour les développeurs. Toute l'interface est en français et chaque étape est guidée. Si vous savez utiliser Excel, vous savez utiliser ${config.appName}.`,
   },
   {
     q: "Quel format de fichier est accepté pour l'import ?",
@@ -80,15 +82,13 @@ const faqs = [
 const howToSchema = {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  name: "Comment fidéliser vos clients hôtel avec Baobab Loyalty",
+  name: `Comment fidéliser vos clients hôtel avec ${config.appName}`,
   description:
     "Guide pas-à-pas pour créer votre compte, importer vos clients, segmenter et lancer votre première campagne WhatsApp en moins de 10 minutes.",
   totalTime: "PT10M",
-  estimatedCost: {
-    "@type": "MonetaryAmount",
-    currency: "XOF",
-    value: "39000",
-  },
+  estimatedCost: isEurope
+    ? { "@type": "MonetaryAmount", currency: "EUR", value: String(config.billing.plansEurope[0].price) }
+    : { "@type": "MonetaryAmount", currency: "XOF", value: "39000" },
   step: steps.map((step, i) => ({
     "@type": "HowToStep",
     position: i + 1,
@@ -219,12 +219,19 @@ export default function CommentCaMarchePage() {
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-              {[
-                { value: "10 min", label: "Pour lancer votre première campagne" },
-                { value: "0%", label: "Commission sur vos réservations directes" },
-                { value: "2 réservations", label: "Garanties ou le mois suivant est offert" },
-                { value: "WhatsApp", label: "Canal de communication principal en Afrique de l'Ouest" },
-              ].map((stat, i) => (
+              {(isEurope
+                ? [
+                    { value: "10 min", label: "Pour lancer votre première campagne" },
+                    { value: "0%", label: "Commission sur vos réservations directes" },
+                    { value: "WhatsApp", label: "Canal de communication principal" },
+                  ]
+                : [
+                    { value: "10 min", label: "Pour lancer votre première campagne" },
+                    { value: "0%", label: "Commission sur vos réservations directes" },
+                    { value: "2 réservations", label: "Garanties ou le mois suivant est offert" },
+                    { value: "WhatsApp", label: "Canal de communication principal en Afrique de l'Ouest" },
+                  ]
+              ).map((stat, i) => (
                 <div key={i}>
                   <p className="text-3xl font-bold text-[#EBC161] mb-1">{stat.value}</p>
                   <p className="text-[#a3c4b5] text-xs leading-snug">{stat.label}</p>
@@ -262,8 +269,10 @@ export default function CommentCaMarchePage() {
               Prêt à lancer votre première campagne ?
             </h2>
             <p className="text-slate-500 text-base sm:text-lg mb-8 leading-relaxed">
-              Rejoignez les hôteliers d&apos;Afrique qui fidélisent leurs clients via WhatsApp.
-              Démarrez gratuitement, sans engagement.
+              {isEurope
+                ? "Rejoignez les hôteliers qui fidélisent leurs clients via WhatsApp. Démarrez gratuitement, sans engagement."
+                : <>Rejoignez les hôteliers d&apos;Afrique qui fidélisent leurs clients via WhatsApp.
+                  Démarrez gratuitement, sans engagement.</>}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

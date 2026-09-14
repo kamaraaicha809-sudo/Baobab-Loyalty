@@ -2,10 +2,11 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
 export const metadata = getSEOTags({
-  title: "Réactivation clients hôtel — Baobab Loyalty",
+  title: `Réactivation clients hôtel — ${config.appName}`,
   description: "Vos anciens clients ne reviennent pas faute de relance. Découvrez comment identifier vos clients inactifs et les réactiver via des campagnes WhatsApp ciblées.",
   canonicalUrlRelative: "/reactivation-clients-hotel",
 });
@@ -17,11 +18,11 @@ const faqItems = [
   },
   {
     question: "Comment identifier mes clients inactifs ?",
-    answer: "Baobab Loyalty segmente automatiquement votre base clients importée selon la date de dernière visite : 3 mois, 6 mois, 9 mois ou plus. Vous voyez immédiatement combien de clients sont concernés par segment.",
+    answer: `${config.appName} segmente automatiquement votre base clients importée selon la date de dernière visite : 3 mois, 6 mois, 9 mois ou plus. Vous voyez immédiatement combien de clients sont concernés par segment.`,
   },
   {
     question: "Quel type d'offre fonctionne pour réactiver un client ?",
-    answer: "Une remise, un surclassement (upgrade) ou une attention particulière (cocktail de bienvenue) sont les leviers les plus courants. L'IA de Baobab Loyalty aide à rédiger un message adapté au segment et à l'offre choisis.",
+    answer: `Une remise, un surclassement (upgrade) ou une attention particulière (cocktail de bienvenue) sont les leviers les plus courants. L'IA de ${config.appName} aide à rédiger un message adapté au segment et à l'offre choisis.`,
   },
   {
     question: "Combien de temps prend une campagne de réactivation ?",

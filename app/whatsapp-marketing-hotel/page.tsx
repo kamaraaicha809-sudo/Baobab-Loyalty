@@ -2,15 +2,39 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "WhatsApp Marketing pour hôtels — Baobab Loyalty",
-  description: "WhatsApp est le canal de communication prioritaire des clients d'hôtel en Afrique. Découvrez comment lancer des campagnes WhatsApp ciblées, avec l'IA, en 2 minutes.",
+  title: `WhatsApp Marketing pour hôtels — ${config.appName}`,
+  description: isEurope
+    ? "WhatsApp est un canal de communication direct et personnel pour vos clients d'hôtel. Découvrez comment lancer des campagnes WhatsApp ciblées, avec l'IA, en 2 minutes."
+    : "WhatsApp est le canal de communication prioritaire des clients d'hôtel en Afrique. Découvrez comment lancer des campagnes WhatsApp ciblées, avec l'IA, en 2 minutes.",
   canonicalUrlRelative: "/whatsapp-marketing-hotel",
 });
 
-const faqItems = [
+const faqItemsEurope = [
+  {
+    question: "Pourquoi utiliser WhatsApp pour le marketing hôtelier ?",
+    answer: "WhatsApp est un canal direct et personnel : vos clients le consultent au quotidien, et un message y engage une vraie conversation, contrairement à un email qui peut rester non lu.",
+  },
+  {
+    question: "Faut-il un compte WhatsApp Business pour faire du marketing hôtelier ?",
+    answer: `Oui. ${config.appName} utilise l'API WhatsApp Business (Meta Cloud API). Chaque hôtelier connecte son propre compte, ce qui garantit la personnalisation des messages et la conformité avec les règles de Meta.`,
+  },
+  {
+    question: "Comment personnaliser mes messages WhatsApp sans y passer des heures ?",
+    answer: `L'IA intégrée à ${config.appName} génère un message adapté au segment ciblé (client inactif depuis 3, 6 ou 9 mois) et à l'offre choisie. Vous relisez, ajustez si besoin, et envoyez.`,
+  },
+  {
+    question: "Est-ce que l'envoi de campagnes WhatsApp est légal et respecte la vie privée des clients ?",
+    answer: "Oui. Chaque campagne passe par l'API officielle WhatsApp Business de Meta, et chaque message inclut une option de désinscription. Les données clients restent la propriété de l'hôtel.",
+  },
+];
+
+const faqItemsAfrica = [
   {
     question: "Pourquoi utiliser WhatsApp plutôt que l'email pour un hôtel en Afrique ?",
     answer: "En Afrique de l'Ouest et centrale, le smartphone est l'outil de communication principal et WhatsApp en est l'application reine. Les clients le consultent plusieurs fois par jour, contrairement à l'email, largement délaissé sur ce marché.",
@@ -28,6 +52,8 @@ const faqItems = [
     answer: "Oui. Chaque campagne passe par l'API officielle WhatsApp Business de Meta, et chaque message inclut une option de désinscription. Les données clients restent la propriété de l'hôtel.",
   },
 ];
+
+const faqItems = isEurope ? faqItemsEurope : faqItemsAfrica;
 
 export default function WhatsappMarketingHotelPage() {
   return (
@@ -51,9 +77,11 @@ export default function WhatsappMarketingHotelPage() {
               <span className="text-[#1a2f2a]">par WhatsApp</span>
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
-              En Afrique de l&apos;Ouest et centrale, vos clients consultent WhatsApp des
-              dizaines de fois par jour — et rarement leur boîte email. Voici comment en
-              faire un vrai canal de fidélisation.
+              {isEurope
+                ? "Vos clients consultent WhatsApp au quotidien. Voici comment en faire un vrai canal de fidélisation."
+                : <>En Afrique de l&apos;Ouest et centrale, vos clients consultent WhatsApp des
+                  dizaines de fois par jour — et rarement leur boîte email. Voici comment en
+                  faire un vrai canal de fidélisation.</>}
             </p>
             <Link
               href="/demo"
@@ -69,19 +97,29 @@ export default function WhatsappMarketingHotelPage() {
             <div className="grid sm:grid-cols-2 gap-10 items-start">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-4">
-                  Pourquoi l&apos;email sous-performe sur ce marché
+                  {isEurope ? "Un canal direct et personnel" : "Pourquoi l'email sous-performe sur ce marché"}
                 </h2>
-                <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                  L&apos;email marketing reste construit pour des marchés où la boîte de
-                  réception est un réflexe quotidien. Ce n&apos;est pas le cas ici : les
-                  offres envoyées par email restent souvent non lues, arrivent trop tard, ou
-                  finissent en spam.
-                </p>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                  WhatsApp, lui, s&apos;est imposé comme le canal de communication de
-                  référence — aussi bien pour la clientèle d&apos;affaires que pour les
-                  voyageurs loisirs.
-                </p>
+                {isEurope ? (
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Un message WhatsApp se lit différemment d&apos;un email : il arrive dans un espace
+                    de conversation personnelle, et invite naturellement à une réponse — aussi bien
+                    pour la clientèle d&apos;affaires que pour les voyageurs loisirs.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-4">
+                      L&apos;email marketing reste construit pour des marchés où la boîte de
+                      réception est un réflexe quotidien. Ce n&apos;est pas le cas ici : les
+                      offres envoyées par email restent souvent non lues, arrivent trop tard, ou
+                      finissent en spam.
+                    </p>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      WhatsApp, lui, s&apos;est imposé comme le canal de communication de
+                      référence — aussi bien pour la clientèle d&apos;affaires que pour les
+                      voyageurs loisirs.
+                    </p>
+                  </>
+                )}
               </div>
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-4">
@@ -104,7 +142,7 @@ export default function WhatsappMarketingHotelPage() {
         <section className="py-16 sm:py-20 bg-[#F8F8F6]">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-6 text-center">
-              Comment ça marche avec Baobab Loyalty
+              Comment ça marche avec {config.appName}
             </h2>
             <ol className="space-y-4">
               {[
@@ -121,12 +159,14 @@ export default function WhatsappMarketingHotelPage() {
                 </li>
               ))}
             </ol>
-            <p className="text-xs text-slate-400 mt-6 text-center">
-              Pour aller plus loin :{" "}
-              <Link href="/blog/whatsapp-marketing-hotel-vs-email" className="underline hover:text-slate-600">
-                WhatsApp vs email marketing pour hôtels
-              </Link>
-            </p>
+            {!isEurope && (
+              <p className="text-xs text-slate-400 mt-6 text-center">
+                Pour aller plus loin :{" "}
+                <Link href="/blog/whatsapp-marketing-hotel-vs-email" className="underline hover:text-slate-600">
+                  WhatsApp vs email marketing pour hôtels
+                </Link>
+              </p>
+            )}
           </div>
         </section>
 

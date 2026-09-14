@@ -5,9 +5,13 @@ import Footer from "@/components/landing/Footer";
 import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema, renderOrganizationSchema } from "@/libs/seo";
 
+const isEurope = config.region === "europe";
+
 export const metadata = getSEOTags({
-  title: "À propos — Baobab Loyalty",
-  description: "Baobab Loyalty est une solution SaaS de fidélisation et de réactivation client destinée aux hôtels d'Afrique francophone, basée sur l'IA, la segmentation et WhatsApp.",
+  title: `À propos — ${config.appName}`,
+  description: isEurope
+    ? `${config.appName} est une solution SaaS de fidélisation et de réactivation client destinée aux hôtels, basée sur l'IA, la segmentation et WhatsApp.`
+    : "Baobab Loyalty est une solution SaaS de fidélisation et de réactivation client destinée aux hôtels d'Afrique francophone, basée sur l'IA, la segmentation et WhatsApp.",
   canonicalUrlRelative: "/a-propos",
 });
 
@@ -45,11 +49,15 @@ export default function AProposPage() {
               À propos
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-6">
-              Une solution pensée pour l&apos;hôtellerie{" "}
-              <span className="text-[#1a2f2a]">en Afrique francophone</span>
+              {isEurope ? (
+                "Une solution pensée pour l'hôtellerie indépendante"
+              ) : (
+                <>Une solution pensée pour l&apos;hôtellerie{" "}
+                  <span className="text-[#1a2f2a]">en Afrique francophone</span></>
+              )}
             </h1>
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed">
-              Baobab Loyalty est une solution SaaS de fidélisation et de réactivation client
+              {config.appName} est une solution SaaS de fidélisation et de réactivation client
               destinée aux hôtels. Elle utilise l&apos;intelligence artificielle, la
               segmentation des données clients et WhatsApp pour aider les hôtels à réactiver
               leurs anciens clients, promouvoir leurs offres et générer davantage de
@@ -66,25 +74,36 @@ export default function AProposPage() {
                 <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-4">
                   Le problème que nous adressons
                 </h2>
-                <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                  Dans l&apos;hôtellerie en Afrique de l&apos;Ouest et centrale, la majorité
-                  des clients ayant déjà séjourné dans un établissement n&apos;y reviennent pas
-                  faute de relance. Les hôtels dépendent alors fortement des plateformes de
-                  réservation en ligne (OTAs), qui prélèvent une commission sur chaque réservation.
-                </p>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                  Les logiciels de fidélisation existants sont, pour la plupart, conçus pour le
-                  marché européen ou nord-américain : ils ne gèrent ni WhatsApp comme canal
-                  principal, ni le FCFA, ni les usages propres à la clientèle d&apos;affaires
-                  locale.
-                </p>
+                {isEurope ? (
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Dans l&apos;hôtellerie indépendante, la majorité des clients ayant déjà
+                    séjourné dans un établissement n&apos;y reviennent pas faute de relance. Les
+                    hôtels dépendent alors fortement des plateformes de réservation en ligne
+                    (OTAs), qui prélèvent une commission sur chaque réservation.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-4">
+                      Dans l&apos;hôtellerie en Afrique de l&apos;Ouest et centrale, la majorité
+                      des clients ayant déjà séjourné dans un établissement n&apos;y reviennent pas
+                      faute de relance. Les hôtels dépendent alors fortement des plateformes de
+                      réservation en ligne (OTAs), qui prélèvent une commission sur chaque réservation.
+                    </p>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      Les logiciels de fidélisation existants sont, pour la plupart, conçus pour le
+                      marché européen ou nord-américain : ils ne gèrent ni WhatsApp comme canal
+                      principal, ni le FCFA, ni les usages propres à la clientèle d&apos;affaires
+                      locale.
+                    </p>
+                  </>
+                )}
               </div>
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-[#2C2C2C] mb-4">
                   Notre approche
                 </h2>
                 <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                  Baobab Loyalty permet à un hôtel d&apos;importer sa base clients, de
+                  {config.appName} permet à un hôtel d&apos;importer sa base clients, de
                   segmenter automatiquement les clients inactifs (3, 6 ou 9 mois) et de leur
                   envoyer des offres personnalisées directement sur WhatsApp, avec l&apos;aide
                   de l&apos;intelligence artificielle pour la rédaction des messages.
@@ -98,29 +117,31 @@ export default function AProposPage() {
           </div>
         </section>
 
-        {/* Marchés */}
-        <section className="py-16 sm:py-20 bg-[#1a2f2a]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-              Où sommes-nous disponibles ?
-            </h2>
-            <p className="text-[#a3c4b5] text-sm sm:text-base mb-10 max-w-xl mx-auto leading-relaxed">
-              Baobab Loyalty est disponible dans quatre marchés d&apos;Afrique francophone
-              et anglophone.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {markets.map((market) => (
-                <Link
-                  key={market.href}
-                  href={market.href}
-                  className="px-5 py-2.5 rounded-full bg-white/10 text-white text-sm font-semibold hover:bg-white/20 transition-colors"
-                >
-                  {market.name}
-                </Link>
-              ))}
+        {/* Marchés — pas de liste de marchés validee pour l'Europe */}
+        {!isEurope && (
+          <section className="py-16 sm:py-20 bg-[#1a2f2a]">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Où sommes-nous disponibles ?
+              </h2>
+              <p className="text-[#a3c4b5] text-sm sm:text-base mb-10 max-w-xl mx-auto leading-relaxed">
+                Baobab Loyalty est disponible dans quatre marchés d&apos;Afrique francophone
+                et anglophone.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {markets.map((market) => (
+                  <Link
+                    key={market.href}
+                    href={market.href}
+                    className="px-5 py-2.5 rounded-full bg-white/10 text-white text-sm font-semibold hover:bg-white/20 transition-colors"
+                  >
+                    {market.name}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Informations clés */}
         <section className="py-16 sm:py-20 bg-white">
