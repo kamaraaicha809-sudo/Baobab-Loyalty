@@ -87,7 +87,7 @@ const CTA = () => {
               </div>
             ) : (
               <Link
-                href={isLoggedIn ? "/dashboard" : "/beta"}
+                href={isLoggedIn ? "/dashboard" : config.region === "europe" ? "/signup" : "/beta"}
                 className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-white text-slate-900 font-bold text-base sm:text-lg hover:bg-slate-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
               >
                 {isLoggedIn ? "Tableau de bord" : "Commencer maintenant"}

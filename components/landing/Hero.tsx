@@ -64,7 +64,7 @@ const Hero = () => {
             </div>
           ) : (
             <Link
-              href={isLoggedIn ? "/dashboard" : "/beta"}
+              href={isLoggedIn ? "/dashboard" : config.region === "europe" ? "/signup" : "/beta"}
               className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/25"
             >
               {isLoggedIn ? "Tableau de bord" : "Commencer maintenant"}
