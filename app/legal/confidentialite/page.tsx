@@ -146,7 +146,7 @@ function ConfidentialiteEurope() {
                 <tr>
                   <td className="p-3 border border-slate-200">OpenRouter</td>
                   <td className="p-3 border border-slate-200">Génération de messages assistée par IA</td>
-                  <td className="p-3 border border-slate-200">États-Unis — décisions d&apos;adéquation et clauses contractuelles types invoquées par le prestataire. ⚠️ Accord de sous-traitance signé disponible uniquement pour les comptes de niveau « entreprise » : à confirmer selon le niveau de compte utilisé par Loyavia.</td>
+                  <td className="p-3 border border-slate-200">États-Unis (et infrastructure des fournisseurs de modèles tiers sollicités par OpenRouter) — décisions d&apos;adéquation (art. 45 RGPD) et clauses contractuelles types (art. 46 RGPD) prévues par la politique de confidentialité générale d&apos;OpenRouter, applicables à toutes les offres. Le compte utilisé par Loyavia est de niveau « pay-as-you-go » : aucun accord de sous-traitance (DPA) mutuellement signé n&apos;est en place, ce document contractuel n&apos;étant proposé par OpenRouter qu&apos;aux comptes « entreprise ». Le routage régional UE (eu.openrouter.ai) n&apos;est pas disponible sur l&apos;offre actuellement utilisée par Loyavia ; cette fonctionnalité est proposée sur les offres Business et Enterprise.</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Stripe <span className="text-xs text-slate-400">(prévu, non activé)</span></td>
@@ -156,7 +156,7 @@ function ConfidentialiteEurope() {
                 <tr>
                   <td className="p-3 border border-slate-200">PostHog</td>
                   <td className="p-3 border border-slate-200">Mesure d&apos;audience du site (uniquement avec consentement, jamais dans le tableau de bord hôtelier)</td>
-                  <td className="p-3 border border-slate-200">⚠️ À confirmer : PostHog propose un hébergement UE (Frankfurt) ; la configuration réellement utilisée par Loyavia (UE ou US par défaut) doit être vérifiée avant publication définitive.</td>
+                  <td className="p-3 border border-slate-200">États-Unis (aucun hébergement UE configuré à ce jour pour Loyavia ; PostHog propose une option d&apos;hébergement UE à Frankfurt, non activée) — clauses contractuelles types + participation de PostHog au cadre EU-US Data Privacy Framework.</td>
                 </tr>
               </tbody>
             </table>

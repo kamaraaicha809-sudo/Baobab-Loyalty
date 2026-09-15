@@ -113,7 +113,7 @@ function DPAEurope() {
                 <tr>
                   <td className="p-3 border border-slate-200">OpenRouter</td>
                   <td className="p-3 border border-slate-200">Génération assistée par IA des messages de campagne</td>
-                  <td className="p-3 border border-slate-200">États-Unis — décisions d&apos;adéquation et clauses contractuelles types invoquées par le prestataire. ⚠️ Accord de sous-traitance signé disponible uniquement pour les comptes « entreprise » : à confirmer selon le niveau de compte utilisé.</td>
+                  <td className="p-3 border border-slate-200">États-Unis (et infrastructure des fournisseurs de modèles tiers sollicités par OpenRouter) — décisions d&apos;adéquation (art. 45 RGPD) et clauses contractuelles types (art. 46 RGPD) prévues par la politique de confidentialité générale d&apos;OpenRouter. Le compte Loyavia est de niveau « pay-as-you-go » : aucun accord de sous-traitance (DPA) mutuellement signé n&apos;est en place avec OpenRouter à ce jour, ce document n&apos;étant proposé qu&apos;aux comptes « entreprise ». Cette situation devra être réévaluée si Loyavia souscrit une offre Business ou Enterprise.</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Stripe <span className="text-xs text-slate-400">(prévu, non activé)</span></td>

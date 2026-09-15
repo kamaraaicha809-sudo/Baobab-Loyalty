@@ -53,7 +53,7 @@ function CookiesEurope() {
                 Nous aident à comprendre comment les visiteurs utilisent nos pages publiques (pages vues, clics). Ces cookies ne sont déposés que si vous cliquez sur « Accepter » dans le bandeau, et jamais dans votre espace hôtelier (tableau de bord). Durée : 12 mois. Vous pouvez les refuser ou retirer votre consentement à tout moment.
               </p>
               <p className="text-slate-400 text-xs mt-2">
-                ⚠️ Hébergement du service PostHog (Union européenne ou États-Unis) à confirmer avant publication définitive de cette politique.
+                Hébergement confirmé : États-Unis (aucune configuration d&apos;hébergement UE activée pour Loyavia à ce jour).
               </p>
             </div>
           </div>
