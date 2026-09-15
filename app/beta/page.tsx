@@ -89,7 +89,7 @@ export default function BetaPage() {
     e.preventDefault();
   }
 
-  if (config.features.signupsPaused) {
+  if (config.features.betaPaused) {
     return (
       <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-sm">
