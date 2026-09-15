@@ -1,11 +1,43 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import config from "@/config";
 
 export const metadata: Metadata = {
-  title: "Informations légales | Baobab Loyalty",
+  title: config.region === "europe" ? "Informations légales | Loyavia" : "Informations légales | Baobab Loyalty",
 };
 
-const pages = [
+const pages = config.region === "europe" ? [
+  {
+    href: "/legal/mentions-legales",
+    title: "Mentions légales",
+    desc: "Informations sur l'éditeur du site, l'hébergeur et la propriété intellectuelle.",
+  },
+  {
+    href: "/legal/cgu",
+    title: "Conditions Générales d'Utilisation",
+    desc: "Règles d'accès et d'utilisation de la plateforme Loyavia.",
+  },
+  {
+    href: "/legal/confidentialite",
+    title: "Politique de Confidentialité",
+    desc: "Comment nous collectons, utilisons et protégeons vos données personnelles (RGPD).",
+  },
+  {
+    href: "/legal/cookies",
+    title: "Politique de Cookies",
+    desc: "Informations sur les cookies utilisés et comment les gérer.",
+  },
+  {
+    href: "/legal/cgv",
+    title: "Conditions Générales de Vente",
+    desc: "Tarifs, paiements, garanties et conditions de résiliation.",
+  },
+  {
+    href: "/legal/dpa",
+    title: "Accord de sous-traitance (DPA)",
+    desc: "Rôles et obligations entre l'hôtel (responsable de traitement) et Loyavia (sous-traitant) concernant les données de vos clients.",
+  },
+] : [
   {
     href: "/legal/mentions-legales",
     title: "Mentions légales",

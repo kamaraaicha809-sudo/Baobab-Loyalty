@@ -1,10 +1,105 @@
 import { Metadata } from "next";
+import config from "@/config";
 
 export const metadata: Metadata = {
-  title: "Politique de Cookies | Baobab Loyalty",
+  title: config.region === "europe" ? "Politique de Cookies | Loyavia" : "Politique de Cookies | Baobab Loyalty",
 };
 
+function CookiesEurope() {
+  return (
+    <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 15 septembre 2026</p>
+      <h1 className="text-3xl font-bold text-slate-900 mb-10">Politique de Cookies</h1>
+
+      <div className="prose prose-slate max-w-none space-y-8">
+
+        <section>
+          <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Qu&apos;est-ce qu&apos;un cookie ?</h2>
+          <p className="text-slate-600 leading-relaxed">
+            Un cookie est un petit fichier texte déposé sur votre appareil (ordinateur, téléphone, tablette) lors de votre visite sur un site web. Il permet au site de mémoriser vos actions et préférences pendant une période déterminée.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-slate-800 mb-3">2. Cookies utilisés</h2>
+
+          <div className="space-y-4">
+            <div className="border border-slate-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">Essentiels — pas de consentement requis</span>
+                <p className="font-medium text-slate-700">Cookies de fonctionnement</p>
+              </div>
+              <p className="text-slate-600 text-sm">
+                Nécessaires au bon fonctionnement du site (session utilisateur, authentification). Ils ne peuvent pas être désactivés. Durée : session ou jusqu&apos;à déconnexion.
+              </p>
+            </div>
+
+            <div className="border border-slate-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">Essentiels — pas de consentement requis</span>
+                <p className="font-medium text-slate-700">Cookies de préférences</p>
+              </div>
+              <p className="text-slate-600 text-sm">
+                Mémorisent vos choix (consentement cookies, préférences d&apos;affichage). Durée : 12 mois.
+              </p>
+            </div>
+
+            <div className="border border-slate-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded">Consentement requis</span>
+                <p className="font-medium text-slate-700">Cookies d&apos;analyse (PostHog)</p>
+              </div>
+              <p className="text-slate-600 text-sm">
+                Nous aident à comprendre comment les visiteurs utilisent nos pages publiques (pages vues, clics). Ces cookies ne sont déposés que si vous cliquez sur « Accepter » dans le bandeau, et jamais dans votre espace hôtelier (tableau de bord). Durée : 12 mois. Vous pouvez les refuser ou retirer votre consentement à tout moment.
+              </p>
+              <p className="text-slate-400 text-xs mt-2">
+                ⚠️ Hébergement du service PostHog (Union européenne ou États-Unis) à confirmer avant publication définitive de cette politique.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-slate-800 mb-3">3. Cookies tiers</h2>
+          <p className="text-slate-600 leading-relaxed">
+            Certains cookies sont déposés par des services tiers que nous utilisons :
+          </p>
+          <ul className="mt-3 space-y-2 text-slate-600 list-disc list-inside">
+            <li><strong>Stripe</strong> <span className="text-xs text-slate-400">(prévu, non encore activé)</span> : cookies nécessaires au traitement sécurisé des paiements, une fois la facturation activée</li>
+            <li><strong>PostHog :</strong> cookies de mesure d&apos;audience, déposés uniquement avec votre consentement</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-slate-800 mb-3">4. Gestion des cookies</h2>
+          <p className="text-slate-600 leading-relaxed mb-3">
+            Vous pouvez gérer vos préférences cookies à tout moment :
+          </p>
+          <ul className="space-y-2 text-slate-600 list-disc list-inside">
+            <li><strong>Via la bannière cookies</strong> : lors de votre première visite sur le site. Aucun cookie non essentiel n&apos;est déposé tant que vous n&apos;avez pas cliqué sur « Accepter ».</li>
+            <li><strong>Via votre navigateur</strong> : dans les paramètres de confidentialité (Chrome, Firefox, Safari, Edge permettent tous de bloquer ou supprimer les cookies)</li>
+          </ul>
+          <p className="text-slate-600 leading-relaxed mt-3 text-sm bg-amber-50 border border-amber-100 rounded-lg p-3">
+            Attention : désactiver certains cookies essentiels peut affecter le bon fonctionnement de la plateforme.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-slate-800 mb-3">5. Contact</h2>
+          <p className="text-slate-600 leading-relaxed">
+            Pour toute question relative aux cookies :{" "}
+            <a href="mailto:support@loyavia.com" className="text-primary hover:underline">support@loyavia.com</a>
+          </p>
+        </section>
+
+      </div>
+    </main>
+  );
+}
+
 export default function CookiesPage() {
+  if (config.region === "europe") return <CookiesEurope />;
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
       <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 12 avril 2026</p>

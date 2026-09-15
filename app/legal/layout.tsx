@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import config from "@/config";
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
@@ -7,9 +8,13 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       <header className="border-b border-slate-100 bg-white">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#2C2C2C] flex items-center justify-center">
-              <span className="text-white font-bold text-base">B</span>
-            </div>
+            <Image
+              src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-emblem.png"}
+              alt={config.appName}
+              width={720}
+              height={720}
+              className="w-8 h-8 rounded-lg"
+            />
             <span className="font-semibold text-[#2C2C2C]">{config.appName}</span>
           </Link>
         </div>
