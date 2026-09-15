@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import config from "@/config";
 
-export const metadata: Metadata = {
+// Page presse Afrique masquee pour l'Europe (voir app/presse/page.tsx) :
+// pas de metadata Afrique-only pour une page qui 404 cote Europe.
+export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Presse & Médias — Baobab Loyalty",
   description:
     "Page presse de Baobab Loyalty. Communiqués de presse, chiffres clés et contact médias pour les journalistes couvrant l'hôtellerie et le numérique en Afrique de l'Ouest.",

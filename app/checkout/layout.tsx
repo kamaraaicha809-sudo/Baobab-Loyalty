@@ -1,9 +1,10 @@
 import { getSEOTags } from "@/libs/seo";
 import { ReactNode } from "react";
+import config from "@/config";
 
 export const metadata = getSEOTags({
-  title: "Paiement — Baobab Loyalty",
-  description: "Finalisez votre abonnement Baobab Loyalty.",
+  title: `Paiement — ${config.appName}`,
+  description: `Finalisez votre abonnement ${config.appName}.`,
   robots: { index: false, follow: false },
 });
 

@@ -11,13 +11,14 @@ import { requireAuth } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { success, errors } from "../_shared/response.ts";
 
-function buildWelcomeEmail(hotelierEmail: string): string {
+function buildWelcomeEmail(hotelierEmail: string, brand: string, siteUrl: string, isEurope: boolean): string {
+  const siteHost = siteUrl.replace(/^https?:\/\//, "");
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bienvenue sur Baobab Loyalty</title>
+  <title>Bienvenue sur ${brand}</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;padding:40px 20px;">
@@ -29,7 +30,7 @@ function buildWelcomeEmail(hotelierEmail: string): string {
           <tr>
             <td style="background:#1a2f2a;padding:32px 40px;text-align:center;">
               <h1 style="margin:0;font-size:28px;font-weight:700;color:#EBC161;letter-spacing:-0.5px;">
-                Baobab Loyalty
+                ${brand}
               </h1>
               <p style="margin:8px 0 0;font-size:13px;color:#7a9e8e;letter-spacing:1px;text-transform:uppercase;">
                 Votre compte est activé
@@ -44,7 +45,7 @@ function buildWelcomeEmail(hotelierEmail: string): string {
                 Bonjour,
               </p>
               <p style="margin:0 0 28px;font-size:15px;color:#444;line-height:1.7;">
-                Votre compte Baobab Loyalty est maintenant actif. En quelques minutes,
+                Votre compte ${brand} est maintenant actif. En quelques minutes,
                 vous allez pouvoir envoyer votre première campagne WhatsApp et remplir
                 vos chambres vides.
               </p>
@@ -80,7 +81,7 @@ function buildWelcomeEmail(hotelierEmail: string): string {
                     <p style="margin:0;font-size:15px;font-weight:600;color:#1a2f2a;">Importez vos clients</p>
                     <p style="margin:4px 0 0;font-size:14px;color:#666;line-height:1.5;">
                       Téléchargez votre fichier Excel ou CSV avec les numéros WhatsApp
-                      de vos anciens clients. Baobab Loyalty détecte automatiquement
+                      de vos anciens clients. ${brand} détecte automatiquement
                       les colonnes.
                     </p>
                   </td>
@@ -107,7 +108,7 @@ function buildWelcomeEmail(hotelierEmail: string): string {
               <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                 <tr>
                   <td style="border-radius:8px;background:#EBC161;">
-                    <a href="https://baobabloyalty.com/dashboard/configuration"
+                    <a href="${siteUrl}/dashboard/configuration"
                        style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#1a2f2a;text-decoration:none;letter-spacing:0.2px;">
                       Configurer mon hôtel
                     </a>
@@ -121,7 +122,7 @@ function buildWelcomeEmail(hotelierEmail: string): string {
               </p>
               <p style="margin:0;font-size:14px;color:#888;line-height:1.6;">
                 À très bientôt,<br />
-                <strong style="color:#2c2c2c;">L'équipe Baobab Loyalty</strong>
+                <strong style="color:#2c2c2c;">L'équipe ${brand}</strong>
               </p>
             </td>
           </tr>
@@ -130,8 +131,8 @@ function buildWelcomeEmail(hotelierEmail: string): string {
           <tr>
             <td style="background:#f8f8f5;border-top:1px solid #eee;padding:24px 40px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#aaa;line-height:1.6;">
-                Vous recevez cet email car vous venez de créer un compte sur baobabloyalty.com<br />
-                Baobab Loyalty — Fidélisation hôtelière en Afrique de l'Ouest
+                Vous recevez cet email car vous venez de créer un compte sur ${siteHost}<br />
+                ${brand}${isEurope ? "" : " — Fidélisation hôtelière en Afrique de l'Ouest"}
               </p>
             </td>
           </tr>
@@ -166,6 +167,13 @@ Deno.serve(async (req) => {
       return errors.internal("RESEND_API_KEY non configuré");
     }
 
+    // APP_BRAND (Vault Europe uniquement) : voir email-send pour le
+    // raisonnement. loyavia.com verifie dans Resend le 2026-09-15.
+    const brand = Deno.env.get("APP_BRAND") || "Baobab Loyalty";
+    const isEurope = !!Deno.env.get("APP_BRAND");
+    const siteUrl = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
+    const senderDomain = isEurope ? "loyavia.com" : "baobabloyalty.com";
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -173,10 +181,10 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Baobab Loyalty <noreply@baobabloyalty.com>",
+        from: `${brand} <noreply@${senderDomain}>`,
         to: user.email,
-        subject: "Votre compte Baobab Loyalty est activé — démarrez en 3 étapes",
-        html: buildWelcomeEmail(user.email!),
+        subject: `Votre compte ${brand} est activé — démarrez en 3 étapes`,
+        html: buildWelcomeEmail(user.email!, brand, siteUrl, isEurope),
       }),
     });
 

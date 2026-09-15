@@ -94,7 +94,7 @@ export default function BetaPage() {
       <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-sm">
           <div className="text-center mb-10">
-            <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-14 h-14 rounded-2xl mb-4 inline-block" />
+            <Image src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-emblem.png"} alt={config.appName} width={720} height={720} className="w-14 h-14 rounded-2xl mb-4 inline-block" />
             <p className="text-slate-400 text-sm font-medium tracking-widest uppercase mt-2">
               {config.appName}
             </p>
@@ -113,7 +113,7 @@ export default function BetaPage() {
 
         {/* Logo */}
         <div className="text-center mb-10">
-          <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-14 h-14 rounded-2xl mb-4 inline-block" />
+          <Image src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-emblem.png"} alt={config.appName} width={720} height={720} className="w-14 h-14 rounded-2xl mb-4 inline-block" />
 
           <p className="text-slate-400 text-sm font-medium tracking-widest uppercase mt-2">
             {config.appName}

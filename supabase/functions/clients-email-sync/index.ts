@@ -256,17 +256,20 @@ async function sendConfirmationEmail(
   resendApiKey: string,
   fromEmail: string
 ) {
+  // APP_BRAND (Vault Europe uniquement) : nom affiche seulement, l'adresse
+  // d'expedition (fromEmail) est deja calculee par l'appelant.
+  const brand = Deno.env.get("APP_BRAND") || "Baobab Loyalty";
   const html = `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
       <h2 style="color:#1e293b;margin-bottom:8px;">Synchronisation clients effectuée</h2>
-      <p style="color:#475569;">Votre base de données a été mise à jour automatiquement via Baobab Loyalty.</p>
+      <p style="color:#475569;">Votre base de données a été mise à jour automatiquement via ${brand}.</p>
       <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:20px 0;border:1px solid #e2e8f0;">
         <p style="margin:0;color:#334155;font-size:16px;">
           <strong>${inserted}</strong> client(s) ajouté(s) ou mis à jour
           ${errorCount > 0 ? `<br/><span style="color:#dc2626;font-size:14px;">${errorCount} ligne(s) ignorée(s)</span>` : ""}
         </p>
       </div>
-      <p style="color:#94a3b8;font-size:12px;">Baobab Loyalty — Synchronisation automatique par email</p>
+      <p style="color:#94a3b8;font-size:12px;">${brand} — Synchronisation automatique par email</p>
     </div>
   `;
 
@@ -276,7 +279,7 @@ async function sendConfirmationEmail(
     body: JSON.stringify({
       from: fromEmail,
       to: [to],
-      subject: `Baobab Loyalty — ${inserted} client(s) synchronisé(s)`,
+      subject: `${brand} — ${inserted} client(s) synchronisé(s)`,
       html,
     }),
   });
@@ -364,7 +367,15 @@ Deno.serve(async (req) => {
       allFailed ? "Toutes les lignes ont échoué" : null
     );
 
-    const fromEmail = Deno.env.get("EMAIL_FROM") ?? "Baobab Loyalty <noreply@baobab-loyalty.com>";
+    // Fallback historique (domaine avec tiret preserve tel quel pour l'Afrique,
+    // n'est utilise que si EMAIL_FROM n'est pas configure. Le domaine avec
+    // tiret est preserve tel quel pour l'Afrique (comportement historique
+    // inchange) ; Europe utilise loyavia.com, verifie dans Resend le 2026-09-15.
+    const isEuropeSync = !!Deno.env.get("APP_BRAND");
+    const fromEmail = Deno.env.get("EMAIL_FROM")
+      ?? (isEuropeSync
+        ? `Loyavia <noreply@loyavia.com>`
+        : `Baobab Loyalty <noreply@baobab-loyalty.com>`);
     if (profile.email_principal) {
       await sendConfirmationEmail(profile.email_principal, inserted, errorCount, resendApiKey, fromEmail);
     }

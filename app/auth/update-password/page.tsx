@@ -220,7 +220,7 @@ export default function UpdatePassword() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
           {/* Logo */}
           <div className="text-center mb-6 sm:mb-8">
-            <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-12 h-12 rounded-xl mb-4 inline-block" />
+            <Image src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-emblem.png"} alt={config.appName} width={720} height={720} className="w-12 h-12 rounded-xl mb-4 inline-block" />
 
 
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 text-slate-900">

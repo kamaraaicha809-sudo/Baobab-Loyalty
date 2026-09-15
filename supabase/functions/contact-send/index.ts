@@ -21,7 +21,9 @@ interface ContactBody {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_NAME_LENGTH = 200;
 const MAX_MESSAGE_LENGTH = 5000;
-const SUPPORT_EMAIL = "support@baobabloyalty.com";
+// APP_BRAND (Vault Europe uniquement) : support@loyavia.com est une vraie
+// boite (hebergement mail LWS) confirmee active le 2026-09-15.
+const SUPPORT_EMAIL = Deno.env.get("APP_BRAND") ? "support@loyavia.com" : "support@baobabloyalty.com";
 
 function parseContactBody(body: unknown): ContactBody | null {
   if (typeof body !== "object" || body === null) return null;
@@ -73,6 +75,11 @@ function buildContactEmail({ name, email, message }: ContactBody): string {
 }
 
 async function sendContactEmail(body: ContactBody, resendApiKey: string): Promise<boolean> {
+  // APP_BRAND (Vault Europe uniquement) : voir email-send pour le
+  // raisonnement. loyavia.com verifie dans Resend le 2026-09-15.
+  const isEurope = !!Deno.env.get("APP_BRAND");
+  const brand = Deno.env.get("APP_BRAND") || "Baobab Loyalty";
+  const senderDomain = isEurope ? "loyavia.com" : "baobabloyalty.com";
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -80,7 +87,7 @@ async function sendContactEmail(body: ContactBody, resendApiKey: string): Promis
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Baobab Loyalty <noreply@baobabloyalty.com>",
+      from: `${brand} <noreply@${senderDomain}>`,
       to: SUPPORT_EMAIL,
       reply_to: body.email,
       subject: `Nouveau message de ${body.name} via /contact`,

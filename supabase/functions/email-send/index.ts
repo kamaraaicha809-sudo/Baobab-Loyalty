@@ -57,7 +57,12 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) return errors.internal("Email service not configured");
 
-    const defaultFrom = from || Deno.env.get("EMAIL_FROM") || "Baobab Loyalty <noreply@baobabloyalty.com>";
+    // APP_BRAND (Vault Europe uniquement) bascule nom + domaine. loyavia.com
+    // verifie dans Resend le 2026-09-15 (SPF/DKIM, region Ireland eu-west-1).
+    const isEurope = !!Deno.env.get("APP_BRAND");
+    const brand = Deno.env.get("APP_BRAND") || "Baobab Loyalty";
+    const senderDomain = isEurope ? "loyavia.com" : "baobabloyalty.com";
+    const defaultFrom = from || Deno.env.get("EMAIL_FROM") || `${brand} <noreply@${senderDomain}>`;
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",

@@ -14,12 +14,19 @@ const PLAN_SLUG_TO_INDEX: Record<string, number> = {
   premium: 2,
 };
 
+const isEurope = config.region === "europe";
+
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "redirecting" | "error">("loading");
 
   useEffect(() => {
+    // La facturation Europe (Stripe) n'est pas encore active : on ne doit
+    // jamais appeler billing-create-checkout (Moneroo/FCFA, Afrique) pour un
+    // visiteur Europe, meme en arrivant directement sur cette URL.
+    if (isEurope) return;
+
     const planSlug = searchParams.get("plan")?.toLowerCase();
     if (!planSlug || !(planSlug in PLAN_SLUG_TO_INDEX)) {
       toast.error("Plan invalide");
@@ -60,6 +67,20 @@ function CheckoutContent() {
 
     runCheckout();
   }, [searchParams, router]);
+
+  if (isEurope) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-8">
+        <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md">
+          <p className="font-semibold text-slate-900 text-sm">Facturation Europe à venir</p>
+          <p className="text-slate-500 text-sm mt-2">
+            La gestion de l&apos;abonnement en ligne n&apos;est pas encore activée pour l&apos;Europe.
+            Contactez-nous pour toute question sur votre accès.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (status === "error") {
     return (

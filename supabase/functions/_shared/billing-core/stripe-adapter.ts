@@ -110,7 +110,9 @@ export function createStripeAdapter(secretKey: string): BillingAdapter {
               currency: "eur",
               unit_amount: params.amountExclTaxCents,
               recurring: { interval: "month" },
-              product_data: { name: `Baobab Loyalty Europe — ${params.planId}` },
+              // Ce fichier n'est importe que par les 3 fonctions -eu (Stripe,
+              // Europe uniquement) : aucun risque de regression Afrique ici.
+              product_data: { name: `Loyavia — ${params.planId}` },
             },
             quantity: 1,
           },

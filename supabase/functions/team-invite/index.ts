@@ -100,6 +100,11 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const siteUrl = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
     const inviteUrl = `${siteUrl}/auth/accept-invite?token=${invitation.token}`;
+    // APP_BRAND (Vault Europe uniquement) : voir email-send pour le
+    // raisonnement. loyavia.com verifie dans Resend le 2026-09-15.
+    const isEurope = !!Deno.env.get("APP_BRAND");
+    const brand = Deno.env.get("APP_BRAND") || "Baobab Loyalty";
+    const senderDomain = isEurope ? "loyavia.com" : "baobabloyalty.com";
 
     if (resendApiKey) {
       await fetch("https://api.resend.com/emails", {
@@ -109,10 +114,10 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Baobab Loyalty <noreply@baobabloyalty.com>",
+          from: `${brand} <noreply@${senderDomain}>`,
           to: email,
-          subject: `Invitation à rejoindre ${profile.hotel_name || "votre hôtel"} sur Baobab Loyalty`,
-          html: `<p>Vous avez été invité(e) à rejoindre l'espace Baobab Loyalty de <strong>${profile.hotel_name || "votre hôtel"}</strong>.</p><p><a href="${inviteUrl}">Accepter l'invitation</a></p><p>Ce lien expire dans 7 jours.</p>`,
+          subject: `Invitation à rejoindre ${profile.hotel_name || "votre hôtel"} sur ${brand}`,
+          html: `<p>Vous avez été invité(e) à rejoindre l'espace ${brand} de <strong>${profile.hotel_name || "votre hôtel"}</strong>.</p><p><a href="${inviteUrl}">Accepter l'invitation</a></p><p>Ce lien expire dans 7 jours.</p>`,
         }),
       });
     }

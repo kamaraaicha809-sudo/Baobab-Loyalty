@@ -132,7 +132,7 @@ export const renderSchemaTags = () => {
           "@type": "SoftwareApplication",
           name: config.appName,
           description: config.appDescription,
-          image: `https://${config.domainName}/brand/baobab-tree.png`,
+          image: `https://${config.domainName}${config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-tree.png"}`,
           url: `https://${config.domainName}/`,
           author: {
             "@type": "Organization",
@@ -143,7 +143,7 @@ export const renderSchemaTags = () => {
             name: config.appName,
             logo: {
               "@type": "ImageObject",
-              url: `https://${config.domainName}/brand/baobab-tree.png`,
+              url: `https://${config.domainName}${config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-tree.png"}`,
             },
           },
           datePublished: "2024-01-01",
@@ -189,7 +189,7 @@ export const renderOrganizationSchema = () => {
           url: `https://${config.domainName}/`,
           logo: {
             "@type": "ImageObject",
-            url: `https://${config.domainName}/brand/baobab-tree.png`,
+            url: `https://${config.domainName}${config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-tree.png"}`,
           },
           description: config.appDescription,
           email: config.resend.supportEmail,

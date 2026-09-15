@@ -62,7 +62,7 @@ function AcceptInviteContent() {
     <main className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-8">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm text-center">
-          <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-12 h-12 rounded-xl mb-4 inline-block" />
+          <Image src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-emblem.png"} alt={config.appName} width={720} height={720} className="w-12 h-12 rounded-xl mb-4 inline-block" />
 
           {(status === "checking" || status === "accepting") && (
             <>

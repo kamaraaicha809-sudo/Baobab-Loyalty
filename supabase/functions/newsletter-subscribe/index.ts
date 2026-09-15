@@ -34,15 +34,22 @@ function parseSubscribeBody(body: unknown): SubscribeBody | null {
   return { email: email.trim(), name, source };
 }
 
-function buildWelcomeEmail(name: string | undefined): string {
+function buildWelcomeEmail(name: string | undefined, brand: string, siteUrl: string, isEurope: boolean): string {
   const greeting = name ? `Bonjour ${name},` : `Bonjour cher hôtelier,`;
+  const siteHost = siteUrl.replace(/^https?:\/\//, "");
+  const tagline = isEurope ? "" : "Fidélisation hôtelière en Afrique de l'Ouest";
+  const intro = isEurope
+    ? "Merci de rejoindre notre communauté de directeurs d'hôtels."
+    : "Merci de rejoindre notre communauté de directeurs d'hôtels en Afrique de l'Ouest.";
+  const trend = isEurope ? "Tendances du secteur hôtelier" : "Tendances du marché hôtelier en Afrique";
+  const footerTag = isEurope ? brand : `${brand} — Afrique de l'Ouest`;
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bienvenue dans la communauté Baobab Loyalty</title>
+  <title>Bienvenue dans la communauté ${brand}</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;padding:40px 20px;">
@@ -54,11 +61,11 @@ function buildWelcomeEmail(name: string | undefined): string {
           <tr>
             <td style="background:#1a2f2a;padding:32px 40px;text-align:center;">
               <h1 style="margin:0;font-size:28px;font-weight:700;color:#EBC161;letter-spacing:-0.5px;">
-                Baobab Loyalty
+                ${brand}
               </h1>
-              <p style="margin:8px 0 0;font-size:13px;color:#7a9e8e;letter-spacing:1px;text-transform:uppercase;">
-                Fidélisation hôtelière en Afrique de l'Ouest
-              </p>
+              ${tagline ? `<p style="margin:8px 0 0;font-size:13px;color:#7a9e8e;letter-spacing:1px;text-transform:uppercase;">
+                ${tagline}
+              </p>` : ""}
             </td>
           </tr>
 
@@ -67,7 +74,7 @@ function buildWelcomeEmail(name: string | undefined): string {
             <td style="padding:40px 40px 32px;">
               <p style="margin:0 0 20px;font-size:16px;color:#2c2c2c;line-height:1.6;">${greeting}</p>
               <p style="margin:0 0 20px;font-size:15px;color:#444;line-height:1.7;">
-                Merci de rejoindre notre communauté de directeurs d'hôtels en Afrique de l'Ouest.
+                ${intro}
                 Vous faites maintenant partie d'un réseau de professionnels engagés à améliorer
                 leur taux d'occupation et fidéliser leurs clients.
               </p>
@@ -81,7 +88,7 @@ function buildWelcomeEmail(name: string | undefined): string {
                     </p>
                     <ul style="margin:0;padding:0 0 0 18px;color:#444;font-size:14px;line-height:2;">
                       <li>Conseils pratiques pour fidéliser vos clients</li>
-                      <li>Tendances du marché hôtelier en Afrique</li>
+                      <li>${trend}</li>
                       <li>Guides marketing WhatsApp</li>
                       <li>Études de cas d'hôtels qui ont boosté leur taux d'occupation</li>
                     </ul>
@@ -93,9 +100,9 @@ function buildWelcomeEmail(name: string | undefined): string {
               <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                 <tr>
                   <td style="border-radius:8px;background:#EBC161;">
-                    <a href="https://baobabloyalty.com"
+                    <a href="${siteUrl}"
                        style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:600;color:#1a2f2a;text-decoration:none;letter-spacing:0.2px;">
-                      Découvrir Baobab Loyalty
+                      Découvrir ${brand}
                     </a>
                   </td>
                 </tr>
@@ -103,7 +110,7 @@ function buildWelcomeEmail(name: string | undefined): string {
 
               <p style="margin:0;font-size:14px;color:#888;line-height:1.6;">
                 À très bientôt dans votre boîte mail,<br />
-                <strong style="color:#2c2c2c;">L'équipe Baobab Loyalty</strong>
+                <strong style="color:#2c2c2c;">L'équipe ${brand}</strong>
               </p>
             </td>
           </tr>
@@ -112,14 +119,14 @@ function buildWelcomeEmail(name: string | undefined): string {
           <tr>
             <td style="background:#f8f8f5;border-top:1px solid #eee;padding:24px 40px;text-align:center;">
               <p style="margin:0 0 8px;font-size:12px;color:#aaa;line-height:1.6;">
-                Vous recevez cet email car vous vous êtes inscrit(e) sur baobabloyalty.com
+                Vous recevez cet email car vous vous êtes inscrit(e) sur ${siteHost}
               </p>
               <p style="margin:0;font-size:12px;color:#aaa;">
-                <a href="https://baobabloyalty.com/unsubscribe" style="color:#EBC161;text-decoration:none;">
+                <a href="${siteUrl}/unsubscribe" style="color:#EBC161;text-decoration:none;">
                   Se désabonner
                 </a>
                 &nbsp;&nbsp;·&nbsp;&nbsp;
-                Baobab Loyalty — Afrique de l'Ouest
+                ${footerTag}
               </p>
             </td>
           </tr>
@@ -137,6 +144,13 @@ async function sendWelcomeEmail(
   name: string | undefined,
   resendApiKey: string
 ): Promise<void> {
+  // APP_BRAND (Vault Europe uniquement) : voir email-send pour le
+  // raisonnement. loyavia.com verifie dans Resend le 2026-09-15.
+  const brand = Deno.env.get("APP_BRAND") || "Baobab Loyalty";
+  const isEurope = !!Deno.env.get("APP_BRAND");
+  const siteUrl = Deno.env.get("SITE_URL") || "https://baobabloyalty.com";
+  const senderDomain = isEurope ? "loyavia.com" : "baobabloyalty.com";
+
   // Non-blocking — l'appelant ignore le résultat, un échec d'envoi ne doit pas bloquer l'inscription.
   await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -145,10 +159,10 @@ async function sendWelcomeEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Baobab Loyalty <noreply@baobabloyalty.com>",
+      from: `${brand} <noreply@${senderDomain}>`,
       to: email,
-      subject: "Bienvenue dans la communauté Baobab Loyalty 🌿",
-      html: buildWelcomeEmail(name),
+      subject: `Bienvenue dans la communauté ${brand} 🌿`,
+      html: buildWelcomeEmail(name, brand, siteUrl, isEurope),
     }),
   });
 }

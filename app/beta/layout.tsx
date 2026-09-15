@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import config from "@/config";
 
 export const metadata: Metadata = {
-  title: "Accès Bêta Privé — Baobab Loyalty",
-  description: "Rejoignez les premiers hôteliers à tester Baobab Loyalty gratuitement.",
+  title: `Accès Bêta Privé — ${config.appName}`,
+  description: `Rejoignez les premiers hôteliers à tester ${config.appName} gratuitement.`,
   robots: "noindex, nofollow",
 };
 

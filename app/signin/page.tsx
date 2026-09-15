@@ -100,7 +100,7 @@ function SignInContent() {
 
         {/* Header / Branding */}
         <div className="text-center mb-8">
-          <Image src="/brand/baobab-emblem.png" alt={config.appName} width={720} height={720} className="w-16 h-16 rounded-xl mb-4 inline-block" />
+          <Image src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-emblem.png"} alt={config.appName} width={720} height={720} className="w-16 h-16 rounded-xl mb-4 inline-block" />
 
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
             Bienvenue sur {config.appName}

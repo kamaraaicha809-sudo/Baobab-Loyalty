@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import config from "@/config";
 
-export const metadata: Metadata = {
+// Page pays Afrique masquee pour l'Europe (voir app/cote-divoire/page.tsx) :
+// pas de metadata Afrique-only pour une page qui 404 cote Europe.
+export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Logiciel fidélisation hôtel Côte d'Ivoire — Baobab Loyalty",
   description:
     "Logiciel de fidélisation hôtel pour la Côte d'Ivoire : relancez vos clients inactifs via WhatsApp, zéro commission Booking.com. WhatsApp IA, FCFA, opérationnel en 10 min.",

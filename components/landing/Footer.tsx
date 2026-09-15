@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
         <Link href="/" className="inline-flex items-center gap-2 mb-4">
           <Image
-            src="/brand/baobab-tree.png"
+            src={config.region === "europe" ? "/brand/loyavia-emblem.png" : "/brand/baobab-tree.png"}
             alt={config.appName}
             width={775}
             height={575}

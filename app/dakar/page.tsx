@@ -2,17 +2,24 @@ import { Suspense } from "react";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { notFound } from "next/navigation";
 import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 import {
   CountryLandingPage,
   type CountryPageData,
 } from "@/components/landing/CountryLandingPage";
 
-export const metadata = getSEOTags({
-  title: "Fidélisation hôtelière à Dakar — Baobab Loyalty",
-  description: "Hôtels à Dakar : relancez vos clients inactifs grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Opérationnel en 10 min. Essai gratuit.",
-  canonicalUrlRelative: "/dakar",
-});
+// Metadata dynamique (pas d'export statique) : evite qu'une valeur
+// Afrique-only reste figee dans le <head> initial d'une page qui 404
+// pour l'Europe (voir le notFound() ci-dessous).
+export function generateMetadata() {
+  if (config.region === "europe") return {};
+  return getSEOTags({
+    title: "Fidélisation hôtelière à Dakar — Baobab Loyalty",
+    description: "Hôtels à Dakar : relancez vos clients inactifs grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Opérationnel en 10 min. Essai gratuit.",
+    canonicalUrlRelative: "/dakar",
+  });
+}
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
@@ -154,6 +161,10 @@ const data: CountryPageData = {
 };
 
 export default function DakarPage() {
+  // Page pays Afrique : sans equivalent Europe valide (aucun marche
+  // europeen decide), on la masque plutot que d'inventer un contenu.
+  if (config.region === "europe") notFound();
+
   return (
     <>
       <script

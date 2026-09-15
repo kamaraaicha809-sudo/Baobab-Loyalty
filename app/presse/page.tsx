@@ -1,15 +1,21 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 
-export const metadata = getSEOTags({
-  title: "Espace Presse — Baobab Loyalty",
-  description: "Communiqués de presse, chiffres clés et ressources pour journalistes. Baobab Loyalty, solution de fidélisation hôtelière pour l'Afrique francophone.",
-  canonicalUrlRelative: "/presse",
-});
+// Page presse Afrique (chiffres cles, marches, prix FCFA) : aucun equivalent
+// Europe valide, on la masque plutot que d'inventer un contenu presse.
+export function generateMetadata() {
+  if (config.region === "europe") return {};
+  return getSEOTags({
+    title: "Espace Presse — Baobab Loyalty",
+    description: "Communiqués de presse, chiffres clés et ressources pour journalistes. Baobab Loyalty, solution de fidélisation hôtelière pour l'Afrique francophone.",
+    canonicalUrlRelative: "/presse",
+  });
+}
 
 const keyFacts = [
   { value: "4", label: "marchés disponibles", detail: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
@@ -34,6 +40,8 @@ const pressSchema = {
 };
 
 export default function PressePage() {
+  if (config.region === "europe") notFound();
+
   return (
     <>
       <script

@@ -35,6 +35,18 @@ const nextConfig = {
         destination: "/legal/confidentialite",
         permanent: true,
       },
+      // www.loyavia.com -> loyavia.com (Europe) : les deux servaient le meme
+      // contenu sans redirection (aucun redirect DNS/Vercel configure, a la
+      // difference de baobabloyalty.com apex -> www cote Afrique). Sans ceci,
+      // un visiteur arrivant par www subissait un blocage CORS sur toutes
+      // les Edge Functions (SITE_URL Europe = https://loyavia.com, sans www).
+      // Ne matche jamais le trafic Afrique (host different).
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.loyavia.com" }],
+        destination: "https://loyavia.com/:path*",
+        permanent: true,
+      },
     ];
   },
   // Security headers

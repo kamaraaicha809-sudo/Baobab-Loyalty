@@ -23,7 +23,7 @@ const contactPageSchema = {
 const contactChannels = [
   {
     label: "Support produit",
-    email: "support@baobabloyalty.com",
+    email: config.resend.supportEmail,
     detail: "Questions sur votre compte, votre abonnement ou l'utilisation de la plateforme.",
   },
   {

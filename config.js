@@ -35,15 +35,18 @@ const config = {
   appName: region === "europe" ? "Loyavia" : "Baobab Loyalty",
   // → Nom de votre application (header, footer, emails). Marque officielle :
   //   "Baobab Loyalty" (Afrique) / "Loyavia" (Europe), confirmée par
-  //   l'utilisatrice le 2026-09-14. domainName/colors/resend restent à
-  //   "Baobab Loyalty" pour l'instant tant qu'aucun domaine/email Loyavia
-  //   réel n'a été communiqué — ne pas inventer de valeurs ici.
-  
+  //   l'utilisatrice le 2026-09-14. colors/resend restent à "Baobab Loyalty"
+  //   pour l'instant tant qu'aucun email Loyavia réel (domaine vérifié
+  //   Resend) n'a été communiqué — ne pas inventer de valeurs ici.
+
   appDescription: "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et leur base de données clients en automatisant l'envoi via WhatsApp en 2 minutes",
   // → Description courte pour le SEO et la homepage
-  
-  domainName: "baobabloyalty.com",
-  // → Domaine de production (sans https://)
+
+  domainName: region === "europe" ? "loyavia.com" : "baobabloyalty.com",
+  // → Domaine de production (sans https://). loyavia.com confirmé opérationnel
+  //   en HTTPS le 2026-09-14 (DNS + certificat Vercel) : utilisé uniquement
+  //   pour le SEO/canonical/JSON-LD (voir libs/seo.tsx), jamais pour l'envoi
+  //   d'email (resend.* reste séparé, voir commentaire au-dessus).
 
   // ============================================
   // 2. COULEURS
@@ -81,14 +84,16 @@ const config = {
   // Remplacez par votre domaine vérifié dans Resend
   
   resend: {
-    fromNoReply: `Baobab Loyalty <noreply@baobabloyalty.com>`,
-    // → Emails automatiques (confirmations, etc.)
+    fromNoReply: region === "europe" ? `Loyavia <noreply@loyavia.com>` : `Baobab Loyalty <noreply@baobabloyalty.com>`,
+    // → Emails automatiques (confirmations, etc.). loyavia.com verifie dans
+    //   Resend le 2026-09-15 (SPF/DKIM, region Ireland eu-west-1).
 
-    fromAdmin: `Support Baobab Loyalty <support@baobabloyalty.com>`,
+    fromAdmin: region === "europe" ? `Support Loyavia <support@loyavia.com>` : `Support Baobab Loyalty <support@baobabloyalty.com>`,
     // → Emails de support
 
-    supportEmail: "support@baobabloyalty.com",
-    // → Adresse affichée pour contacter le support
+    supportEmail: region === "europe" ? "support@loyavia.com" : "support@baobabloyalty.com",
+    // → Adresse affichée pour contacter le support. support@loyavia.com est
+    //   une vraie boite (hebergement mail LWS) confirmee active le 2026-09-15.
 
     inboundDomain: "baobabloyalty.com",
     // → Domaine pour la réception des emails de sync clients

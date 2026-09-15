@@ -1,11 +1,17 @@
 import { ImageResponse } from "next/og";
+import { notFound } from "next/navigation";
+import config from "@/config";
 
 export const runtime = "edge";
-export const alt = "Baobab Loyalty — Fidélisation hôtelière au Sénégal";
+export const alt = config.region === "europe" ? "Loyavia" : "Baobab Loyalty — Fidélisation hôtelière au Sénégal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default function OgImage() {
+  // Page pays Afrique masquee pour l'Europe (voir app/senegal/page.tsx) :
+  // cette image ne doit pas non plus rester accessible isolement.
+  if (config.region === "europe") notFound();
+
   return new ImageResponse(
     (
       <div

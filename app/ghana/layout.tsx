@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import config from "@/config";
 
-export const metadata: Metadata = {
+// Page pays Afrique masquee pour l'Europe (voir app/ghana/page.tsx) :
+// pas de metadata Afrique-only pour une page qui 404 cote Europe.
+export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Hotel Guest Loyalty in Ghana — Baobab Loyalty",
   description:
     "Ghana hotels: win back inactive guests via WhatsApp, zero OTA commission. WhatsApp campaigns with AI, auto-segmentation. Up and running in 10 min — free trial.",

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import config from "@/config";
 
-export const metadata: Metadata = {
+// Page pays Afrique masquee pour l'Europe (voir app/cameroun/page.tsx) :
+// pas de metadata Afrique-only pour une page qui 404 cote Europe.
+export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Fidélisation clients hôtel au Cameroun — Baobab Loyalty",
   description:
     "Hôtels Douala et Yaoundé : relancez vos clients inactifs via WhatsApp, zéro commission OTA. Segmentation automatique + WhatsApp IA en 10 min. Essai gratuit sans engagement.",
