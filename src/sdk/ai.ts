@@ -4,6 +4,9 @@
  */
 
 import { callEdgeFunction } from "./_core";
+import config from "@/config";
+
+const isEurope = config.region === "europe";
 
 // Types
 export interface GenerateParams {
@@ -46,7 +49,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   "tous":     "tous les clients",
 };
 
-const LINKEDIN_SYSTEM_PROMPT = `Tu es un expert en contenu LinkedIn pour directeurs d'hotels en Afrique francophone.
+const LINKEDIN_SYSTEM_PROMPT = `Tu es un expert en contenu LinkedIn pour directeurs d'hotels${isEurope ? "" : " en Afrique francophone"}.
 
 ROLE : Tu rediges UN post LinkedIn au nom du directeur d'hotel, destine a ses pairs professionnels.
 AUDIENCE : Autres hoteliers, partenaires, agences de voyage, investisseurs. PAS des clients finaux.
@@ -154,7 +157,7 @@ export const OFFER_TEMPLATE_NAMES: Record<string, string> = Object.fromEntries(
   OFFER_CATALOG.map((o) => [o.id, o.name])
 );
 
-const RECOMMENDATION_SYSTEM_PROMPT = `Tu es un assistant commercial pour un hotel en Afrique francophone qui utilise Baobab Loyalty.
+const RECOMMENDATION_SYSTEM_PROMPT = `Tu es un assistant commercial pour un hotel${isEurope ? "" : " en Afrique francophone"} qui utilise ${config.appName}.
 
 ROLE : a partir de donnees reelles (segments de clients inactifs, taux de conversion mesure), tu recommandes UNE seule action commerciale prioritaire parmi les opportunites fournies.
 

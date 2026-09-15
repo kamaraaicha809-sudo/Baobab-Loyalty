@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { user } from "@/src/sdk";
 import { clients, type Client } from "@/src/sdk/clients";
 import { isDemoMode, demoProfile, demoClients } from "@/src/lib/demo";
+import config from "@/config";
 
 const emptyForm = {
   nom: "",
@@ -104,7 +105,7 @@ export default function RegistrePage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Registre numérique</h1>
         <p className="text-slate-600 text-base">
           Saisissez ici chaque nouveau client à la réception, à la place du cahier papier — chaque fiche est
-          enregistrée immédiatement dans votre base clients Baobab Loyalty et disponible pour vos segments et
+          enregistrée immédiatement dans votre base clients {config.appName} et disponible pour vos segments et
           campagnes.
         </p>
       </header>

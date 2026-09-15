@@ -7,6 +7,7 @@ import { team, SdkError } from "@/src/sdk";
 import type { TeamListResponse } from "@/src/sdk";
 import { usePremiumAccess } from "@/src/hooks/usePremiumAccess";
 import { isDemoMode, demoTeam } from "@/src/lib/demo";
+import config from "@/config";
 
 function TeamPremiumUpsell() {
   return (
@@ -142,7 +143,7 @@ export default function EquipePage() {
       <div className="space-y-8">
         <header>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Équipe</h1>
-          <p className="text-slate-600">Invitez des collaborateurs à accéder à votre espace Baobab Loyalty.</p>
+          <p className="text-slate-600">Invitez des collaborateurs à accéder à votre espace {config.appName}.</p>
         </header>
         <TeamPremiumUpsell />
       </div>
@@ -154,7 +155,7 @@ export default function EquipePage() {
       <header>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Équipe</h1>
         <p className="text-slate-600">
-          Invitez jusqu&apos;à {data?.maxMembers ?? 2} collaborateurs à accéder à votre espace Baobab Loyalty.
+          Invitez jusqu&apos;à {data?.maxMembers ?? 2} collaborateurs à accéder à votre espace {config.appName}.
         </p>
       </header>
 

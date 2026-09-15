@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ai } from "@/src/sdk/ai";
+import config from "@/config";
 
 interface Props {
   hotelName: string;
@@ -19,7 +20,10 @@ export default function Step3WawMoment({ hotelName, clientCount, onComplete }: P
   useEffect(() => {
     const generate = async () => {
       try {
-        const systemPrompt = `Tu es un expert en marketing hôtelier WhatsApp pour l'Afrique francophone. Rédige des messages de fidélisation courts, chaleureux et percutants. RÈGLES : 2 à 3 phrases maximum. Inclure {nom} au début. Ton chaleureux et personnel. Langue française. Produire UNIQUEMENT le texte du message.`;
+        const systemPrompt =
+          config.region === "europe"
+            ? `Tu es un expert en marketing hôtelier WhatsApp. Rédige des messages de fidélisation courts, chaleureux et percutants. RÈGLES : 2 à 3 phrases maximum. Inclure {nom} au début. Ton chaleureux et personnel. Langue française. Produire UNIQUEMENT le texte du message.`
+            : `Tu es un expert en marketing hôtelier WhatsApp pour l'Afrique francophone. Rédige des messages de fidélisation courts, chaleureux et percutants. RÈGLES : 2 à 3 phrases maximum. Inclure {nom} au début. Ton chaleureux et personnel. Langue française. Produire UNIQUEMENT le texte du message.`;
 
         const result = await ai.generate({
           prompt: `Rédige un message WhatsApp de relance pour l'hôtel "${hotelName}". Clients cibles : inactifs depuis plus de 3 mois. Offre : remise de 20% sur le prochain séjour. Segment : clients fidèles.`,
@@ -88,7 +92,7 @@ export default function Step3WawMoment({ hotelName, clientCount, onComplete }: P
             <>
               <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">{message}</p>
               <div className="flex justify-end mt-2">
-                <span className="text-[10px] text-slate-400">Baobab Loyalty · IA</span>
+                <span className="text-[10px] text-slate-400">{config.appName} · IA</span>
               </div>
             </>
           )}

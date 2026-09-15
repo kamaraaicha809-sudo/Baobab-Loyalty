@@ -134,7 +134,7 @@ export default function WhatsAppConnectButton({ initialConnected, initialPhone, 
     }
 
     if (!config.whatsapp?.metaAppId) {
-      toast.error("Configuration Meta App manquante — contactez le support Baobab Loyalty");
+      toast.error(`Configuration Meta App manquante — contactez le support ${config.appName}`);
       return;
     }
 

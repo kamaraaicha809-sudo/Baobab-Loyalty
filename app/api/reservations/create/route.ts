@@ -246,7 +246,7 @@ export async function POST(request: Request) {
     const offerLabel = avantage || "Offre de fidélisation";
 
     const emailBody = `
-Nouvelle demande de réservation via Baobab Loyalty
+Nouvelle demande de réservation via ${config.appName}
 
 Hôtel : ${hotelLabel}
 Client : ${clientLabel}
@@ -268,7 +268,7 @@ ACTION REQUISE : Appelez le client pour confirmer la disponibilité et valider l
     const htmlBody = `
 <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1e293b;">
   <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Nouvelle demande de réservation</h2>
-  <p style="color: #64748b; font-size: 14px; margin-top: 0;">via Baobab Loyalty — ${hotelLabelHtml}</p>
+  <p style="color: #64748b; font-size: 14px; margin-top: 0;">via ${config.appName} — ${hotelLabelHtml}</p>
 
   <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
     <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -303,7 +303,7 @@ ACTION REQUISE : Appelez le client pour confirmer la disponibilité et valider l
     </p>
   </div>
 
-  <p style="margin-top: 24px; font-size: 12px; color: #94a3b8;">Ce message a été envoyé automatiquement par Baobab Loyalty.</p>
+  <p style="margin-top: 24px; font-size: 12px; color: #94a3b8;">Ce message a été envoyé automatiquement par ${config.appName}.</p>
 </div>
     `.trim();
 

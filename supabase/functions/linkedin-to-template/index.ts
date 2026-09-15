@@ -21,9 +21,13 @@ const UNIPILE_TIMEOUT_MS = 10000;
 // Module-level prompt cache
 let cachedSystemPrompt: string | null = null;
 
+// APP_BRAND (Vault Europe uniquement) : meme convention que contact-send/
+// team-invite pour distinguer les deux deploiements Edge Functions.
+const isEurope = !!Deno.env.get("APP_BRAND");
+
 const FALLBACK_PROMPT = `<ROLE>
 Tu es un expert en marketing hotelier specialise dans la conversion de contenus
-professionnels en messages WhatsApp pour les hotels d'Afrique francophone.
+professionnels en messages WhatsApp pour les hotels${isEurope ? "" : " d'Afrique francophone"}.
 Tu transformes des posts LinkedIn formels en messages WhatsApp chaleureux,
 courts et incitatifs, prets a etre envoyes a des clients reels.
 </ROLE>

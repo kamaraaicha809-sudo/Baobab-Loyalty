@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { campaigns } from "@/src/sdk/campaigns";
 import { isDemoMode, demoCampaignSendResult, demoCampaignSendDelayMs } from "@/src/lib/demo";
+import config from "@/config";
 
 function SendingContent() {
   const searchParams = useSearchParams();
@@ -140,7 +141,7 @@ function SendingContent() {
           <p className="text-slate-500 text-base mt-2">
             {status === "done"
               ? "Redirection vers le résumé…"
-              : "Baobab Loyalty envoie vos messages WhatsApp…"}
+              : `${config.appName} envoie vos messages WhatsApp…`}
           </p>
         </div>
         <div className="space-y-2">
