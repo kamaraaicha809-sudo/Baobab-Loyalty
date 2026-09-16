@@ -42,22 +42,17 @@ export default function AccesLimitePage() {
           </h1>
 
           <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-            {config.appName} est actuellement en accès limité. Notre plateforme est
+            {config.appName}{" "}
+            est actuellement en accès limité. Notre plateforme est
             temporairement fermée au public pendant la phase de préparation et de
             déploiement auprès de nos hôtels partenaires. Nous vous remercions pour
             votre patience. L&apos;ouverture officielle sera annoncée prochainement.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3">
-            <Link
-              href="/beta"
-              className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-dark transition-all text-sm sm:text-base"
-            >
-              Rejoindre la bêta hôteliers
-            </Link>
+          <div className="mt-8">
             <Link
               href="/"
-              className="w-full py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-all text-sm sm:text-base"
+              className="w-full inline-block py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-all text-sm sm:text-base"
             >
               Retour à l&apos;accueil
             </Link>
