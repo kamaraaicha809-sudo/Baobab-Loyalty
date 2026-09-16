@@ -116,13 +116,16 @@ export async function callEdgeFunction<T>(
 
     // Gérer les erreurs de invoke
     if (error) {
-      // Essayer de parser l'erreur structurée depuis la fonction
-      if (error.context) {
+      // error.context est le Response brut renvoyé par le fetch (voir
+      // FunctionsHttpError/FunctionsRelayError de @supabase/functions-js) —
+      // jamais une chaîne JSON ni un objet déjà parsé. error.message vaut
+      // toujours le texte générique "Edge Function returned a non-2xx status
+      // code" : il faut lire le corps de la réponse pour récupérer le vrai
+      // message renvoyé par la fonction (ex: "Service IA non configuré.").
+      if (error.context && typeof error.context.json === "function") {
         try {
-          const contextBody = typeof error.context === "string"
-            ? JSON.parse(error.context)
-            : error.context;
-          
+          const contextBody = await error.context.json();
+
           if (contextBody?.error) {
             throw new SdkError(
               contextBody.error.code || "FUNCTION_ERROR",
@@ -131,11 +134,11 @@ export async function callEdgeFunction<T>(
             );
           }
         } catch (parseError) {
-          // Si le parsing échoue, utiliser le message d'erreur brut
+          // Corps non-JSON ou déjà consommé : retombe sur le message générique.
           if (parseError instanceof SdkError) throw parseError;
         }
       }
-      
+
       throw new SdkError("FUNCTION_ERROR", error.message);
     }
 
