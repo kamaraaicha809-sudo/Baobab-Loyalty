@@ -38,7 +38,6 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
   const mainNavItems: NavItem[] = [
     { id: 'dashboard', label: 'Tableau de bord', icon: <Icons.Home />, href: '/dashboard' },
     { id: 'reservations', label: 'Réservations', icon: <Icons.Calendar />, href: '/dashboard/reservations' },
-    { id: 'configuration', label: 'Configuration', icon: <Icons.Settings />, href: '/dashboard/configuration' },
     {
       id: 'registre',
       label: 'Registre',
@@ -74,6 +73,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
       href: '/dashboard/linkedin',
       premiumOnly: true,
     },
+    { id: 'configuration', label: 'Configuration', icon: <Icons.Settings />, href: '/dashboard/configuration' },
     {
       id: 'equipe',
       label: 'Équipe',
