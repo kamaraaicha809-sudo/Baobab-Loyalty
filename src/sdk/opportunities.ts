@@ -16,16 +16,38 @@ import { getSegmentCounts } from "./clients";
 export interface RevenueOpportunity {
   segmentCode: string;
   segmentLabel: string;
+  title: string;
+  reasoning: string;
   clientCount: number;
   potentialRevenueFcfa: number | null;
   ctaHref: string;
 }
 
-const INACTIVITY_SEGMENTS: { code: string; label: string }[] = [
-  { code: "3-6mois", label: "clients inactifs depuis 3 à 6 mois" },
-  { code: "6-9mois", label: "clients inactifs depuis 6 à 9 mois" },
-  { code: "9-12mois", label: "clients inactifs depuis 9 à 12 mois" },
-  { code: "1an+", label: "clients inactifs depuis plus d'un an" },
+const INACTIVITY_SEGMENTS: { code: string; label: string; title: string; reasoning: string }[] = [
+  {
+    code: "3-6mois",
+    label: "clients inactifs depuis 3 à 6 mois",
+    title: "Relancer les clients récemment inactifs",
+    reasoning: "Ces clients n'ont pas réservé depuis 3 à 6 mois. Une offre de retour ciblée peut les ramener avant qu'ils n'oublient votre hôtel.",
+  },
+  {
+    code: "6-9mois",
+    label: "clients inactifs depuis 6 à 9 mois",
+    title: "Reconquérir les clients avant qu'ils partent à la concurrence",
+    reasoning: "Sans nouvelle de votre part depuis 6 à 9 mois, ce segment est à risque. L'IA recommande une offre de retour pour les reconquérir.",
+  },
+  {
+    code: "9-12mois",
+    label: "clients inactifs depuis 9 à 12 mois",
+    title: "Agir avant le premier anniversaire d'inactivité",
+    reasoning: "Ces clients approchent d'un an sans réservation. Une offre plus forte peut encore les faire revenir avant qu'il ne soit trop tard.",
+  },
+  {
+    code: "1an+",
+    label: "clients inactifs depuis plus d'un an",
+    title: "Réactiver vos clients historiques",
+    reasoning: "Plus d'un an sans réservation : une offre exceptionnelle est nécessaire pour relancer la relation avec ces clients.",
+  },
 ];
 
 /**
@@ -68,6 +90,8 @@ export async function getRevenueOpportunities(
     return {
       segmentCode: seg.code,
       segmentLabel: seg.label,
+      title: seg.title,
+      reasoning: seg.reasoning,
       clientCount,
       potentialRevenueFcfa: canEstimateRevenue
         ? Math.round(clientCount * (avgSpendPerBooking as number) * (conversionRate as number))

@@ -324,100 +324,129 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Opportunités de revenus — croise segments et historique réel pour proposer des relances concrètes */}
-      {(isDemoMode ? demoOpportunities : revenueOpportunities ?? []).length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6">
-          <h2 className="font-bold text-base text-slate-900 mb-1">Opportunités de revenus</h2>
-          <p className="text-xs text-slate-400 mb-4">
-            Segments de clients inactifs à fort potentiel, calculés à partir de vos données réelles.
-          </p>
-          <div className="space-y-3">
-            {(isDemoMode ? demoOpportunities : revenueOpportunities ?? []).map((opp) => (
-              <div
-                key={opp.segmentCode}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-slate-100 bg-slate-50"
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <span className="text-[var(--color-primary)] shrink-0 mt-0.5 w-5 h-5">
-                    <Icons.Target />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-slate-900">
-                      {opp.clientCount} {opp.segmentLabel}
-                    </p>
-                    {opp.potentialRevenueFcfa !== null ? (
-                      <p className="text-sm text-slate-600 mt-0.5">
-                        Revenu potentiel estimé :{" "}
-                        <span className="font-semibold text-green-600">
-                          {formatCurrency(opp.potentialRevenueFcfa)}
-                        </span>
-                      </p>
-                    ) : (
-                      <p className="text-sm text-slate-400 mt-0.5">
-                        Revenu potentiel disponible après votre première campagne
-                      </p>
-                    )}
-                  </div>
-                </div>
+      {/* Recommandations IA — toujours visible directement sur le tableau de
+          bord (jamais reléguée à une autre page). Croise segments et
+          historique réel pour proposer jusqu'à 3 actions concrètes ; le texte
+          "pourquoi" est un modèle déterministe par segment (pas d'appel IA
+          supplémentaire à chaque chargement, voir opportunities.ts). */}
+      {(() => {
+        const opps = isDemoMode ? demoOpportunities : revenueOpportunities ?? [];
+        return (
+          <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6">
+            <h2 className="font-bold text-base text-slate-900 mb-1 flex items-center gap-2">
+              <span>🤖</span> Recommandations IA
+            </h2>
+            <p className="text-xs text-slate-400 mb-4">
+              Les campagnes que notre IA vous recommande actuellement, calculées à partir de vos données réelles.
+            </p>
+
+            {opps.length === 0 ? (
+              <div className="p-4 rounded-lg border border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-sm text-slate-500">
+                  Pas encore de recommandation disponible : importez votre historique clients pour que l&apos;IA puisse analyser vos opportunités.
+                </p>
                 <Link
-                  href={opp.ctaHref}
+                  href="/dashboard/registre"
                   className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
                 >
-                  Lancer la campagne
+                  Ajouter mes clients
                 </Link>
               </div>
-            ))}
-          </div>
-
-          {/* Recommandation IA : choisit un segment + une offre + un moment
-              parmi les opportunités ci-dessus. Générée à la demande (pas au
-              chargement) pour ne pas consommer inutilement le quota IA. */}
-          <div className="mt-4 pt-4 border-t border-slate-100">
-            {!recommendation ? (
-              <button
-                onClick={handleAskRecommendation}
-                disabled={recoLoading}
-                className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-primary)] text-[var(--color-primary)] text-sm font-semibold rounded-lg hover:bg-[var(--color-primary)]/5 transition-colors disabled:opacity-50"
-              >
-                <span className="w-4 h-4">
-                  <Icons.Sparkles />
-                </span>
-                {recoLoading ? "Analyse en cours…" : "Demander une recommandation IA"}
-              </button>
             ) : (
-              <div className="p-4 rounded-lg border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
-                <div className="flex items-start gap-3">
-                  <span className="text-[var(--color-primary)] shrink-0 mt-0.5 w-5 h-5">
-                    <Icons.Sparkles />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-slate-900">
-                      Recommandation : {SEGMENT_LABELS[recommendation.segmentCode] || recommendation.segmentCode} avec{" "}
-                      {OFFER_TEMPLATE_NAMES[recommendation.templateId] || recommendation.templateId}
-                    </p>
-                    <p className="text-sm text-slate-600 mt-1">{recommendation.reasoning}</p>
-                    <p className="text-sm text-slate-500 mt-1">Meilleur moment : {recommendation.bestTiming}</p>
-                    <div className="flex flex-wrap items-center gap-3 mt-3">
-                      <Link
-                        href={`/dashboard/templates?segment=${recommendation.segmentCode}&template=${recommendation.templateId}`}
-                        className="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
-                      >
-                        Lancer cette campagne
-                      </Link>
-                      <button
-                        onClick={() => setRecommendation(null)}
-                        className="text-xs font-medium text-slate-500 hover:text-slate-700 underline"
-                      >
-                        Redemander
-                      </button>
+              <div className="space-y-3">
+                {opps.map((opp, i) => (
+                  <div
+                    key={opp.segmentCode}
+                    className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 p-4 rounded-lg border border-slate-100 bg-slate-50"
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <span className="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-[var(--color-primary)]/15 text-[var(--color-primary)] text-xs font-bold flex items-center justify-center">
+                        {i + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900">{opp.title}</p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          → {opp.clientCount} {opp.segmentLabel}.
+                        </p>
+                        <p className="text-sm text-slate-600 mt-0.5">→ {opp.reasoning}</p>
+                        {opp.potentialRevenueFcfa !== null ? (
+                          <p className="text-sm text-slate-600 mt-0.5">
+                            → Revenu potentiel estimé :{" "}
+                            <span className="font-semibold text-green-600">
+                              {formatCurrency(opp.potentialRevenueFcfa)}
+                            </span>
+                          </p>
+                        ) : (
+                          <p className="text-sm text-slate-400 mt-0.5">
+                            → Revenu potentiel disponible après votre première campagne
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <Link
+                      href={opp.ctaHref}
+                      className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
+                    >
+                      Lancer la campagne
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Recommandation approfondie : l'IA choisit UN segment + une
+                offre + un moment parmi les opportunités ci-dessus, avec un
+                vrai raisonnement généré à la demande (pas au chargement) pour
+                ne pas consommer inutilement le quota IA. */}
+            {opps.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                {!recommendation ? (
+                  <button
+                    onClick={handleAskRecommendation}
+                    disabled={recoLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-primary)] text-[var(--color-primary)] text-sm font-semibold rounded-lg hover:bg-[var(--color-primary)]/5 transition-colors disabled:opacity-50"
+                  >
+                    <span className="w-4 h-4">
+                      <Icons.Sparkles />
+                    </span>
+                    {recoLoading ? "Analyse en cours…" : "Demander une recommandation approfondie"}
+                  </button>
+                ) : (
+                  <div className="p-4 rounded-lg border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
+                    <div className="flex items-start gap-3">
+                      <span className="text-[var(--color-primary)] shrink-0 mt-0.5 w-5 h-5">
+                        <Icons.Sparkles />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-slate-900">
+                          Priorité n°1 : {SEGMENT_LABELS[recommendation.segmentCode] || recommendation.segmentCode} avec{" "}
+                          {OFFER_TEMPLATE_NAMES[recommendation.templateId] || recommendation.templateId}
+                        </p>
+                        <p className="text-sm text-slate-600 mt-1">{recommendation.reasoning}</p>
+                        <p className="text-sm text-slate-500 mt-1">Meilleur moment : {recommendation.bestTiming}</p>
+                        <div className="flex flex-wrap items-center gap-3 mt-3">
+                          <Link
+                            href={`/dashboard/templates?segment=${recommendation.segmentCode}&template=${recommendation.templateId}`}
+                            className="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
+                          >
+                            Lancer cette campagne
+                          </Link>
+                          <button
+                            onClick={() => setRecommendation(null)}
+                            className="text-xs font-medium text-slate-500 hover:text-slate-700 underline"
+                          >
+                            Redemander
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Layout 2 colonnes: gauche (Performance + Campagnes), droite (Flux + Impact global) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

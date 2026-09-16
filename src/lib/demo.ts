@@ -232,6 +232,8 @@ export const demoOpportunities = [
   {
     segmentCode: "6-9mois",
     segmentLabel: "clients inactifs depuis 6 à 9 mois",
+    title: "Reconquérir les clients avant qu'ils partent à la concurrence",
+    reasoning: "Sans nouvelle de votre part depuis 6 à 9 mois, ce segment est à risque. L'IA recommande une offre de retour pour les reconquérir.",
     clientCount: 127,
     potentialRevenueFcfa: 850000,
     ctaHref: "/dashboard/templates?segment=6-9mois",
@@ -239,6 +241,8 @@ export const demoOpportunities = [
   {
     segmentCode: "3-6mois",
     segmentLabel: "clients inactifs depuis 3 à 6 mois",
+    title: "Relancer les clients récemment inactifs",
+    reasoning: "Ces clients n'ont pas réservé depuis 3 à 6 mois. Une offre de retour ciblée peut les ramener avant qu'ils n'oublient votre hôtel.",
     clientCount: 64,
     potentialRevenueFcfa: 310000,
     ctaHref: "/dashboard/templates?segment=3-6mois",
