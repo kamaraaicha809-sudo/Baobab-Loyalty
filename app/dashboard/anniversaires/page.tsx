@@ -1,11 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { user } from "@/src/sdk";
 import { audit, type AuditLogEntry } from "@/src/sdk/audit";
 import { isDemoMode, demoProfile, demoAuditLog } from "@/src/lib/demo";
 import { BIRTHDAY_TEMPLATES, renderBirthdayMessage, type BirthdayTemplateKey } from "@/src/lib/birthday-templates";
+import { useBirthdayAccess } from "@/src/hooks/usePremiumAccess";
+import config from "@/config";
+
+const isEurope = config.region === "europe";
+
+function BirthdayProUpsell() {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-20 px-6 bg-white rounded-xl border border-slate-200">
+      <div className="w-14 h-14 rounded-full bg-[var(--color-light)] flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-[var(--color-main)]">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v3m0 0c-1.5 0-3-1-3-2.5S10.5 4 12 4s3 1 3 2.5S13.5 8 12 8zm-7 5h14M5 13a2 2 0 00-2 2v5a1 1 0 001 1h16a1 1 0 001-1v-5a2 2 0 00-2-2M5 13V9a2 2 0 012-2h1m9 6V9a2 2 0 00-2-2h-1" />
+        </svg>
+      </div>
+      <h2 className="text-lg font-bold text-slate-900 mb-2">
+        Fonctionnalité réservée au plan {isEurope ? "Professional ou Business" : "Pro ou Premium"}
+      </h2>
+      <p className="text-sm text-slate-500 max-w-md mb-6">
+        Les messages d&apos;anniversaire automatiques sont disponibles à partir du plan {isEurope ? "Professional" : "Pro"}. Passe au plan supérieur pour y accéder.
+      </p>
+      <Link
+        href="/dashboard/abonnement"
+        className="px-5 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
+      >
+        Voir les plans
+      </Link>
+    </div>
+  );
+}
 
 function formatDateTime(value: string): string {
   try {
@@ -25,6 +54,7 @@ function historyDetails(entry: AuditLogEntry): string {
 }
 
 export default function AnniversairesPage() {
+  const hasAccess = useBirthdayAccess();
   const [profileId, setProfileId] = useState<string | null>(isDemoMode ? demoProfile.id : null);
   const [hotelName, setHotelName] = useState(isDemoMode ? demoProfile.hotel_name : "");
   const [loading, setLoading] = useState(!isDemoMode);
@@ -77,6 +107,28 @@ export default function AnniversairesPage() {
   };
 
   const previewHotel = hotelName || "votre hôtel";
+
+  if (hasAccess === null || (hasAccess && loading)) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="space-y-6">
+        <header>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Anniversaires</h1>
+          <p className="text-slate-600 text-base">
+            Souhaitez automatiquement l&apos;anniversaire de vos clients par WhatsApp.
+          </p>
+        </header>
+        <BirthdayProUpsell />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

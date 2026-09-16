@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { Icons } from '@/components/common/Icons';
 import config from '@/config';
 import { isDemoMode } from '@/src/lib/demo';
-import { usePremiumAccess } from '@/src/hooks/usePremiumAccess';
+import { usePremiumAccess, useBirthdayAccess } from '@/src/hooks/usePremiumAccess';
 import { User } from '@/types';
 
 interface NavItem {
@@ -17,6 +17,7 @@ interface NavItem {
   icon: ReactNode;
   href: string;
   premiumOnly?: boolean;
+  proOnly?: boolean;
 }
 
 interface SidebarProps {
@@ -28,6 +29,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isPremium = usePremiumAccess();
+  const isBirthdayEligible = useBirthdayAccess();
 
   // Vérifier si l'utilisateur est admin (ou en mode démo)
   const isAdmin = isDemoMode || user?.role === "admin";
@@ -58,6 +60,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
         </svg>
       ),
       href: '/dashboard/anniversaires',
+      proOnly: true,
     },
     { id: 'historique', label: 'Historique', icon: <Icons.Clock />, href: '/dashboard/historique' },
     {
@@ -81,7 +84,8 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
   ];
 
   const handlePremiumLockedClick = (item: NavItem) => {
-    toast.error(`Désolé, "${item.label}" n'est disponible qu'avec le forfait Premium.`);
+    const planLabel = item.proOnly ? 'Pro' : 'Premium';
+    toast.error(`Désolé, "${item.label}" n'est disponible qu'avec le forfait ${planLabel} ou supérieur.`);
   };
 
   // Navigation admin (visible uniquement pour les admins)
@@ -111,7 +115,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
           {/* Navigation principale */}
           <nav className="space-y-1">
             {mainNavItems.map((item) => {
-              const locked = item.premiumOnly && !isPremium;
+              const locked = (item.premiumOnly && !isPremium) || (item.proOnly && !isBirthdayEligible);
               if (locked) {
                 return (
                   <button
@@ -253,7 +257,7 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
             {/* Navigation principale */}
             <nav className="space-y-1">
               {mainNavItems.map((item) => {
-                const locked = item.premiumOnly && !isPremium;
+                const locked = (item.premiumOnly && !isPremium) || (item.proOnly && !isBirthdayEligible);
                 if (locked) {
                   return (
                     <button

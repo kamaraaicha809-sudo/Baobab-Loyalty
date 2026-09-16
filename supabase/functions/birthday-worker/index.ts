@@ -20,10 +20,24 @@ import { filterConsentedClients, isClientStillConsented } from "../_shared/conse
 import { buildUnsubscribeSuffix, formatE164, sendViaBsp, sendViaMeta } from "../_shared/whatsapp-send.ts";
 import { renderBirthdayMessage } from "../_shared/birthday-templates.ts";
 
+// Anniversaire = plan Pro et au-dessus (Afrique) ou Professional et au-dessus
+// (Europe) -- Starter exclu. Meme convention que TOP_TIER_SLUGS dans
+// ai-generate/index.ts (liste dupliquee localement plutot que partagee,
+// verification par price_id seul, sans hasActiveAccess -- comportement
+// aligne sur celui deja en place pour les autres fonctionnalites par plan).
+// Verifie ici (pas seulement cote UI) : un hotelier qui redescend au plan
+// Starter apres avoir active l'automatisation ne doit plus jamais recevoir
+// d'envoi, meme si birthday_automation_enabled est reste a true en base.
+const BIRTHDAY_ACCESS_SLUGS = ["pro", "premium", "professional", "business"];
+function hasBirthdayAccess(priceId: string | null | undefined): boolean {
+  return !!priceId && BIRTHDAY_ACCESS_SLUGS.includes(priceId.toLowerCase());
+}
+
 interface BirthdayProfile {
   id: string;
   hotel_name: string | null;
   birthday_template_key: string;
+  price_id: string | null;
   whatsapp_phone_number_id: string | null;
   whatsapp_access_token: string | null;
   bsp_api_key: string | null;
@@ -57,7 +71,7 @@ Deno.serve(async (req) => {
 
     const { data: profiles, error: profilesError } = await db
       .from("profiles")
-      .select("id, hotel_name, birthday_template_key, whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status")
+      .select("id, hotel_name, birthday_template_key, price_id, whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status")
       .eq("birthday_automation_enabled", true);
 
     if (profilesError) return errors.internal(profilesError.message);
@@ -67,6 +81,8 @@ Deno.serve(async (req) => {
     let totalFailed = 0;
 
     for (const profile of (profiles ?? []) as BirthdayProfile[]) {
+      if (!hasBirthdayAccess(profile.price_id)) continue;
+
       const hasBsp = profile.bsp_api_key && profile.bsp_status === "active";
       const hasMeta = profile.whatsapp_phone_number_id && profile.whatsapp_access_token;
       if (!hasBsp && !hasMeta) continue;

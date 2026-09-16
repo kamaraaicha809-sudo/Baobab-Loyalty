@@ -27,7 +27,7 @@ const stamp = Date.now();
 const email = `regression-birthday-${stamp}@baobabloyalty.com`;
 const password = `Reg1!BD#${stamp}`;
 
-let hotelId, campaignIdBefore;
+let hotelId, campaignIdBefore, starterHotelId, starterClientId;
 const clientIds = {};
 
 function todayIso() {
@@ -55,6 +55,7 @@ try {
     method: "PATCH",
     body: JSON.stringify({
       hotel_name: "TEST BIRTHDAY REGRESSION",
+      price_id: "pro",
       bsp_api_key: "FAKE_TEST_KEY_NEVER_REAL",
       bsp_status: "active",
       birthday_automation_enabled: true,
@@ -155,6 +156,57 @@ try {
     body: "{}",
   });
   log("Un appel avec un mauvais secret est bien rejete (401)", wrongSecretRes.status === 401, `status=${wrongSecretRes.status}`);
+
+  // Restriction par plan (Pro et au-dessus uniquement) : un hotel Starter,
+  // meme avec l'automatisation activee et un client eligible, ne doit jamais
+  // etre traite. Verifie reellement le gate cote serveur, pas seulement le
+  // verrouillage visuel cote frontend.
+  {
+    const starterEmail = `regression-birthday-starter-${stamp}@baobabloyalty.com`;
+    starterHotelId = await adminCreateUser(starterEmail, password);
+    await svc(`profiles?id=eq.${starterHotelId}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        hotel_name: "TEST BIRTHDAY STARTER (doit etre ignore)",
+        price_id: "starter",
+        bsp_api_key: "FAKE_TEST_KEY_NEVER_REAL",
+        bsp_status: "active",
+        birthday_automation_enabled: true,
+        birthday_template_key: "chaleureux",
+      }),
+    });
+    const rc = await svc("clients", {
+      method: "POST",
+      body: JSON.stringify({
+        profile_id: starterHotelId,
+        nom: "SCN5_Starter_JamaisTraite",
+        whatsapp: `+2250700${String(Math.floor(Math.random() * 900000) + 100000)}`,
+        derniere_visite: todayIso(),
+        date_naissance: birthdateToday(),
+        marketing_consent: true,
+      }),
+    });
+    starterClientId = rc.body?.[0]?.id;
+
+    const starterWorkerRes = await fetch(`${SUPABASE_URL}/functions/v1/birthday-worker`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-birthday-worker-secret": WORKER_SECRET },
+      body: "{}",
+    });
+    const starterWorkerBody = await starterWorkerRes.json().catch(() => null);
+    await new Promise((r) => setTimeout(r, 500));
+
+    const starterCamp = await svc(`campaigns?profile_id=eq.${starterHotelId}&select=id`);
+    const starterSent = starterClientId ? await svc(`sent_messages?client_id=eq.${starterClientId}&select=id`) : { body: [] };
+    // Note : processedProfiles global peut etre >0 ici (l'hotel Pro du
+    // scenario precedent est retraite, son envoi ayant echoue plus haut) --
+    // la preuve pertinente est scopee sur CE hotel Starter precisement.
+    log(
+      "Un hotel plan Starter avec l'automatisation activee n'est jamais traite (gate serveur reel)",
+      starterWorkerRes.ok && starterCamp.body?.length === 0 && starterSent.body?.length === 0,
+      `body=${JSON.stringify(starterWorkerBody)} campaigns=${JSON.stringify(starterCamp.body)} sentMessages=${JSON.stringify(starterSent.body)}`
+    );
+  }
 } catch (err) {
   log("ERREUR SCRIPT", false, err instanceof Error ? err.stack : String(err));
 } finally {
@@ -170,6 +222,8 @@ try {
     try { if (id) await svc(`clients?id=eq.${id}`, { method: "DELETE" }); } catch {}
   }
   try { if (hotelId) await adminDeleteUser(hotelId); } catch {}
+  try { if (starterClientId) await svc(`clients?id=eq.${starterClientId}`, { method: "DELETE" }); } catch {}
+  try { if (starterHotelId) await adminDeleteUser(starterHotelId); } catch {}
 }
 
 printAndExit();
