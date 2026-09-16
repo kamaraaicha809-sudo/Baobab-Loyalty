@@ -18,6 +18,13 @@ const DEFAULT_MODEL = "openai/gpt-4o-mini";
 const DEFAULT_PROMPT_NAME = "campaign_whatsapp";
 const AI_TIMEOUT_MS = 20000;
 
+// IA personnalisee (contexte hotel injecte dans le prompt) : plan Premium
+// (Afrique) ou Business (Europe).
+const PERSONALIZED_AI_SLUGS = ["premium", "business"];
+function hasPersonalizedAiAccess(priceId: string | null | undefined): boolean {
+  return PERSONALIZED_AI_SLUGS.includes((priceId || "").toLowerCase());
+}
+
 // Module-level prompt cache (reused across warm invocations)
 const promptCache: Record<string, string> = {};
 
@@ -162,7 +169,7 @@ Deno.serve(async (req) => {
       return errors.forbidden("Fonctionnalité réservée au plan Premium.");
     }
 
-    if ((profile.price_id || "").toLowerCase() === "premium") {
+    if (hasPersonalizedAiAccess(profile.price_id)) {
       hotelAiContext = buildHotelAiContext(profile);
     }
 

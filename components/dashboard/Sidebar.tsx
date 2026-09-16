@@ -83,9 +83,15 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
     },
   ];
 
-  const handlePremiumLockedClick = (item: NavItem) => {
-    const planLabel = item.proOnly ? 'Pro' : 'Premium';
-    toast.error(`Désolé, "${item.label}" n'est disponible qu'avec le forfait ${planLabel} ou supérieur.`);
+  const isEurope = config.region === 'europe';
+
+  const requiredPlanLabel = (item: NavItem): string =>
+    item.proOnly
+      ? (isEurope ? 'Professional' : 'Pro')
+      : (isEurope ? 'Business' : 'Premium');
+
+  const handleLockedClick = (item: NavItem) => {
+    toast.error(`Désolé, "${item.label}" n'est disponible qu'avec le forfait ${requiredPlanLabel(item)} ou supérieur.`);
   };
 
   // Navigation admin (visible uniquement pour les admins)
@@ -121,12 +127,17 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => handlePremiumLockedClick(item)}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed"
+                    onClick={() => handleLockedClick(item)}
+                    className="w-full flex flex-col items-start gap-0.5 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed"
                   >
-                    {item.icon}
-                    {item.label}
-                    <span className="ml-auto"><Icons.Lock /></span>
+                    <span className="w-full flex items-center gap-3">
+                      {item.icon}
+                      {item.label}
+                      <span className="ml-auto"><Icons.Lock /></span>
+                    </span>
+                    <span className="pl-8 text-[11px] font-normal text-slate-400">
+                      Disponible avec le plan {requiredPlanLabel(item)}
+                    </span>
                   </button>
                 );
               }
@@ -265,13 +276,18 @@ const Sidebar = ({ user, onLogout }: SidebarProps) => {
                       type="button"
                       onClick={() => {
                         setMobileMenuOpen(false);
-                        handlePremiumLockedClick(item);
+                        handleLockedClick(item);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-400 cursor-not-allowed"
+                      className="w-full flex flex-col items-start gap-0.5 px-4 py-3 rounded-lg text-base font-medium text-slate-400 cursor-not-allowed"
                     >
-                      {item.icon}
-                      {item.label}
-                      <span className="ml-auto"><Icons.Lock /></span>
+                      <span className="w-full flex items-center gap-3">
+                        {item.icon}
+                        {item.label}
+                        <span className="ml-auto"><Icons.Lock /></span>
+                      </span>
+                      <span className="pl-8 text-xs font-normal text-slate-400">
+                        Disponible avec le plan {requiredPlanLabel(item)}
+                      </span>
                     </button>
                   );
                 }

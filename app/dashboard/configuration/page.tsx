@@ -10,7 +10,10 @@ import { clients, MAX_CSV_FILE_SIZE_BYTES, type Client, type ImportClientRow, ty
 import { whatsapp } from "@/src/sdk/whatsapp";
 import { billing } from "@/src/sdk/billing";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
+import { hasPersonalizedAiAccess } from "@/src/lib/plan";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
+
+const isEurope = config.region === "europe";
 
 const SEGMENT_LABELS: Record<string, string> = {
   "3-6mois":  "Clients 3 à 6 mois",
@@ -127,7 +130,7 @@ export default function ConfigurationPage() {
         setForm({ ...emptyForm, hotel_name: demoProfile.hotel_name });
         setConfigComplete(demoProfile.config_complete);
         setCounts(demoSegmentCounts);
-        setIsPremium(demoProfile.price_id === "premium");
+        setIsPremium(hasPersonalizedAiAccess(demoProfile.price_id));
         setOnboardingFeePaidAt(demoProfile.onboarding_fee_paid_at);
         setAiSettings({
           ai_brand_voice: demoProfile.ai_brand_voice || "",
@@ -168,7 +171,7 @@ export default function ConfigurationPage() {
         reception_email: (profile as Record<string, unknown>).reception_email as string || "",
       });
       setConfigComplete(profile.config_complete ?? false);
-      setIsPremium((profile as Record<string, unknown>).price_id === "premium");
+      setIsPremium(hasPersonalizedAiAccess((profile as Record<string, unknown>).price_id as string | null));
       setOnboardingFeePaidAt(((profile as Record<string, unknown>).onboarding_fee_paid_at as string) || null);
       setAiSettings({
         ai_brand_voice: ((profile as Record<string, unknown>).ai_brand_voice as string) || "",
@@ -776,7 +779,7 @@ export default function ConfigurationPage() {
           </h2>
           {!isPremium && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
-              Plan Premium
+              Plan {isEurope ? "Business" : "Premium"}
             </span>
           )}
         </div>
@@ -842,10 +845,11 @@ export default function ConfigurationPage() {
           </form>
         ) : (
           <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span className="text-slate-400 shrink-0 mt-0.5"><Icons.Lock /></span>
             <p className="text-sm text-slate-600">
-              L&apos;IA personnalisée est réservée au plan Premium.{" "}
+              L&apos;IA personnalisée est réservée au plan {isEurope ? "Business" : "Premium"}.{" "}
               <Link href="/tarifs" className="text-primary font-semibold hover:underline">
-                Découvrir le plan Premium
+                Découvrir le plan {isEurope ? "Business" : "Premium"}
               </Link>
             </p>
           </div>
