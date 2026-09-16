@@ -24,6 +24,7 @@ const PUBLIC_PATHS = [
   "/presentation",
   "/demo",
   "/offre",
+  "/acces-limite",
 ];
 
 function isPublicPath(pathname: string): boolean {
