@@ -213,7 +213,7 @@ const config = {
     payments: true,                   // Paiements Moneroo
     signupsPaused: region === "europe" ? false : true,  // Coupe-circuit /signup uniquement. Europe ouvert (2026-09-15), Afrique inchangée (comptes déjà actifs non affectés).
     betaPaused: region === "europe" ? true : false,  // Coupe-circuit /beta. Europe fermé (pas de bêta privée), Afrique ouvert (bêta-testeurs pilotes, système de code existant conservé).
-    dashboardMaintenanceMode: region === "europe" ? false : true,  // Coupe-circuit /dashboard (sauf role=admin). Activé Afrique 2026-09-16 (accès public constaté hors demande, fermeture pendant la préparation des hôtels partenaires) ; Europe non affectée par cette décision.
+    dashboardMaintenanceMode: false,  // Coupe-circuit /dashboard (sauf session authentifiée). DÉSACTIVÉ TEMPORAIREMENT le 2026-09-16 sur demande explicite pour vérifications ponctuelles côté Afrique — remettre à `region === "europe" ? false : true` dès réception du "GO" de l'utilisatrice, ne pas laisser cet état permanent.
     oauth: {
       google: false,                  // OAuth Google (configurer dans Supabase)
       github: false,                  // OAuth GitHub (configurer dans Supabase)
