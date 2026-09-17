@@ -17,6 +17,9 @@ const MONTHLY_RELANCE_QUOTAS: Record<string, number> = {
   // Anciens slugs, conservés pour les comptes créés avant le renommage
   essentiel: 5,
   croissance: 10,
+  // Slugs Europe (plans distincts, voir config.js billing.plansEurope)
+  professional: 10,
+  business: 30,
 };
 
 /**

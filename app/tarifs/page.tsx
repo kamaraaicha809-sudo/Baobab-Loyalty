@@ -17,22 +17,19 @@ export const metadata = getSEOTags({
   canonicalUrlRelative: "/tarifs",
 });
 
-// Quotas de campagnes/chambres et fonctionnalités par plan Europe non
-// décidés (voir config.billing.plansEurope, status='draft') — la carte
-// Europe n'affiche donc que le nom, le prix HT validé et l'essai 14 jours,
-// jamais de chiffres inventés ni le comparatif détaillé ci-dessous (propre
-// à la répartition de fonctionnalités Afrique).
+// Grille de fonctionnalités validée le 16/09/2026 (voir config.billing.plansEurope
+// et supabase/migrations-europe/015 pour l'application réelle des quotas/limites).
 const plansEuropeDisplay = config.billing.plansEurope.map((p) => ({
   name: p.name,
   price: String(p.price),
   priceRaw: String(p.price),
   priceDetail: "€ HT / mois",
-  rooms: null as string | null,
-  relances: null as number | null,
+  rooms: p.maxRooms === null ? "Chambres illimitées" : `Jusqu'à ${p.maxRooms} chambres`,
+  relances: p.monthlyRelances,
   trialDays: p.trialDays,
   highlighted: !!p.isFeatured,
-  features: [] as string[],
-  notIncluded: [] as string[],
+  features: p.features.map((f) => f.name),
+  notIncluded: p.notIncluded.map((f) => f.name),
 }));
 
 const plansAfrica = [
@@ -122,10 +119,11 @@ const faqsAfrica = [
   },
 ];
 
-// Quotas de campagnes, SLA de support et garantie de résultats non décidés
-// pour l'Europe (config.billing.plansEurope, status='draft') — ces
-// questions/réponses ne sont donc pas reprises ici tant qu'aucune valeur
-// n'est validée. Ne jamais inventer un équivalent.
+// SLA de support précis et garantie de résultats non décidés pour l'Europe
+// (engagements marketing propres à l'Afrique) — ces questions/réponses ne
+// sont donc pas reprises ici tant qu'aucune valeur n'est validée. Les quotas
+// de campagnes/chambres, eux, sont désormais décidés (voir plansEurope) et
+// affichés directement sur les cartes tarifaires ci-dessus.
 const faqsEurope = [
   {
     q: "Est-ce qu'il y a un engagement ou une durée minimale ?",
@@ -291,7 +289,7 @@ export default function TarifsPage() {
                     </span>
                   </div>
 
-                  {/* Quota de campagnes WhatsApp — non décidé pour l'Europe (plan.relances=null), boîte masquée plutôt que d'afficher un chiffre inventé */}
+                  {/* Quota de campagnes WhatsApp du mois (null seulement si jamais un plan futur n'en a pas) */}
                   {plan.relances !== null && (
                     <div
                       className={`mb-5 px-4 py-3 rounded-xl flex items-center justify-between ${
@@ -401,10 +399,11 @@ export default function TarifsPage() {
           </div>
         </section>
 
-        {/* What's included comparison — répartition des fonctionnalités par
-            plan non décidée pour l'Europe (config.billing.plansEurope,
-            status='draft') : section entière masquée plutôt que d'afficher
-            un comparatif inventé. */}
+        {/* What's included comparison — tableau comparatif détaillé propre à
+            l'Afrique. La grille de fonctionnalités Europe est décidée (voir
+            plansEurope, déjà affichée sur les cartes ci-dessus) mais ce
+            grand tableau reste volontairement masqué pour l'Europe pour
+            l'instant, sur décision explicite de l'utilisatrice. */}
         {!isEurope && (
         <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">

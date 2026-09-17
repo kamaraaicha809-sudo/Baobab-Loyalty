@@ -179,16 +179,87 @@ const config = {
         ],
       },
     ],
-    // Prix HT validés (79/149/349 EUR) — voir migrations-europe/012. Les
-    // quotas et la liste de fonctionnalités restent null/vides tant que non
-    // tranchés ; ne pas les afficher comme des limites ou promesses réelles
-    // dans l'UI avant validation. Mêmes noms de champs que `plans`
-    // (price/features/description) pour que les composants de pricing
-    // puissent lire l'un ou l'autre sans logique dupliquée.
+    // Prix HT et grille de fonctionnalités validés le 16/09/2026 — voir
+    // migrations-europe/012 (prix) et migrations-europe/015 (quotas
+    // appliqués réellement côté serveur/base, pas seulement affichés ici).
+    // Mêmes noms de champs que `plans` (price/features/description) pour
+    // que les composants de pricing puissent lire l'un ou l'autre sans
+    // logique dupliquée.
     plansEurope: [
-      { planId: "starter", name: "Starter", price: 79, description: "Pour démarrer", monthlyRelances: null, maxRooms: null, trialDays: 14, features: [] },
-      { planId: "professional", isFeatured: true, name: "Professional", price: 149, description: "Le plus populaire", monthlyRelances: null, maxRooms: null, trialDays: 14, features: [] },
-      { planId: "business", name: "Business", price: 349, description: "Pour les grands établissements", monthlyRelances: null, maxRooms: null, trialDays: 14, features: [] },
+      {
+        planId: "starter",
+        name: "Starter",
+        price: 79,
+        description: "Pour démarrer",
+        monthlyRelances: 5,
+        // → Nombre de campagnes WhatsApp incluses par mois. Appliqué côté
+        //   serveur dans campaign-send (supabase/functions/_shared/plan.ts).
+        maxRooms: 30,
+        // → Doit rester synchronisé avec la fonction SQL
+        //   enforce_room_types_limit() (supabase/migrations-europe/015).
+        trialDays: 14,
+        features: [
+          { name: "Génération de messages WhatsApp par IA" },
+          { name: "Campagnes WhatsApp + segmentation (3, 6, 9 mois)" },
+          { name: "Import CSV" },
+          { name: "Registre numérique" },
+          { name: "Tableau de bord réservations" },
+          { name: "Support standard" },
+        ],
+        notIncluded: [
+          { name: "Messages d'anniversaire automatiques" },
+          { name: "Accès multi-utilisateurs (Équipe)" },
+          { name: "IA personnalisée avec contexte hôtelier" },
+          { name: "Génération de posts LinkedIn (IA)" },
+        ],
+      },
+      {
+        planId: "professional",
+        isFeatured: true,
+        name: "Professional",
+        price: 149,
+        description: "Le plus populaire",
+        monthlyRelances: 10,
+        maxRooms: 100,
+        trialDays: 14,
+        features: [
+          { name: "Génération de messages WhatsApp par IA" },
+          { name: "Campagnes WhatsApp + segmentation (3, 6, 9 mois)" },
+          { name: "Import CSV" },
+          { name: "Registre numérique" },
+          { name: "Tableau de bord réservations" },
+          { name: "Messages d'anniversaire automatiques" },
+          { name: "Accès multi-utilisateurs (Équipe)" },
+          { name: "Support prioritaire" },
+        ],
+        notIncluded: [
+          { name: "IA personnalisée avec contexte hôtelier" },
+          { name: "Génération de posts LinkedIn (IA)" },
+        ],
+      },
+      {
+        planId: "business",
+        name: "Business",
+        price: 349,
+        description: "Pour les grands établissements",
+        monthlyRelances: 30,
+        maxRooms: null,
+        // → null = illimité
+        trialDays: 14,
+        features: [
+          { name: "Génération de messages WhatsApp par IA" },
+          { name: "Campagnes WhatsApp + segmentation (3, 6, 9 mois)" },
+          { name: "Import CSV" },
+          { name: "Registre numérique" },
+          { name: "Tableau de bord réservations" },
+          { name: "Messages d'anniversaire automatiques" },
+          { name: "Accès multi-utilisateurs (Équipe)" },
+          { name: "IA personnalisée avec contexte hôtelier" },
+          { name: "Génération de posts LinkedIn (IA)" },
+          { name: "Support prioritaire + accompagnement personnalisé" },
+        ],
+        notIncluded: [],
+      },
     ],
   },
 
