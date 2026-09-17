@@ -200,7 +200,6 @@ const config = {
         trialDays: 14,
         features: [
           { name: "Génération de messages WhatsApp par IA" },
-          { name: "Campagnes WhatsApp + segmentation (3, 6, 9 mois)" },
           { name: "Import CSV" },
           { name: "Registre numérique" },
           { name: "Tableau de bord réservations" },
@@ -224,7 +223,6 @@ const config = {
         trialDays: 14,
         features: [
           { name: "Génération de messages WhatsApp par IA" },
-          { name: "Campagnes WhatsApp + segmentation (3, 6, 9 mois)" },
           { name: "Import CSV" },
           { name: "Registre numérique" },
           { name: "Tableau de bord réservations" },
@@ -248,7 +246,6 @@ const config = {
         trialDays: 14,
         features: [
           { name: "Génération de messages WhatsApp par IA" },
-          { name: "Campagnes WhatsApp + segmentation (3, 6, 9 mois)" },
           { name: "Import CSV" },
           { name: "Registre numérique" },
           { name: "Tableau de bord réservations" },

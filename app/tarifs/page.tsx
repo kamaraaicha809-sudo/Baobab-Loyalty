@@ -265,13 +265,15 @@ export default function TarifsPage() {
                   >
                     {plan.name}
                   </h2>
-                  <p
-                    className={`text-xs mb-4 ${
-                      plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
-                    }`}
-                  >
-                    {plan.rooms}
-                  </p>
+                  {!isEurope && (
+                    <p
+                      className={`text-xs mb-4 ${
+                        plan.highlighted ? "text-[#a3c4b5]" : "text-slate-400"
+                      }`}
+                    >
+                      {plan.rooms}
+                    </p>
+                  )}
                   <div className="mb-5">
                     <span
                       className={`text-3xl font-bold ${
@@ -289,8 +291,11 @@ export default function TarifsPage() {
                     </span>
                   </div>
 
-                  {/* Quota de campagnes WhatsApp du mois (null seulement si jamais un plan futur n'en a pas) */}
-                  {plan.relances !== null && (
+                  {/* Encadre quota (Afrique uniquement) — l'Europe affiche le
+                      quota, les chambres et la segmentation comme coches
+                      dans la liste ci-dessous, sur demande explicite du
+                      17/09/2026 (reference : ancien design Afrique). */}
+                  {!isEurope && plan.relances !== null && (
                     <div
                       className={`mb-5 px-4 py-3 rounded-xl flex items-center justify-between ${
                         plan.highlighted ? "bg-white/10" : "bg-[#1a2f2a]/5"
@@ -326,6 +331,35 @@ export default function TarifsPage() {
                   )}
 
                   <ul className="space-y-2.5 mb-3 flex-1">
+                    {isEurope &&
+                      [
+                        plan.relances !== null ? `${plan.relances} campagnes WhatsApp / mois` : null,
+                        plan.rooms,
+                        "Segmentation clients (3, 6, 9 mois)",
+                      ]
+                        .filter((line): line is string => !!line)
+                        .map((line, j) => (
+                          <li key={`quota-${j}`} className="flex items-start gap-2.5">
+                            <svg
+                              className={`w-4 h-4 mt-0.5 shrink-0 ${
+                                plan.highlighted ? "text-[#EBC161]" : "text-[#1a2f2a]"
+                              }`}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2.5}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                            <span
+                              className={`text-sm leading-snug ${
+                                plan.highlighted ? "text-[#d4e8df]" : "text-slate-600"
+                              }`}
+                            >
+                              {line}
+                            </span>
+                          </li>
+                        ))}
                     {plan.features.map((feature, j) => (
                       <li key={j} className="flex items-start gap-2.5">
                         <svg
