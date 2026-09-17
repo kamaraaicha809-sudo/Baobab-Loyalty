@@ -4,22 +4,30 @@
  *
  * Une "relance" = une campagne WhatsApp envoyée (peu importe la taille du
  * segment ciblé). Quota mensuel, non reporté d'un mois à l'autre — voir
- * config.js (billing.plans[].monthlyRelances) pour les valeurs affichées
- * côté marketing, qui doivent rester synchronisées avec cette table.
+ * config.js (billing.plans[].monthlyRelances pour l'Afrique,
+ * billing.plansEurope[].monthlyRelances pour l'Europe) pour les valeurs
+ * affichées côté marketing, qui doivent rester synchronisées avec ces tables.
  */
 
 import { hasActiveAccess } from "./access.ts";
 
-const MONTHLY_RELANCE_QUOTAS: Record<string, number> = {
+// Le slug "starter" est partagé entre Afrique et Europe (voir config.js
+// billing.plans / billing.plansEurope) mais leurs quotas divergent depuis le
+// 17/09/2026 : deux tables distinctes, sélectionnées via APP_BRAND (secret
+// Vault Europe uniquement, même convention que email-send/contact-send).
+const MONTHLY_RELANCE_QUOTAS_AFRICA: Record<string, number> = {
   starter: 5,
   pro: 10,
   premium: 30,
   // Anciens slugs, conservés pour les comptes créés avant le renommage
   essentiel: 5,
   croissance: 10,
-  // Slugs Europe (plans distincts, voir config.js billing.plansEurope)
-  professional: 10,
-  business: 30,
+};
+
+const MONTHLY_RELANCE_QUOTAS_EUROPE: Record<string, number> = {
+  starter: 8,
+  professional: 16,
+  business: 32,
 };
 
 /**
@@ -49,13 +57,16 @@ export function getMonthlyRelanceQuota(profile: {
   access_until?: string | null;
   trial_ends_at?: string | null;
 }): number {
+  const isEurope = !!Deno.env.get("APP_BRAND");
+  const quotas = isEurope ? MONTHLY_RELANCE_QUOTAS_EUROPE : MONTHLY_RELANCE_QUOTAS_AFRICA;
   const slug = profile.price_id?.toLowerCase();
-  if (slug && MONTHLY_RELANCE_QUOTAS[slug] != null) {
-    return MONTHLY_RELANCE_QUOTAS[slug];
+  if (slug && quotas[slug] != null) {
+    return quotas[slug];
   }
-  // Pas encore de plan payant : quota Pro pendant l'essai gratuit
-  // (20 réservé aux comptes qui payent réellement le plan Premium), sinon aucun accès.
-  return hasActiveAccess(profile) ? MONTHLY_RELANCE_QUOTAS.pro : 0;
+  // Pas encore de plan payant : quota du plan intermédiaire pendant l'essai
+  // gratuit (Pro en Afrique, Professional en Europe), sinon aucun accès.
+  if (!hasActiveAccess(profile)) return 0;
+  return isEurope ? MONTHLY_RELANCE_QUOTAS_EUROPE.professional : MONTHLY_RELANCE_QUOTAS_AFRICA.pro;
 }
 
 export function startOfCurrentMonthIso(): string {

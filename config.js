@@ -191,7 +191,7 @@ const config = {
         name: "Starter",
         price: 79,
         description: "Pour démarrer",
-        monthlyRelances: 5,
+        monthlyRelances: 8,
         // → Nombre de campagnes WhatsApp incluses par mois. Appliqué côté
         //   serveur dans campaign-send (supabase/functions/_shared/plan.ts).
         maxRooms: 30,
@@ -219,7 +219,7 @@ const config = {
         name: "Professional",
         price: 149,
         description: "Le plus populaire",
-        monthlyRelances: 10,
+        monthlyRelances: 16,
         maxRooms: 100,
         trialDays: 14,
         features: [
@@ -242,7 +242,7 @@ const config = {
         name: "Business",
         price: 349,
         description: "Pour les grands établissements",
-        monthlyRelances: 30,
+        monthlyRelances: 32,
         maxRooms: null,
         // → null = illimité
         trialDays: 14,
