@@ -198,6 +198,20 @@ export const renderOrganizationSchema = () => {
           // pays, dans quelle langue) n'a pas encore été décidé, ne pas
           // inventer une liste ici tant que ce n'est pas validé.
           ...(config.region !== "europe" && {
+            legalName: "FIRST DIGITAL PROD SARL",
+            telephone: "+22574851123",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "CAFOP 1, 10 BP 605 ABJ 10",
+              addressLocality: "Grand-Bassam",
+              addressRegion: "Sud-Comoé",
+              addressCountry: "CI",
+            },
+            identifier: {
+              "@type": "PropertyValue",
+              name: "RCCM",
+              value: "CI-BAS-01-2026-B12-00604",
+            },
             areaServed: [
               { "@type": "Country", name: "Côte d'Ivoire" },
               { "@type": "Country", name: "Sénégal" },

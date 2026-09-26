@@ -64,7 +64,7 @@ export default function ContactPage() {
             <p className="text-slate-500 text-base sm:text-lg leading-relaxed">
               {isEurope
                 ? "Notre équipe répond en français sous 24 à 48 heures ouvrées."
-                : <>Notre équipe est basée à Abidjan, Côte d&apos;Ivoire, et répond en français
+                : <>Notre équipe est basée en Côte d&apos;Ivoire, et répond en français
                   sous 24 à 48 heures ouvrées.</>}
             </p>
           </div>

@@ -49,6 +49,11 @@ const Footer = () => {
         <p className="text-slate-500 text-sm">
           © {new Date().getFullYear()} {config.appName}. Tous droits réservés.
         </p>
+        {config.region !== "europe" && (
+          <p className="text-slate-400 text-xs mt-1">
+            Solution éditée par FIRST DIGITAL PROD SARL — RCCM CI-BAS-01-2026-B12-00604 — Grand-Bassam, Côte d&apos;Ivoire
+          </p>
+        )}
         {/* Marchés desservis propres à l'Afrique — équivalent Europe (pays,
             pages SEO dédiées) pas encore décidé, section masquée plutôt que
             d'inventer une liste pour Loyavia. */}

@@ -116,7 +116,7 @@ export default function CGUPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Objet</h2>
           <p className="text-slate-600 leading-relaxed">
-            Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme <strong>Baobab Loyalty</strong>, éditée par First Digital Prod SARL, dont le siège est à Abidjan, Côte d&apos;Ivoire.
+            Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme <strong>Baobab Loyalty</strong>, éditée par First Digital Prod SARL, dont le siège est à Grand-Bassam, Côte d&apos;Ivoire.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
             Baobab Loyalty est une solution SaaS d&apos;engagement client destinée aux hôtels et établissements d&apos;hébergement, permettant de gérer des campagnes WhatsApp, de segmenter une base clients et de générer des réservations directes.

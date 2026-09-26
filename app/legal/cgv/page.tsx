@@ -145,7 +145,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Objet</h2>
           <p className="text-slate-600 leading-relaxed">
-            Les présentes Conditions Générales de Vente (CGV) régissent les ventes d&apos;abonnements à la plateforme Baobab Loyalty, éditée par First Digital Prod SARL, Abidjan, Côte d&apos;Ivoire.
+            Les présentes Conditions Générales de Vente (CGV) régissent les ventes d&apos;abonnements à la plateforme Baobab Loyalty, éditée par First Digital Prod SARL, Grand-Bassam, Côte d&apos;Ivoire.
           </p>
         </section>
 
