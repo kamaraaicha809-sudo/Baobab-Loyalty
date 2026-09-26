@@ -23,8 +23,8 @@ const markets = [
 ];
 
 const facts = [
-  { label: "Statut", value: "Baobab Loyalty SAS" },
-  { label: "Siège social", value: "Plateau, Abidjan, Côte d'Ivoire" },
+  { label: "Statut", value: "FIRST DIGITAL PROD SARL (Baobab Loyalty)" },
+  { label: "Siège social", value: "Grand-Bassam CAFOP 1, Côte d'Ivoire" },
   { label: "Secteur", value: "SaaS / Hôtellerie / Technologie pour l'Afrique" },
   { label: "Canal principal", value: "WhatsApp Business API" },
   { label: "Devise", value: "FCFA (XOF)" },

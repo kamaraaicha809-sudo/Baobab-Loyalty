@@ -103,10 +103,12 @@ export default function MentionsLegalesPage() {
             Le site <strong>baobabloyalty.com</strong> est édité par :
           </p>
           <ul className="mt-3 space-y-1 text-slate-600">
-            <li><strong>Raison sociale :</strong> First Digital Prod SARL</li>
+            <li><strong>Raison sociale :</strong> FIRST DIGITAL PROD SARL</li>
+            <li><strong>Forme juridique :</strong> Société à responsabilité limitée (SARL), capital de 10 000 000 FCFA</li>
             <li><strong>Solution éditée :</strong> Baobab Loyalty (SaaS d&apos;engagement client pour hôtels)</li>
-            <li><strong>Siège social :</strong> Plateau, Abidjan, Côte d&apos;Ivoire</li>
-            <li><strong>Numéro RCCM :</strong> En cours d&apos;enregistrement</li>
+            <li><strong>Siège social :</strong> Grand-Bassam CAFOP 1, 10 BP 605 ABJ 10, Côte d&apos;Ivoire</li>
+            <li><strong>Numéro RCCM :</strong> CI-BAS-01-2026-B12-00604</li>
+            <li><strong>Téléphone :</strong> +225 74 85 11 23</li>
             <li><strong>Email :</strong> <a href="mailto:legal@baobabloyalty.com" className="text-primary hover:underline">legal@baobabloyalty.com</a></li>
           </ul>
         </section>
