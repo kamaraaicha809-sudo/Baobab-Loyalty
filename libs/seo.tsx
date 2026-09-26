@@ -199,7 +199,7 @@ export const renderOrganizationSchema = () => {
           // inventer une liste ici tant que ce n'est pas validé.
           ...(config.region !== "europe" && {
             legalName: "FIRST DIGITAL PROD SARL",
-            telephone: "+22574851123",
+            telephone: "+2250574851123",
             address: {
               "@type": "PostalAddress",
               streetAddress: "CAFOP 1, 10 BP 605 ABJ 10",

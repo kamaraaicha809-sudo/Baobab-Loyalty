@@ -108,7 +108,7 @@ export default function MentionsLegalesPage() {
             <li><strong>Solution éditée :</strong> Baobab Loyalty (SaaS d&apos;engagement client pour hôtels)</li>
             <li><strong>Siège social :</strong> Grand-Bassam CAFOP 1, 10 BP 605 ABJ 10, Côte d&apos;Ivoire</li>
             <li><strong>Numéro RCCM :</strong> CI-BAS-01-2026-B12-00604</li>
-            <li><strong>Téléphone :</strong> +225 74 85 11 23</li>
+            <li><strong>Téléphone :</strong> +225 05 74 85 11 23</li>
             <li><strong>Email :</strong> <a href="mailto:legal@baobabloyalty.com" className="text-primary hover:underline">legal@baobabloyalty.com</a></li>
           </ul>
         </section>
