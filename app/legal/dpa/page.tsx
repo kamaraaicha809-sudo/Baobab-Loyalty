@@ -195,10 +195,10 @@ export default function DPAPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 27 août 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <h1 className="text-3xl font-bold text-slate-900 mb-4">Accord de sous-traitance des données (DPA)</h1>
       <p className="text-slate-500 mb-10">
-        Ce document précise les rôles et obligations de chaque partie concernant les données personnelles des clients de l&apos;hôtel traitées via Baobab Loyalty. Il fait partie intégrante des <a href="/legal/cgu" className="text-primary hover:underline">CGU</a> et des <a href="/legal/cgv" className="text-primary hover:underline">CGV</a> et s&apos;applique automatiquement à tout compte hôtelier créé sur la plateforme.
+        Ce document précise les rôles et obligations de chaque partie concernant les données personnelles des clients de l&apos;hôtel traitées via Baobab Loyalty. Il fait partie intégrante des <a href="/legal/cgu" className="text-primary hover:underline">CGU</a> et des <a href="/legal/cgv" className="text-primary hover:underline">CGV</a>. Il est accepté expressément par l&apos;hôtel lors de la première connexion à l&apos;espace hôtelier (case à cocher, date et version enregistrées). Il est établi au regard de la loi ivoirienne n° 2013-450 du 19 juin 2013 relative à la protection des données à caractère personnel.
       </p>
 
       <div className="prose prose-slate max-w-none space-y-8">
@@ -233,7 +233,7 @@ export default function DPAPage() {
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200 font-medium text-slate-700">Catégories de données</td>
-                  <td className="p-3 border border-slate-200">Nom, numéro de téléphone/WhatsApp, email, date et fréquence de séjour, historique de réservation</td>
+                  <td className="p-3 border border-slate-200">Nom, numéro de téléphone/WhatsApp, email, date et fréquence de séjour, historique de réservation, date de naissance (si l&apos;hôtel la renseigne), accord du client pour recevoir les offres par WhatsApp (date et source)</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium text-slate-700">Durée du traitement</td>
@@ -295,7 +295,7 @@ export default function DPAPage() {
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200">OpenRouter</td>
-                  <td className="p-3 border border-slate-200">Génération assistée par IA des messages de campagne</td>
+                  <td className="p-3 border border-slate-200">Génération assistée par IA des messages de campagne (reçoit le type d&apos;offre, le segment et le nom de l&apos;hôtel, jamais les données des clients)</td>
                   <td className="p-3 border border-slate-200">États-Unis</td>
                 </tr>
                 <tr className="bg-slate-50">
@@ -308,6 +308,9 @@ export default function DPAPage() {
           </div>
           <p className="text-slate-600 leading-relaxed mt-3">
             Baobab Loyalty informera l&apos;hôtel de tout changement prévu concernant l&apos;ajout ou le remplacement d&apos;un sous-traitant ultérieur, lui donnant ainsi la possibilité de s&apos;y opposer.
+          </p>
+          <p className="text-slate-600 leading-relaxed mt-3">
+            Ces prestataires sont situés hors de la CEDEAO. Conformément à la loi n° 2013-450 (articles 7 et 26), ces transferts de données sont soumis à l&apos;autorisation préalable de l&apos;ARTCI. First Digital Prod SARL prépare sa demande d&apos;autorisation ; sa référence sera indiquée ici dès sa délivrance.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
             PostHog (mesure d&apos;audience du site public de Baobab Loyalty) n&apos;apparaît pas
@@ -328,6 +331,9 @@ export default function DPAPage() {
           <h2 className="text-xl font-semibold text-slate-800 mb-3">6. Obligations de l&apos;hôtel (responsable de traitement)</h2>
           <ul className="space-y-2 text-slate-600 list-disc list-inside">
             <li>S&apos;assurer que les données de ses clients importées dans Baobab Loyalty ont été collectées licitement</li>
+            <li>Recueillir l&apos;accord préalable de chaque client avant de lui envoyer des offres par WhatsApp, et enregistrer cet accord dans Baobab Loyalty (loi n° 2013-546 du 30 juillet 2013, art. 14). Un client sans accord enregistré ne reçoit aucune campagne</li>
+            <li>Ne pas utiliser à des fins de prospection les données recueillies pour la fiche de police sans l&apos;accord du client ; le registre numérique de Baobab Loyalty ne remplace pas cette fiche</li>
+            <li>Effectuer, en tant que responsable de traitement, ses propres formalités auprès de l&apos;ARTCI pour son fichier clients (loi n° 2013-450)</li>
             <li>Informer ses clients de l&apos;utilisation de leurs coordonnées pour des campagnes de fidélisation (WhatsApp/email)</li>
             <li>Traiter les demandes d&apos;opposition ou de désinscription reçues directement de ses clients, avec l&apos;assistance de Baobab Loyalty le cas échéant</li>
             <li>Ne pas importer de catégories de données non nécessaires à la finalité du service</li>

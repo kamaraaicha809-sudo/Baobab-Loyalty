@@ -44,9 +44,9 @@ Dans le cadre de votre séjour dans notre établissement, nous collectons et uti
 
 ### Sur quelle base légale traitons-nous vos données ?
 
-Nous traitons vos données sur la base de notre **intérêt légitime** à fidéliser notre clientèle et à maintenir une relation commerciale avec vous.
+Nous ne vous envoyons des offres par WhatsApp que si vous nous avez donné votre **accord préalable** (par exemple à la réception ou lors de votre réservation), conformément à la loi ivoirienne n° 2013-546 (article 14). Vous pouvez retirer cet accord à tout moment, gratuitement, grâce au lien présent dans chaque message ou en répondant STOP.
 
-[Optionnel si consentement : *Nous recueillons également votre consentement explicite au moment du check-in.*]
+La conservation de votre historique de séjour repose sur notre intérêt légitime à gérer la relation avec nos clients.
 
 ---
 

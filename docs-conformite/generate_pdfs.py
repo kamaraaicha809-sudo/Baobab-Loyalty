@@ -262,7 +262,7 @@ def write_dpa(output_path):
     pdf.table(
         ["Champ", "Information"],
         [
-            ["Raison sociale", "Baobab Loyalty"],
+            ["Raison sociale", "First Digital Prod SARL (nom commercial : Baobab Loyalty) — RCCM CI-BAS-01-2026-B12-00604"],
             ["Email", "support@baobabloyalty.com"],
             ["Site web", "baobabloyalty.com"],
         ],
@@ -391,10 +391,16 @@ def write_guide(output_path):
             ["Categories de donnees", "Nom, email, telephone, date de derniere visite"],
             ["Destinataires", "Baobab Loyalty (sous-traitant), WhatsApp Business API"],
             ["Duree de conservation", "Duree de l'abonnement actif Baobab Loyalty"],
-            ["Transferts hors CI", "Oui — vers serveurs AWS EU West (Irlande) — proteges par RGPD"],
+            ["Transferts hors CEDEAO", "Oui — Irlande (Supabase) et Etats-Unis (Meta, Vercel) — autorisation prealable ARTCI obligatoire (art. 7 et 26)"],
             ["Mesures de securite", "Chiffrement TLS, JWT, RLS PostgreSQL"],
         ],
         [80, 106]
+    )
+    pdf.info_box(
+        "Accord prealable de chaque client obligatoire avant tout message WhatsApp (loi n 2013-546, art. 14). "
+        "Formulaires : www.autoritedeprotection.ci. Frais de dossier : decision ARTCI n 2016-0201. "
+        "Transfert hors CEDEAO : attendre l'autorisation ecrite de l'ARTCI (une absence de reponse ne vaut pas accord).",
+        "warning"
     )
 
     pdf.section_title("SENEGAL — Declaration a la CDP", level=2)
@@ -417,7 +423,9 @@ def write_guide(output_path):
         [
             ["Signer le DPA", "OUI", "OUI", "OUI", "OUI", "Immediat"],
             ["Notice clients", "OUI", "OUI", "OUI", "OUI", "Avant import"],
+            ["Accord WhatsApp client", "OUI", "—", "—", "—", "Avant tout envoi"],
             ["Declaration ARTCI", "OUI", "—", "—", "—", "Avant utilisation"],
+            ["Autorisation transfert", "OUI", "—", "—", "—", "Avant utilisation"],
             ["Declaration CDP", "—", "OUI", "—", "—", "Avant utilisation"],
             ["Declaration CNDP", "—", "—", "OUI", "—", "Avant utilisation"],
             ["Registre traitements", "Recommande", "Recommande", "Recommande", "Obligatoire", "Avant import"],
@@ -520,7 +528,8 @@ def write_notice(output_path):
             ["Finalite du traitement", "Fidelisation clientele hoteliere par communications WhatsApp personnalisees"],
             ["Donnees traitees", "Nom, telephone/WhatsApp, email, date de derniere visite"],
             ["Sous-traitant", "Baobab Loyalty (contrat de sous-traitance signe)"],
-            ["Transfert hors CI", "Oui — serveurs AWS EU West (Irlande) — proteges par RGPD"],
+            ["Transfert hors CEDEAO", "Oui — Irlande et Etats-Unis — autorisation ARTCI n [a completer]"],
+            ["Accord WhatsApp", "Offres envoyees uniquement avec votre accord prealable, retirable a tout moment (STOP)"],
             ["N declaration ARTCI", "[A completer apres depot de la declaration]"],
             ["Duree de conservation", "[X annees] a compter de votre dernier sejour"],
         ],
@@ -596,8 +605,8 @@ def write_artci(output_path):
         "prospection commerciale (offres promotionnelles, reductions, surclassements) via WhatsApp."
     )
     pdf.body_text(
-        "Base legale : Interet legitime du responsable de traitement (fidelisation de la clientele "
-        "existante) — Article 5 de la Loi n 2013-450."
+        "Base legale : consentement prealable de chaque client pour la prospection par WhatsApp "
+        "(loi n 2013-546 du 30 juillet 2013, article 14). Un client sans accord ne recoit aucun message."
     )
 
     pdf.section_title("SECTION 4 — CATEGORIES DE DONNEES TRAITEES")
@@ -609,6 +618,8 @@ def write_artci(output_path):
             ["Coordonnees", "Numero de telephone mobile", "Facultatif"],
             ["Coordonnees", "Numero WhatsApp", "Obligatoire pour l'envoi"],
             ["Historique", "Date du dernier sejour", "Obligatoire"],
+            ["Date de naissance", "Pour le message d'anniversaire", "Facultatif"],
+            ["Accord WhatsApp", "Oui/non, date et source de l'accord", "Obligatoire"],
             ["Notes internes", "Commentaires de l'hotelier (usage interne)", "Facultatif"],
         ],
         [50, 96, 40]
@@ -621,21 +632,25 @@ def write_artci(output_path):
         ["Destinataire", "Qualite", "Donnees transmises", "Localisation"],
         [
             ["[Nom de l'hotel]", "Responsable de traitement", "Toutes les donnees", "Cote d'Ivoire"],
-            ["Baobab Loyalty", "Sous-traitant", "Toutes (gestion technique)", "Hebergement EU"],
-            ["WhatsApp (Meta)", "Destinataire envoi", "Numero de telephone", "Etats-Unis"],
+            ["Baobab Loyalty", "Sous-traitant", "Toutes (gestion technique)", "Base en Irlande"],
+            ["WhatsApp (Meta)", "Sous-traitant ulterieur", "Numero WhatsApp, message", "Etats-Unis"],
+            ["Vercel", "Sous-traitant ulterieur", "Donnees affichees", "Etats-Unis"],
         ],
         [40, 40, 60, 46]
     )
 
     pdf.section_title("SECTION 7 — TRANSFERTS INTERNATIONAUX DE DONNEES")
-    pdf.info_box("Y a-t-il un transfert hors de Cote d'Ivoire ? OUI", "warning")
+    pdf.info_box(
+        "Transfert hors CEDEAO : OUI. Autorisation prealable de l'ARTCI obligatoire (loi n 2013-450, art. 7 et 26) — "
+        "formulaire 'Demande de transfert de donnees' sur www.autoritedeprotection.ci.",
+        "warning"
+    )
     pdf.table(
         ["Element", "Detail"],
         [
-            ["Pays destinataire", "Union Europeenne (Irlande)"],
-            ["Organisme", "Amazon Web Services EMEA SARL (via Supabase Inc.)"],
-            ["Garanties offertes", "RGPD (UE 2016/679) — niveau de protection superieur a la Loi 2013-450"],
-            ["Mecanisme de transfert", "Clauses Contractuelles Types (CCT) de la Commission Europeenne"],
+            ["Irlande (UE)", "Supabase Inc. (AWS eu-west-1) — toutes les donnees clients — RGPD + CCT"],
+            ["Etats-Unis", "Meta Platforms (WhatsApp) — numero WhatsApp et message"],
+            ["Etats-Unis", "Vercel Inc. — hebergement de l'application"],
         ],
         [70, 116]
     )
@@ -686,7 +701,7 @@ def write_registre(output_path):
     pdf.table(
         ["Champ", "Information"],
         [
-            ["Raison sociale", "Baobab Loyalty"],
+            ["Raison sociale", "First Digital Prod SARL (nom commercial : Baobab Loyalty) — RCCM CI-BAS-01-2026-B12-00604"],
             ["Role", "Sous-traitant (donnees clients hotels) ET Responsable de traitement (donnees abonnes)"],
             ["Contact DPO", "support@baobabloyalty.com"],
         ],
@@ -703,8 +718,8 @@ def write_registre(output_path):
     for ref, title, details in [
         ("ST-01", "Gestion de la base clients hoteliere", [
             ("Finalite", "Stocker, segmenter et gerer la base clients pour campagnes WhatsApp"),
-            ("Base legale", "Interet legitime de l'hotelier (Article 6.1.f RGPD)"),
-            ("Donnees traitees", "Nom, email, telephone, WhatsApp, date de derniere visite, notes"),
+            ("Base legale", "Interet legitime (fichier clients) ; consentement prealable pour la prospection WhatsApp (loi CI n 2013-546, art. 14)"),
+            ("Donnees traitees", "Nom, email, telephone, WhatsApp, date de derniere visite, date de naissance, accord WhatsApp, notes"),
             ("Personnes concernees", "Clients (voyageurs) des hotels abonnes"),
             ("Duree de conservation", "Duree du compte actif + 30 jours apres resiliation"),
             ("Hebergement", "Supabase Inc. — AWS EU West (Irlande)"),
@@ -712,6 +727,7 @@ def write_registre(output_path):
         ]),
         ("ST-02", "Envoi de campagnes WhatsApp", [
             ("Finalite", "Transmettre des messages commerciaux personnalises aux clients des hotels"),
+            ("Base legale", "Consentement prealable du client — sans accord enregistre, aucun envoi"),
             ("Donnees traitees", "Numero de telephone/WhatsApp du client, texte du message"),
             ("Duree des logs", "3 ans apres l'envoi (tracabilite)"),
             ("Sous-traitant", "WhatsApp Business API (Meta Platforms)"),

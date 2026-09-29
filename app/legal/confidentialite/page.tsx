@@ -220,7 +220,7 @@ export default function ConfidentialitePage() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 12 avril 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <h1 className="text-3xl font-bold text-slate-900 mb-10">Politique de Confidentialité</h1>
 
       <div className="prose prose-slate max-w-none space-y-8">
@@ -305,7 +305,10 @@ export default function ConfidentialitePage() {
             <li><strong>L&apos;intérêt légitime</strong> : pour améliorer le service et prévenir la fraude</li>
           </ul>
           <p className="text-slate-600 leading-relaxed mt-3">
-            Le traitement est conforme à la législation ivoirienne en vigueur sur la protection des données personnelles.
+            Ces traitements sont soumis à la loi ivoirienne n° 2013-450 du 19 juin 2013 relative à la protection des données à caractère personnel. Les formalités préalables auprès de l&apos;ARTCI (déclaration des traitements et autorisation de transfert des données hors CEDEAO) sont en préparation ; leurs références seront indiquées sur cette page dès leur délivrance.
+          </p>
+          <p className="text-slate-600 leading-relaxed mt-3">
+            Les données des clients des hôtels (voyageurs) sont traitées par Baobab Loyalty pour le compte de chaque hôtel, qui en est responsable : voir l&apos;<a href="/legal/dpa" className="text-primary hover:underline">accord de sous-traitance (DPA)</a>. Un voyageur ne reçoit des offres par WhatsApp que s&apos;il a donné son accord préalable à l&apos;hôtel.
           </p>
         </section>
 
@@ -361,7 +364,7 @@ export default function ConfidentialitePage() {
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">OpenRouter</td>
-                  <td className="p-3 border border-slate-200">Génération de messages IA</td>
+                  <td className="p-3 border border-slate-200">Génération de messages IA (reçoit le type d&apos;offre et le nom de l&apos;hôtel, jamais les données des clients)</td>
                   <td className="p-3 border border-slate-200">États-Unis</td>
                 </tr>
                 <tr>
@@ -377,7 +380,7 @@ export default function ConfidentialitePage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">7. Vos droits</h2>
           <p className="text-slate-600 leading-relaxed mb-3">
-            Conformément à la législation applicable, vous disposez des droits suivants :
+            Conformément à la loi n° 2013-450, vous disposez des droits suivants :
           </p>
           <ul className="space-y-2 text-slate-600 list-disc list-inside">
             <li><strong>Droit d&apos;accès :</strong> obtenir une copie de vos données</li>
@@ -388,6 +391,9 @@ export default function ConfidentialitePage() {
           </ul>
           <p className="text-slate-600 leading-relaxed mt-3">
             Pour exercer ces droits, contactez-nous à : <a href="mailto:legal@baobabloyalty.com" className="text-primary hover:underline">legal@baobabloyalty.com</a>
+          </p>
+          <p className="text-slate-600 leading-relaxed mt-3">
+            Vous pouvez vous opposer sans frais et sans justification à toute prospection commerciale. Vous pouvez également adresser une réclamation à l&apos;ARTCI, autorité de protection des données personnelles en Côte d&apos;Ivoire (<a href="https://www.artci.ci" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">www.artci.ci</a>).
           </p>
         </section>
 

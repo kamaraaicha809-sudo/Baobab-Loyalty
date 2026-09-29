@@ -126,7 +126,7 @@ Mettre à la disposition de l'Hôtelier toutes les informations nécessaires pou
 L'Hôtelier s'engage à :
 
 ### 4.1 Licéité du traitement
-S'assurer qu'il dispose d'une base légale valable pour traiter les données de ses clients (intérêt légitime, consentement, exécution du contrat de séjour).
+S'assurer qu'il dispose d'une base légale valable pour traiter les données de ses clients. En Côte d'Ivoire, l'envoi d'offres par WhatsApp exige le **consentement préalable** de chaque client (loi n° 2013-546 du 30 juillet 2013, article 14) : l'Hôtelier recueille cet accord et l'enregistre dans Baobab Loyalty avant tout envoi. Les données recueillies pour la fiche de police ne sont pas utilisées à des fins de prospection sans l'accord du client.
 
 ### 4.2 Information des personnes concernées
 Informer ses clients (voyageurs) du traitement de leurs données et de leur transmission à Baobab Loyalty, conformément à la Notice d'Information jointe en Annexe 1.
@@ -161,11 +161,11 @@ Baobab Loyalty s'assure que ces sous-traitants ultérieurs présentent des garan
 
 ## ARTICLE 6 — TRANSFERTS INTERNATIONAUX DE DONNÉES
 
-Les données sont hébergées sur des serveurs AWS situés en **EU West (Irlande / Europe de l'Ouest)**, soumis au RGPD européen.
+Les données sont hébergées sur des serveurs AWS situés en **EU West (Irlande / Europe de l'Ouest)**, soumis au RGPD européen, et certains sous-traitants ultérieurs sont situés aux États-Unis (article 5).
 
 Ce transfert est encadré par :
 - Les clauses contractuelles types (SCCs) de la Commission Européenne intégrées aux conditions d'utilisation de Supabase
-- Le niveau de protection adéquat offert par le RGPD, supérieur aux exigences minimales de la Loi n° 2013-450
+- Pour la Côte d'Ivoire : l'autorisation préalable de l'ARTCI, obligatoire pour tout transfert hors CEDEAO (loi n° 2013-450, articles 7 et 26). Chaque partie dépose la demande correspondant aux traitements dont elle est responsable.
 
 L'Hôtelier est informé de ce transfert international et l'accepte en signant le présent contrat.
 

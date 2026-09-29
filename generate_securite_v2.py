@@ -577,16 +577,16 @@ def build(output_path):
             ["Union Europeenne", "RGPD — Reglement (UE) 2016/679", "CNIL", "Conforme — RGPD applique directement"],
             ["Senegal", "Loi n 2008-12 du 25 janv. 2008", "CDP — www.cdp.sn", "Conforme sous reserve declaration CDP"],
             ["Maroc", "Loi n 09-08 du 18 fevr. 2009", "CNDP — www.cndp.ma", "Conforme — accord partiel UE/Maroc"],
-            ["Cote d'Ivoire", "Loi n 2013-450 du 19 juin 2013", "ARTCI — www.artci.ci", "Conforme — declaration ARTCI requise"],
+            ["Cote d'Ivoire", "Loi n 2013-450 du 19 juin 2013", "ARTCI — www.artci.ci", "Declaration + autorisation de transfert ARTCI requises"],
             ["Cameroun", "Loi n 2010/021", "—", "Conforme — meme logique que CI"],
         ],
         [28, 48, 40, 70]
     )
     pdf.box(
-        "Point critique Cote d'Ivoire : Le niveau de protection RGPD est superieur a la Loi n 2013-450, "
-        "mais le transfert de donnees hors de CI doit faire l'objet d'une declaration prealable a l'ARTCI "
-        "(Articles 8 a 14). Cette obligation est a la charge de l'hotelier. Un formulaire pre-rempli est "
-        "disponible (Document 04 — Declaration ARTCI).",
+        "Point critique Cote d'Ivoire : tout transfert de donnees hors CEDEAO (Irlande, Etats-Unis) "
+        "est soumis a l'AUTORISATION PREALABLE de l'ARTCI (loi n 2013-450, articles 7 et 26), en plus de "
+        "la declaration du traitement. Chaque partie depose la demande pour les traitements dont elle est "
+        "responsable. Un formulaire pre-rempli est disponible (Document 04 — Declaration ARTCI).",
         "warn"
     )
 
@@ -620,14 +620,17 @@ def build(output_path):
             ["Categories de donnees", "Nom, email, telephone, date de derniere visite"],
             ["Destinataires", "Baobab Loyalty (sous-traitant), WhatsApp Business API"],
             ["Duree de conservation", "Duree de l'abonnement actif Baobab Loyalty"],
-            ["Transferts hors CI", "Oui — vers serveurs AWS EU West (Irlande) — proteges par RGPD"],
+            ["Transferts hors CEDEAO", "Oui — Irlande (Supabase) et Etats-Unis (Meta, Vercel) — autorisation prealable ARTCI obligatoire"],
             ["Mesures de securite", "Chiffrement TLS, JWT, RLS PostgreSQL"],
         ],
         [80, 106]
     )
     pdf.body(
-        "Delai de reponse ARTCI : 1 mois (sans reponse = declaration acceptee). Gratuit.\n"
-        "Adresse : Tour Postel 2001, Avenue Marchand, Abidjan-Plateau — www.artci.ci"
+        "Accord prealable de chaque client obligatoire avant tout message WhatsApp (loi n 2013-546, art. 14).\n"
+        "Delai ARTCI : 1 mois, prolongeable d'1 mois. Pour le transfert hors CEDEAO, attendre l'autorisation "
+        "ecrite (une absence de reponse ne vaut pas accord). Frais de dossier fixes par la decision ARTCI "
+        "n 2016-0201.\n"
+        "Formulaires : www.autoritedeprotection.ci — www.artci.ci"
     )
 
     pdf.section("10.3", "Declaration CDP — Senegal", level=2)
@@ -687,7 +690,7 @@ def build(output_path):
     pdf.table(
         ["Obligation", "Detail"],
         [
-            ["Liceite du traitement", "Disposer d'une base legale valable (interet legitime, consentement)"],
+            ["Liceite du traitement", "Base legale valable ; accord prealable de chaque client pour la prospection WhatsApp (loi CI n 2013-546, art. 14)"],
             ["Information des clients", "Informer les voyageurs du traitement et de la transmission a Baobab Loyalty"],
             ["Declarations reglementaires", "Effectuer les declarations ARTCI / CDP / CNDP selon son pays"],
             ["Qualite des donnees", "S'assurer de l'exactitude des donnees importees"],
@@ -731,7 +734,7 @@ def build(output_path):
             ["Finalite", "Fidelisation clientele hoteliere par communications WhatsApp personnalisees"],
             ["Donnees traitees", "Nom, telephone/WhatsApp, email, date de derniere visite"],
             ["Sous-traitant", "Baobab Loyalty (contrat de sous-traitance signe)"],
-            ["Transfert hors CI", "Oui — serveurs AWS EU West (Irlande) — proteges par RGPD. N declaration ARTCI : [...]"],
+            ["Transfert hors CEDEAO", "Oui — Irlande et Etats-Unis. N autorisation ARTCI : [...] ; N declaration ARTCI : [...]"],
             ["Droits", "Acces, rectification, opposition (Articles 22 a 29 Loi 2013-450) — contact : [email hotel]"],
             ["Reclamations", "ARTCI — Tour Postel 2001, Avenue Marchand, Abidjan-Plateau — www.artci.ci"],
         ],

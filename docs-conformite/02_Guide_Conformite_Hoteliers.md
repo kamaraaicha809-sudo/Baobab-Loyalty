@@ -1,7 +1,7 @@
 # Guide de Conformité — Protection des Données Personnelles
 ## À destination des Hôteliers utilisant Baobab Loyalty
 
-**Version 1.0 — Avril 2026**
+**Version 1.1 — Septembre 2026**
 
 ---
 
@@ -49,6 +49,22 @@ Vos clients (les voyageurs) ont le droit de savoir que vous utilisez leurs donn�
 
 ---
 
+## ÉTAPE 2 bis — Recueillir l'accord de vos clients avant tout message WhatsApp
+
+**Obligatoire en Côte d'Ivoire.**
+
+La loi n° 2013-546 du 30 juillet 2013 (transactions électroniques), article 14, interdit d'envoyer des offres par SMS, WhatsApp ou tout autre moyen électronique à une personne qui n'a pas donné son accord **avant**. L'exception « clients existants » ne vaut que pour l'email. Les sanctions sont pénales.
+
+**Comment faire dans Baobab Loyalty :**
+- À la réception, dans le **registre numérique**, cochez « Le client accepte de recevoir les offres de l'hôtel par WhatsApp » uniquement s'il vient de vous donner son accord.
+- À l'import CSV, ajoutez une colonne `consentement_whatsapp` (oui / non), et si possible `date_consentement` et `source_consentement`. Vous pouvez aussi certifier que tous les clients du fichier ont donné leur accord : cette déclaration engage votre hôtel.
+- Un client sans accord est bien importé, mais ne reçoit **aucune** campagne ni message d'anniversaire.
+- Chaque message contient un lien de désinscription ; le mot STOP fonctionne aussi.
+
+**Attention à la fiche de police :** les informations remplies pour la fiche de police (désormais la plateforme HORA de la Police nationale) servent à la sécurité. Vous ne pouvez pas les utiliser pour de la prospection sans l'accord du client. Le registre de Baobab Loyalty ne remplace pas la fiche de police.
+
+---
+
 ## ÉTAPE 3 — Déclarer votre traitement à l'autorité compétente
 
 **Obligatoire selon votre pays. Voir le tableau ci-dessous.**
@@ -57,32 +73,31 @@ Vos clients (les voyageurs) ont le droit de savoir que vous utilisez leurs donn�
 
 ### CÔTE D'IVOIRE — Déclaration à l'ARTCI
 
-**Base légale :** Loi n° 2013-450 du 19 juin 2013, Articles 8 à 14
+**Base légale :** Loi n° 2013-450 du 19 juin 2013 relative à la protection des données à caractère personnel. Tout traitement de données personnelles doit être déclaré ou autorisé **avant** de commencer.
 
 **Ce que vous devez faire :**
 
-1. **Télécharger** le formulaire de déclaration sur le site de l'ARTCI : www.artci.ci
-2. **Remplir** le formulaire avec les informations de votre hôtel (voir Document 04 — Formulaire pré-rempli)
-3. **Déposer** le formulaire :
-   - En ligne sur le portail ARTCI (si disponible)
-   - Ou en personne à l'ARTCI : Tour Postel 2001, Avenue Marchand, Abidjan-Plateau
-   - Ou par courrier recommandé à l'adresse ci-dessus
-4. **Conserver** l'accusé de réception de l'ARTCI
+1. **Télécharger** les formulaires sur le site de l'Autorité de protection : www.autoritedeprotection.ci (rubrique « Formulaires ») — déclaration, demande d'autorisation et **demande de transfert de données**
+2. **Remplir** les formulaires avec les informations de votre hôtel (voir Document 04 — Formulaire pré-rempli)
+3. **Déposer** le dossier en ligne ou à l'ARTCI (Abidjan-Plateau), et **payer les frais de dossier** (fixés par la décision ARTCI n° 2016-0201 — demandez le montant en vigueur au moment du dépôt)
+4. **Conserver** l'accusé de réception, puis la décision de l'ARTCI
 
 **Informations clés pour remplir le formulaire :**
 
 | Champ | Ce que vous indiquez |
 |-------|---------------------|
-| Finalité du traitement | "Fidélisation clientèle hôtelière par communications WhatsApp" |
-| Catégories de données | Nom, email, téléphone, date de dernière visite |
-| Destinataires | Baobab Loyalty (sous-traitant), WhatsApp Business API |
+| Finalité du traitement | "Fidélisation clientèle hôtelière par communications WhatsApp, avec accord préalable du client" |
+| Catégories de données | Nom, email, téléphone/WhatsApp, date de dernière visite, date de naissance (si utilisée), accord WhatsApp |
+| Destinataires | Baobab Loyalty (sous-traitant), Meta (WhatsApp Business Platform) |
 | Durée de conservation | Durée de l'abonnement actif Baobab Loyalty |
-| Transferts hors CI | Oui — vers serveurs AWS EU West (Irlande) — protégés par RGPD |
-| Mesures de sécurité | Chiffrement TLS, authentification JWT, isolation RLS PostgreSQL |
+| Transferts hors CEDEAO | Oui — Irlande (base de données Supabase, infrastructure AWS) et États-Unis (Meta, Vercel, Resend) |
+| Mesures de sécurité | Chiffrement TLS, authentification, cloisonnement des données par hôtel (RLS PostgreSQL) |
 
-**Délai de réponse ARTCI :** L'ARTCI dispose d'un délai de 1 mois pour répondre. Sans réponse, la déclaration est considérée comme acceptée (déclaration simple). Pour les traitements soumis à autorisation préalable (données sensibles), le délai est de 2 mois.
+**Transfert hors CEDEAO — autorisation obligatoire :** les données de vos clients sont stockées en Irlande et transitent par des services situés aux États-Unis. Tout transfert vers un pays hors CEDEAO est soumis à une **autorisation préalable de l'ARTCI** (articles 7 et 26 de la loi). Le traitement ne peut commencer qu'après réception de cette autorisation, notifiée par courrier.
 
-**Coût :** Gratuit pour une déclaration simple.
+**Délai de réponse ARTCI :** l'ARTCI statue dans un délai d'un mois, prolongeable d'un mois par décision motivée. Ne considérez pas une absence de réponse comme un accord : attendez la décision écrite.
+
+**Sanctions en cas de manquement :** jusqu'à 10 millions de FCFA, et jusqu'à 5 % du chiffre d'affaires en cas de récidive.
 
 ---
 
@@ -164,7 +179,9 @@ Les personnes ayant accès à Baobab Loyalty (réceptionnistes, directeur) doive
 |--------|:---:|:---:|:---:|:---:|----------|
 | Signer le DPA | ✓ | ✓ | ✓ | ✓ | Immédiat |
 | Notice d'information clients | ✓ | ✓ | ✓ | ✓ | Avant import |
+| Accord préalable WhatsApp de chaque client | ✓ | — | — | — | Avant tout envoi |
 | Déclaration ARTCI | ✓ | — | — | — | Avant utilisation |
+| Autorisation ARTCI de transfert hors CEDEAO | ✓ | — | — | — | Avant utilisation |
 | Déclaration CDP | — | ✓ | — | — | Avant utilisation |
 | Déclaration/Autorisation CNDP | — | — | ✓ | — | Avant utilisation |
 | Registre des traitements | Recommandé | Recommandé | Recommandé | Obligatoire | Avant import |
@@ -177,7 +194,7 @@ Les personnes ayant accès à Baobab Loyalty (réceptionnistes, directeur) doive
 
 Si vous suspectez que des données de vos clients ont été compromises :
 
-1. **Contactez immédiatement Baobab Loyalty :** support@baobabloyalty.com ou +XXX XXX XXX XXX
+1. **Contactez immédiatement Baobab Loyalty :** support@baobabloyalty.com ou +225 05 74 85 11 23
 2. **Baobab Loyalty** vous notifiera dans les 72 heures avec un rapport d'incident
 3. **Vous devez notifier** l'autorité de protection des données de votre pays dans les délais légaux :
    - Côte d'Ivoire (ARTCI) : sans délai précis légalement fixé, mais le plus tôt possible
@@ -192,7 +209,7 @@ Si vous suspectez que des données de vos clients ont été compromises :
 
 | Autorité | Pays | Site web | Email / Tél |
 |----------|------|----------|------------|
-| ARTCI | Côte d'Ivoire | www.artci.ci | — |
+| ARTCI | Côte d'Ivoire | www.artci.ci — www.autoritedeprotection.ci | — |
 | CDP | Sénégal | www.cdp.sn | cdp@cdp.sn |
 | CNDP | Maroc | www.cndp.ma | — |
 | CNIL | France | www.cnil.fr | — |
@@ -200,5 +217,5 @@ Si vous suspectez que des données de vos clients ont été compromises :
 
 ---
 
-*Document établi par Baobab Loyalty — Avril 2026*
+*Document établi par Baobab Loyalty (First Digital Prod SARL) — Septembre 2026*
 *Ce guide est fourni à titre informatif et ne constitue pas un conseil juridique. Pour toute situation complexe, consultez un juriste spécialisé en protection des données.*

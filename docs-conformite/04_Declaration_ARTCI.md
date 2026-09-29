@@ -3,9 +3,10 @@
 ## Template pré-rempli pour les hôteliers utilisant Baobab Loyalty
 
 **À déposer auprès de :**
-Autorité de Régulation des Télécommunications/TIC de Côte d'Ivoire (ARTCI)
-Tour Postel 2001, Avenue Marchand, Abidjan-Plateau
-www.artci.ci
+Autorité de Régulation des Télécommunications/TIC de Côte d'Ivoire (ARTCI), en sa qualité d'autorité de protection des données personnelles
+Abidjan-Plateau — www.artci.ci — formulaires officiels : www.autoritedeprotection.ci (rubrique « Formulaires »)
+
+> **Deux dossiers sont nécessaires :** (1) la déclaration ou demande d'autorisation du traitement, et (2) la **demande d'autorisation de transfert de données** hors CEDEAO (formulaire distinct), car les données sont hébergées en Irlande et transitent par des services situés aux États-Unis.
 
 ---
 
@@ -36,7 +37,7 @@ www.artci.ci
 
 | Champ | À remplir |
 |-------|-----------|
-| Nom du DPO / correspondant | **[Nom, ou indiquer "Non désigné" si hôtel < 50 salariés]** |
+| Nom du correspondant à la protection des données | **[Nom, ou indiquer "Non désigné"]** |
 | Email du DPO | **[Email, ou laisser vide]** |
 
 ---
@@ -63,12 +64,12 @@ www.artci.ci
 
 Cochez la case applicable :
 
-- [x] **Intérêt légitime** du responsable de traitement (fidélisation de la clientèle existante)
-- [ ] Consentement de la personne concernée
+- [ ] Intérêt légitime du responsable de traitement
+- [x] **Consentement préalable de la personne concernée**
 - [ ] Exécution d'un contrat
 - [ ] Obligation légale
 
-> **Précision :** Le traitement est fondé sur l'intérêt légitime de l'hôtel à entretenir une relation commerciale avec ses clients ayant déjà séjourné dans l'établissement. Conformément à l'Article 5 de la Loi n° 2013-450, cet intérêt légitime est proportionné à la finalité poursuivie.
+> **Précision :** L'envoi d'offres par WhatsApp est une prospection directe par voie électronique. La loi n° 2013-546 du 30 juillet 2013 (article 14) exige le consentement préalable de chaque client ; l'exception « clients existants » ne vaut que pour l'email. L'accord de chaque client est enregistré dans Baobab Loyalty (date et source) et un client sans accord ne reçoit aucun message. Chaque message contient un moyen gratuit de s'opposer (lien de désinscription, mot STOP — article 15).
 
 ---
 
@@ -81,6 +82,8 @@ Cochez la case applicable :
 | Coordonnées | Numéro de téléphone mobile | Facultatif |
 | Coordonnées | Numéro WhatsApp | Obligatoire pour l'envoi |
 | Historique | Date du dernier séjour dans l'hôtel | Obligatoire |
+| Date de naissance | Pour le message d'anniversaire | Facultatif |
+| Accord WhatsApp | Accord donné (oui/non), date et source de l'accord, date de désinscription | Obligatoire |
 | Notes internes | Commentaires de l'hôtelier (usage interne) | Facultatif |
 
 > **Aucune donnée sensible** au sens de l'Article 14 de la Loi n° 2013-450 n'est traitée (pas de données de santé, origine ethnique, opinions politiques, données biométriques, etc.).
@@ -89,7 +92,7 @@ Cochez la case applicable :
 
 ## SECTION 5 — PERSONNES CONCERNÉES
 
-> Les personnes concernées sont les **clients (voyageurs)** ayant séjourné dans l'établissement hôtelier. Ces données ont été collectées par l'hôtelier lors des séjours (registre des clients, fiches d'hôtel).
+> Les personnes concernées sont les **clients (voyageurs)** ayant séjourné dans l'établissement hôtelier et ayant accepté de recevoir ses offres. Les données sont collectées par l'hôtelier à la réception ou lors de la réservation. Les informations de la fiche de police (plateforme HORA) ne sont pas utilisées à des fins de prospection sans l'accord du client.
 
 Nombre approximatif de personnes concernées : **[Indiquer le nombre estimé — ex : "500 clients actifs"]**
 
@@ -100,26 +103,25 @@ Nombre approximatif de personnes concernées : **[Indiquer le nombre estimé —
 | Destinataire | Qualité | Données transmises | Localisation |
 |--------------|---------|-------------------|--------------|
 | **[Nom de l'hôtel]** | Responsable de traitement | Toutes les données | Côte d'Ivoire |
-| **Baobab Loyalty** | Sous-traitant (prestataire technique) | Toutes les données (gestion technique uniquement) | Hébergement EU |
-| **WhatsApp Business API (Meta Platforms)** | Destinataire pour l'envoi | Numéro de téléphone uniquement | États-Unis |
+| **Baobab Loyalty (First Digital Prod SARL)** | Sous-traitant (prestataire technique) | Toutes les données (gestion technique uniquement) | Côte d'Ivoire ; base de données hébergée en Irlande (Supabase) |
+| **WhatsApp Business Platform (Meta Platforms)** | Sous-traitant ultérieur pour l'envoi | Numéro WhatsApp et contenu du message | États-Unis |
+| **Vercel** | Sous-traitant ultérieur (hébergement de l'application) | Données affichées dans l'espace hôtelier | États-Unis |
 
 ---
 
 ## SECTION 7 — TRANSFERTS INTERNATIONAUX DE DONNÉES
 
-**Y a-t-il un transfert de données hors de Côte d'Ivoire ?** Oui
+**Y a-t-il un transfert de données hors de la CEDEAO ?** Oui
 
-### Description du transfert :
+### Description des transferts :
 
-| Élément | Détail |
-|---------|--------|
-| Pays destinataire | Union Européenne (Irlande) |
-| Organisme destinataire | Amazon Web Services EMEA SARL (via Supabase Inc.) |
-| Données transférées | Toutes les données clients de l'hôtel |
-| Garanties offertes | Règlement Général sur la Protection des Données (RGPD, UE 2016/679) — niveau de protection supérieur à la Loi n° 2013-450 |
-| Mécanisme de transfert | Clauses Contractuelles Types (CCT) de la Commission Européenne, intégrées aux conditions d'utilisation de Supabase |
+| Pays destinataire | Organisme | Données transférées | Garanties invoquées |
+|-------------------|-----------|---------------------|---------------------|
+| Irlande (Union européenne) | Supabase Inc. (infrastructure AWS, région eu-west-1) | Toutes les données clients de l'hôtel | RGPD (UE 2016/679), clauses contractuelles types |
+| États-Unis | Meta Platforms (WhatsApp Business Platform) | Numéro WhatsApp, contenu du message | Conditions de traitement des données de Meta |
+| États-Unis | Vercel Inc. (hébergement de l'application) | Données affichées dans l'espace hôtelier | Accord de traitement des données Vercel |
 
-> **Justification de la conformité :** Conformément à l'Article 34 de la Loi n° 2013-450, le transfert vers un pays offrant un niveau de protection adéquat est autorisé. L'Union Européenne, soumise au RGPD, offre un niveau de protection reconnu comme adéquat ou supérieur à la législation ivoirienne. Ce transfert est couvert par les clauses contractuelles types de la Commission Européenne.
+> **Autorisation préalable obligatoire :** conformément aux articles 7 et 26 de la loi n° 2013-450, un transfert vers un pays situé hors de la CEDEAO n'est possible que vers un État assurant un niveau de protection équivalent ou supérieur, et **après autorisation préalable de l'ARTCI**. Déposez le formulaire « Demande de transfert de données » (www.autoritedeprotection.ci) en même temps que la déclaration. Le transfert vers les États-Unis doit être examiné avec un juriste.
 
 ---
 
@@ -219,14 +221,14 @@ _______________________________________________
 
 Une fois votre déclaration déposée :
 
-1. **L'ARTCI dispose de 1 mois** pour répondre (déclaration simple)
-2. **Sans réponse** dans ce délai : la déclaration est réputée acceptée
-3. **Conservez** l'accusé de réception de l'ARTCI
-4. **Mettez à jour** la Notice d'Information clients avec votre numéro de déclaration ARTCI
+1. **Payez les frais de dossier** fixés par la décision ARTCI n° 2016-0201 (montant à demander à l'ARTCI au moment du dépôt)
+2. **Conservez** l'accusé de réception de l'ARTCI
+3. **L'ARTCI statue en 1 mois**, prolongeable d'1 mois par décision motivée. Pour le transfert hors CEDEAO, n'utilisez le service qu'**après réception de l'autorisation écrite** : une absence de réponse ne vaut pas accord
+4. **Mettez à jour** la Notice d'Information clients avec vos numéros de déclaration et d'autorisation ARTCI
 5. **Signalez tout changement** (nouvelles données, nouveau sous-traitant) par déclaration modificative
 
 ---
 
-*Template préparé par Baobab Loyalty — Avril 2026*
+*Template préparé par Baobab Loyalty (First Digital Prod SARL) — Septembre 2026*
 *Ce formulaire est fourni à titre d'aide et ne remplace pas le formulaire officiel de l'ARTCI. Consultez www.artci.ci pour le formulaire officiel en vigueur.*
 *Baobab Loyalty ne peut être tenu responsable d'un dépôt non conforme ou incomplet.*

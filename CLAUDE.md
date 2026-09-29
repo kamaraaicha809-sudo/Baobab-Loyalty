@@ -53,7 +53,7 @@ app/
 │   ├── segments/           # Segmentation clients
 │   ├── campaign/           # Création + confirmation campagne
 │   ├── configuration/      # Setup hôtel + import CSV + frais d'intégration
-│   ├── registre/           # Saisie continue des clients (remplace le cahier papier)
+│   ├── registre/           # Saisie continue des clients (complète le cahier, ne remplace pas la fiche de police)
 │   └── templates/          # Templates messages IA
 ├── offre/                  # Page publique (client final WhatsApp)
 └── checkout/               # Checkout Moneroo
@@ -155,7 +155,7 @@ Source de vérité : `config.js` (`billing.plans`).
 | Pro | 69 000 FCFA/mo | ≤ 60 | 10 |
 | Premium | 189 000 FCFA/mo | Illimité | 30 (+ multi-utilisateurs, IA perso, posts LinkedIn) |
 
-**Frais d'intégration (one-time)** : 49 000 FCFA, pour les hôtels sans base de données électronique (cahier papier). Couvre la digitalisation de l'historique (import CSV, déjà existant) et l'accès au **registre numérique** (`/dashboard/registre`) — l'outil de saisie continue qui remplace le cahier pour les nouveaux clients, synchronisé en temps réel avec Baobab Loyalty. Paiement Moneroo distinct d'un abonnement (`type: "onboarding_fee"` dans `billing-create-checkout` / `billing-webhook`) : ne touche jamais `has_access`/`price_id`, marque `profiles.onboarding_fee_paid_at` (migration 054). Source de vérité du montant : `ONBOARDING_FEE_XOF` dans `supabase/functions/_shared/plan.ts`.
+**Frais d'intégration (one-time)** : 49 000 FCFA, pour les hôtels sans base de données électronique (cahier papier). Couvre la digitalisation de l'historique (import CSV, déjà existant) et l'accès au **registre numérique** (`/dashboard/registre`) — l'outil de saisie continue des nouveaux clients (avec case d'accord WhatsApp ; il ne remplace pas la fiche de police HORA obligatoire), synchronisé en temps réel avec Baobab Loyalty. Paiement Moneroo distinct d'un abonnement (`type: "onboarding_fee"` dans `billing-create-checkout` / `billing-webhook`) : ne touche jamais `has_access`/`price_id`, marque `profiles.onboarding_fee_paid_at` (migration 054). Source de vérité du montant : `ONBOARDING_FEE_XOF` dans `supabase/functions/_shared/plan.ts`.
 
 ---
 

@@ -137,7 +137,7 @@ export default function CGVPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 12 avril 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <h1 className="text-3xl font-bold text-slate-900 mb-10">Conditions Générales de Vente</h1>
 
       <div className="prose prose-slate max-w-none space-y-8">
@@ -217,7 +217,7 @@ export default function CGVPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-800 mb-3">5. Droit de rétractation</h2>
           <p className="text-slate-600 leading-relaxed">
-            Conformément aux dispositions applicables, vous disposez d&apos;un délai de <strong>14 jours</strong> à compter de la souscription pour exercer votre droit de rétractation, sans avoir à justifier de motif.
+            First Digital Prod SARL accorde volontairement, à titre d&apos;engagement commercial, un délai de <strong>14 jours</strong> à compter de la souscription pour exercer un droit de rétractation, sans avoir à justifier de motif. La portée exacte de cet engagement pour une clientèle professionnelle (hôtels) sera confirmée par un professionnel du droit.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
             Pour exercer ce droit, envoyez un email à <a href="mailto:legal@baobabloyalty.com" className="text-primary hover:underline">legal@baobabloyalty.com</a> avec votre demande explicite de rétractation.

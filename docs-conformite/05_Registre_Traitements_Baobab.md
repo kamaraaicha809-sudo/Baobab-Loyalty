@@ -34,13 +34,13 @@
 | **Intitulé** | Gestion de la base de données clients pour fidélisation hôtelière |
 | **Responsable de traitement** | Les hôteliers abonnés à Baobab Loyalty (chacun pour ses propres clients) |
 | **Finalité** | Stocker, segmenter et gérer la base clients de l'hôtelier pour l'envoi de campagnes de fidélisation WhatsApp |
-| **Base légale (côté hôtelier)** | Intérêt légitime du responsable de traitement (Article 6.1.f RGPD) |
-| **Données traitées** | Nom/prénom, email, téléphone, numéro WhatsApp, date de dernière visite, notes internes |
+| **Base légale (côté hôtelier)** | Intérêt légitime pour la tenue du fichier clients ; consentement préalable pour toute prospection WhatsApp (Côte d'Ivoire : loi n° 2013-546, art. 14) |
+| **Données traitées** | Nom/prénom, email, téléphone, numéro WhatsApp, date de dernière visite, date de naissance (facultatif), accord WhatsApp (date, source), notes internes |
 | **Personnes concernées** | Clients (voyageurs) des hôtels abonnés |
 | **Durée de conservation** | Pendant la durée du compte actif + 30 jours après résiliation |
 | **Hébergement** | Supabase Inc. — AWS EU West (Irlande) |
 | **Sécurité** | RLS PostgreSQL, JWT, TLS 1.3, AES-256, Supabase Vault |
-| **Transfert international** | Oui — UE (Irlande) via AWS. Couvert par RGPD + CCT Commission Européenne |
+| **Transfert international** | Oui — UE (Irlande) via AWS. Couvert par RGPD + CCT Commission Européenne. Côte d'Ivoire : autorisation préalable de l'ARTCI requise (loi n° 2013-450, art. 7 et 26) |
 | **Sous-traitants ultérieurs** | Supabase Inc. (hébergement), WhatsApp/Meta (envoi) |
 
 ---
@@ -53,9 +53,9 @@
 | **Intitulé** | Envoi de messages WhatsApp de fidélisation aux clients des hôtels |
 | **Responsable de traitement** | Les hôteliers abonnés |
 | **Finalité** | Transmettre des messages commerciaux personnalisés (offres, promotions) aux clients de l'hôtelier via WhatsApp |
-| **Base légale (côté hôtelier)** | Intérêt légitime |
+| **Base légale (côté hôtelier)** | Consentement préalable du client (Côte d'Ivoire : loi n° 2013-546, art. 14) — un client sans accord enregistré est exclu de l'envoi |
 | **Données traitées** | Numéro de téléphone/WhatsApp du client, texte du message |
-| **Personnes concernées** | Clients des hôtels ayant un numéro WhatsApp enregistré |
+| **Personnes concernées** | Clients des hôtels ayant donné leur accord pour recevoir des offres par WhatsApp |
 | **Durée de conservation (logs)** | 3 ans après l'envoi (traçabilité) |
 | **Hébergement** | Supabase (table sent_messages) + WhatsApp Business API |
 | **Sous-traitants ultérieurs** | WhatsApp Business API (Meta Platforms) |

@@ -108,7 +108,7 @@ export default function CGUPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 12 avril 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <h1 className="text-3xl font-bold text-slate-900 mb-10">Conditions Générales d&apos;Utilisation</h1>
 
       <div className="prose prose-slate max-w-none space-y-8">
@@ -131,6 +131,9 @@ export default function CGUPage() {
           <p className="text-slate-600 leading-relaxed mt-3">
             L&apos;utilisateur est responsable de toutes les actions effectuées depuis son compte. Il s&apos;engage à informer immédiatement Baobab Loyalty de tout usage non autorisé de son compte.
           </p>
+          <p className="text-slate-600 leading-relaxed mt-3">
+            Les présentes CGU, les <a href="/legal/cgv" className="text-primary hover:underline">CGV</a> et l&apos;<a href="/legal/dpa" className="text-primary hover:underline">accord de sous-traitance des données (DPA)</a> sont acceptés expressément lors de la première connexion à l&apos;espace hôtelier, par une case à cocher. La date et la version acceptées sont enregistrées.
+          </p>
         </section>
 
         <section>
@@ -138,6 +141,8 @@ export default function CGUPage() {
           <p className="text-slate-600 leading-relaxed">L&apos;utilisateur s&apos;engage à :</p>
           <ul className="mt-3 space-y-2 text-slate-600 list-disc list-inside">
             <li>Utiliser la plateforme uniquement à des fins professionnelles légitimes</li>
+            <li>N&apos;envoyer des offres par WhatsApp qu&apos;aux clients qui ont donné leur accord préalable, et enregistrer cet accord dans la plateforme (loi n° 2013-546 du 30 juillet 2013, art. 14)</li>
+            <li>Ne pas utiliser à des fins de prospection les données recueillies pour la fiche de police sans l&apos;accord du client</li>
             <li>Ne pas envoyer de messages non sollicités (spam) via WhatsApp</li>
             <li>Respecter les conditions d&apos;utilisation de WhatsApp Business API</li>
             <li>Ne pas importer de données clients obtenues illégalement</li>
