@@ -6,7 +6,7 @@ import config from "@/config";
 export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Hotel Loyalty Software for Accra, Ghana — Baobab Loyalty",
   description:
-    "Accra hotels: automate guest re-engagement via WhatsApp. Zero OTA commission, launch campaigns in 10 min. Built for Ghana's hospitality market.",
+    "Accra hotels: automate guest re-engagement via WhatsApp. Zero OTA commission. Built for Ghana's hospitality market, launch in preparation.",
   keywords: [
     "hotel loyalty software Accra",
     "WhatsApp marketing hotel Accra",

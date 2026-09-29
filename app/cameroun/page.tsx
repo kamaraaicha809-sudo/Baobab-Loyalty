@@ -16,7 +16,7 @@ export function generateMetadata() {
   if (config.region === "europe") return {};
   return getSEOTags({
     title: "Fidélisation hôtelière au Cameroun — Baobab Loyalty",
-    description: "Hôtels de Douala et Yaoundé : campagnes WhatsApp ciblées, zéro commission OTA, prix en FCFA. Essai gratuit, opérationnel en 10 min.",
+    description: "Hôtels de Douala et Yaoundé : campagnes WhatsApp ciblées, zéro commission OTA, prix en FCFA. Lancement au Cameroun en préparation : découvrez la démo.",
     canonicalUrlRelative: "/cameroun",
   });
 }

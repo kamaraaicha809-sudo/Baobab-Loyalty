@@ -16,7 +16,7 @@ export function generateMetadata() {
   if (config.region === "europe") return {};
   return getSEOTags({
     title: "Fidélisation hôtelière à Douala — Baobab Loyalty",
-    description: "Hôtels à Douala : relancez vos clients inactifs via WhatsApp. Campagnes WhatsApp IA, zéro commission OTA, prix en FCFA. Essai gratuit.",
+    description: "Hôtels à Douala : relancez vos clients inactifs via WhatsApp. Campagnes WhatsApp IA, zéro commission OTA, prix en FCFA. Lancement au Cameroun en préparation : découvrez la démo.",
     canonicalUrlRelative: "/douala",
   });
 }

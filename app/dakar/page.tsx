@@ -16,7 +16,7 @@ export function generateMetadata() {
   if (config.region === "europe") return {};
   return getSEOTags({
     title: "Fidélisation hôtelière à Dakar — Baobab Loyalty",
-    description: "Hôtels à Dakar : relancez vos clients inactifs grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Opérationnel en 10 min. Essai gratuit.",
+    description: "Hôtels à Dakar : relancez vos clients inactifs grâce aux campagnes WhatsApp ciblées. Zéro commission OTA, prix en FCFA. Lancement au Sénégal en préparation : découvrez la démo.",
     canonicalUrlRelative: "/dakar",
   });
 }

@@ -271,7 +271,7 @@ export default function CommentCaMarchePage() {
             <p className="text-slate-500 text-base sm:text-lg mb-8 leading-relaxed">
               {isEurope
                 ? "Rejoignez les hôteliers qui fidélisent leurs clients via WhatsApp. Démarrez gratuitement, sans engagement."
-                : <>Rejoignez les hôteliers d&apos;Afrique qui fidélisent leurs clients via WhatsApp.
+                : <>Fidélisez vos clients via WhatsApp, en FCFA et sans commission.
                   Démarrez gratuitement, sans engagement.</>}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">

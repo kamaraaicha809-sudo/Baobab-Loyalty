@@ -6,7 +6,7 @@ import config from "@/config";
 export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Fidélisation clients hôtel au Cameroun — Baobab Loyalty",
   description:
-    "Hôtels Douala et Yaoundé : relancez vos clients inactifs via WhatsApp, zéro commission OTA. Segmentation automatique + WhatsApp IA en 10 min. Essai gratuit sans engagement.",
+    "Hôtels Douala et Yaoundé : relancez vos clients inactifs via WhatsApp, zéro commission OTA. Segmentation automatique + WhatsApp IA. Lancement au Cameroun en préparation.",
   keywords: [
     "fidélisation hôtel Cameroun",
     "marketing hôtel Douala",

@@ -6,7 +6,7 @@ import config from "@/config";
 export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : {
   title: "Fidélisation clients hôtel au Sénégal — Baobab Loyalty",
   description:
-    "Hôtels Dakar : relancez vos clients inactifs via WhatsApp, zéro commission Booking.com. Campagnes WhatsApp IA, segmentation auto. Démarrez en 10 min — essai gratuit.",
+    "Hôtels Dakar : relancez vos clients inactifs via WhatsApp, zéro commission Booking.com. Campagnes WhatsApp IA, segmentation auto. Lancement au Sénégal en préparation.",
   keywords: [
     "fidélisation hôtel Sénégal",
     "marketing hôtel Dakar",

@@ -16,7 +16,7 @@ export function generateMetadata() {
   if (config.region === "europe") return {};
   return getSEOTags({
     title: "Fidélisation hôtelière au Sénégal — Baobab Loyalty",
-    description: "Hôtels au Sénégal : reconquérez vos clients inactifs via WhatsApp en 10 min. Zéro commission Booking.com, prix en FCFA. Essai gratuit sans carte bancaire.",
+    description: "Hôtels au Sénégal : reconquérez vos clients inactifs via WhatsApp. Zéro commission Booking.com, prix en FCFA. Lancement au Sénégal en préparation : découvrez la démo.",
     canonicalUrlRelative: "/senegal",
   });
 }

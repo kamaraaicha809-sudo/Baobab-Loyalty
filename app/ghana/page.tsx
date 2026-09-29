@@ -16,7 +16,7 @@ export function generateMetadata() {
   if (config.region === "europe") return {};
   return getSEOTags({
     title: "Hotel Loyalty Software for Ghana — Baobab Loyalty",
-    description: "Accra hotels: win back inactive guests with targeted WhatsApp campaigns. Zero OTA commission, AI-generated messages. Get started in 10 minutes. Free trial.",
+    description: "Accra hotels: win back inactive guests with targeted WhatsApp campaigns. Zero OTA commission, AI-generated messages. Ghana launch in preparation: explore the demo.",
     canonicalUrlRelative: "/ghana",
   });
 }
