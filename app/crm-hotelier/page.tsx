@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { signupNote } from "@/src/lib/region-copy";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
 const isEurope = config.region === "europe";
@@ -201,7 +202,7 @@ export default function CrmHotelierPage() {
               Essayez un CRM pensé pour votre marché
             </h2>
             <p className="text-[#a3c4b5] text-base mb-8 leading-relaxed">
-              Sans carte bancaire. Opérationnel en 10 minutes.
+              {signupNote("Sans carte bancaire. Opérationnel en 10 minutes.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/demo" className="inline-block px-8 py-4 rounded-xl bg-[#EBC161] text-[#1a2f2a] text-sm font-bold hover:bg-[#d4a94d] transition-colors">

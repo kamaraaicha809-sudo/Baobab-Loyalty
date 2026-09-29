@@ -6,12 +6,13 @@ import Image from "next/image";
 import config from "@/config";
 import { isDemoMode } from "@/src/lib/demo";
 
+// Le blog (articles Afrique uniquement) est masqué sur Loyavia.
 const navLinks = [
   { href: "/#solution", label: "Solution" },
   { href: "/#benefices", label: "Bénéfices" },
   { href: "/#tarifs", label: "Tarifs" },
   { href: "/blog", label: "Blog" },
-];
+].filter((link) => config.region !== "europe" || link.href !== "/blog");
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

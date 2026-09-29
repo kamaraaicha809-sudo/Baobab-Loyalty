@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
-import { clients as clientsSDK, Client, SegmentFilters, matchesAdvancedFilters } from "@/src/sdk/clients";
+import { clients as clientsSDK, Client, SegmentFilters, matchesAdvancedFilters, type ChannelConsentState } from "@/src/sdk/clients";
 import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
 import { formatCurrency } from "@/src/lib/currency";
 
@@ -209,6 +209,10 @@ export default function SegmentsPage() {
   // Afrique : enregistrer un accord WhatsApp demande une confirmation
   // explicite de l'hôtelier (c'est sa déclaration d'avoir recueilli l'accord).
   const [confirmConsentId, setConfirmConsentId] = useState<string | null>(null);
+  // Europe : accord WhatsApp réel (communication_preferences), seule source
+  // lue à l'envoi — jamais l'ancien champ global marketing_consent.
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [whatsappConsents, setWhatsappConsents] = useState<Record<string, ChannelConsentState>>({});
 
   // Filtres combinables (P5) : en plus des segments basés sur la dernière
   // visite, on peut affiner par montant dépensé, nombre de réservations,
@@ -247,6 +251,10 @@ export default function SegmentsPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
+      setProfileId(user.id);
+      if (isEurope) {
+        clientsSDK.getProfileChannelConsents(user.id, "whatsapp").then(setWhatsappConsents).catch(() => setWhatsappConsents({}));
+      }
       try {
         const seg = await clientsSDK.getSegmentCounts(user.id);
         setCounts(seg);
@@ -321,10 +329,24 @@ export default function SegmentsPage() {
     }
   }
 
+  function hasWhatsappConsent(client: Client): boolean {
+    return isEurope ? whatsappConsents[client.id]?.optedIn === true : client.marketing_consent !== false;
+  }
+
+  function hasRefused(client: Client): boolean {
+    return isEurope ? whatsappConsents[client.id]?.optedIn === false || !!client.opted_out_at : !!client.opted_out_at;
+  }
+
   async function handleToggleConsent(client: Client) {
-    const nextConsent = client.marketing_consent === false;
+    const nextConsent = !hasWhatsappConsent(client);
     setUpdatingConsentId(client.id);
     try {
+      if (isEurope) {
+        if (!isDemoMode && profileId) {
+          await clientsSDK.setChannelConsent(profileId, client.id, "whatsapp", nextConsent, nextConsent ? "bascule_manuelle" : "retrait_manuel");
+        }
+        setWhatsappConsents((prev) => ({ ...prev, [client.id]: { optedIn: nextConsent, updatedAt: new Date().toISOString() } }));
+      }
       if (!isDemoMode) {
         await clientsSDK.setMarketingConsent(client.id, nextConsent);
       }
@@ -693,7 +715,7 @@ export default function SegmentsPage() {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {filteredClients.map((client) => {
-                        const isOptedOut = client.marketing_consent === false;
+                        const isOptedOut = !hasWhatsappConsent(client);
                         return (
                           <tr key={client.id} className="hover:bg-slate-50 transition-colors">
                             <td className="py-3 pr-4 font-medium text-slate-900 whitespace-nowrap">{client.nom}</td>
@@ -708,24 +730,7 @@ export default function SegmentsPage() {
                               })}
                             </td>
                             <td className="py-3 whitespace-nowrap">
-                              {isEurope ? (
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                      isOptedOut ? "bg-slate-100 text-slate-500" : "bg-green-50 text-green-700"
-                                    }`}
-                                  >
-                                    {isOptedOut ? "Désinscrit" : "Abonné"}
-                                  </span>
-                                  <button
-                                    onClick={() => handleToggleConsent(client)}
-                                    disabled={updatingConsentId === client.id}
-                                    className="text-xs text-[var(--color-primary)] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    {isOptedOut ? "Réabonner" : "Désinscrire"}
-                                  </button>
-                                </div>
-                              ) : confirmConsentId === client.id ? (
+                              {confirmConsentId === client.id ? (
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-slate-700">Le client vous a donné son accord ?</span>
                                   <button
@@ -748,12 +753,12 @@ export default function SegmentsPage() {
                                     className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                                       !isOptedOut
                                         ? "bg-green-50 text-green-700"
-                                        : client.opted_out_at
+                                        : hasRefused(client)
                                           ? "bg-slate-100 text-slate-500"
                                           : "bg-amber-50 text-amber-700"
                                     }`}
                                   >
-                                    {!isOptedOut ? "Accord WhatsApp" : client.opted_out_at ? "Désinscrit" : "Sans accord"}
+                                    {!isOptedOut ? "Accord WhatsApp" : hasRefused(client) ? "Désinscrit" : "Sans accord"}
                                   </span>
                                   <button
                                     onClick={() => (isOptedOut ? setConfirmConsentId(client.id) : handleToggleConsent(client))}

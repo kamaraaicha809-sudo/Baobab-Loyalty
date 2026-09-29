@@ -17,6 +17,7 @@
  */
 
 import { getServiceClient } from "../_shared/auth.ts";
+import { getConsentModel } from "../_shared/consent-policy.ts";
 
 const STOP_KEYWORDS = ["stop", "arret", "arreter", "desabonner", "desinscrire", "unsubscribe"];
 
@@ -161,11 +162,29 @@ async function applyInboundOptOut(
   const digits = message.from.replace(/\D/g, "");
   const e164 = `+${digits}`;
 
-  await db
+  const { data: optedOut } = await db
     .from("clients")
     .update({ marketing_consent: false, opted_out_at: new Date().toISOString() })
     .eq("profile_id", profile.id)
-    .or(`whatsapp.eq.${e164},whatsapp.eq.${digits},telephone.eq.${e164},telephone.eq.${digits}`);
+    .or(`whatsapp.eq.${e164},whatsapp.eq.${digits},telephone.eq.${e164},telephone.eq.${digits}`)
+    .select("id");
+
+  // En mode channel_rgpd (Europe), le retrait doit aussi apparaitre dans
+  // communication_preferences, seule source lue a l'envoi -- comme
+  // clients-unsubscribe. Sans effet en Afrique ("legacy", aucun appel).
+  if (getConsentModel() !== "channel_rgpd") return;
+  for (const client of optedOut ?? []) {
+    await db.rpc("set_communication_preference", {
+      p_profile_id: profile.id,
+      p_client_id: client.id,
+      p_channel: "whatsapp",
+      p_opted_in: false,
+      p_method: "whatsapp_stop",
+      p_policy_version: null,
+      p_ip: null,
+      p_user_agent: null,
+    });
+  }
 }
 
 Deno.serve(async (req) => {

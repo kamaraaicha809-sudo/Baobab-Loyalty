@@ -8,7 +8,15 @@ const Solution = () => {
           Et si tes anciens clients remplissaient tes chambres cette semaine ?
         </h2>
         <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-          {config.appName} connecte ta base de données clients existante à WhatsApp et à l&apos;IA. En 2 minutes, tu envoies une offre personnalisée aux clients qui ne sont pas revenus — et tu récupères des réservations directes, sans commission.
+          {config.region === "europe" ? (
+            <>
+              {config.appName} connecte ta base de données clients existante à WhatsApp et à l&apos;IA. Une fois ton WhatsApp connecté, tu prépares et envoies en 10 minutes une offre personnalisée aux clients qui ne sont pas revenus et qui ont accepté de te lire — pour récupérer des réservations directes, sans commission.
+            </>
+          ) : (
+            <>
+              {config.appName} connecte ta base de données clients existante à WhatsApp et à l&apos;IA. En 2 minutes, tu envoies une offre personnalisée aux clients qui ne sont pas revenus — et tu récupères des réservations directes, sans commission.
+            </>
+          )}
         </p>
         <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 text-left">
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">

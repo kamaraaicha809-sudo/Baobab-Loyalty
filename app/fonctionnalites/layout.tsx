@@ -6,7 +6,7 @@ const isEurope = config.region === "europe";
 export const metadata: Metadata = {
   title: `Fonctionnalités — Segmentation, WhatsApp, IA | ${config.appName}`,
   description: isEurope
-    ? "Import CSV, segmentation auto par inactivité, campagnes WhatsApp + IA en 10 min. Tout ce qu'il faut pour reconquérir vos clients hôtel — sans compétence technique."
+    ? "Import CSV, segmentation auto par inactivité, campagnes WhatsApp + IA : une fois votre WhatsApp connecté, préparez et envoyez une campagne en 10 minutes. Sans compétence technique."
     : "Import CSV, segmentation auto par inactivité, campagnes WhatsApp + IA en 10 min. Tout ce qu'il faut pour reconquérir vos clients hôtel en Afrique — sans compétence technique.",
   keywords: isEurope
     ? [

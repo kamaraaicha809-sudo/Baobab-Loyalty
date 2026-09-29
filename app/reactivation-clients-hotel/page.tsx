@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { campaignDelay, signupNote } from "@/src/lib/region-copy";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
 export const metadata = getSEOTags({
@@ -26,7 +27,7 @@ const faqItems = [
   },
   {
     question: "Combien de temps prend une campagne de réactivation ?",
-    answer: "Une fois votre base importée, sélectionner un segment, générer le message et envoyer la campagne prend moins de 10 minutes.",
+    answer: campaignDelay("Une fois votre base importée, sélectionner un segment, générer le message et envoyer la campagne prend moins de 10 minutes."),
   },
 ];
 
@@ -130,7 +131,7 @@ export default function ReactivationClientsHotelPage() {
               Réactivez votre base clients dès aujourd&apos;hui
             </h2>
             <p className="text-[#a3c4b5] text-base mb-8 leading-relaxed">
-              Sans carte bancaire. Opérationnel en 10 minutes.
+              {signupNote("Sans carte bancaire. Opérationnel en 10 minutes.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/demo" className="inline-block px-8 py-4 rounded-xl bg-[#EBC161] text-[#1a2f2a] text-sm font-bold hover:bg-[#d4a94d] transition-colors">

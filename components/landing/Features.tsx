@@ -8,7 +8,9 @@ const features = [
       </svg>
     ),
     title: "Tu cibles les bons clients automatiquement",
-    desc: "L'IA identifie tes clients inactifs depuis 3, 6 ou 9 mois. Tu ne perds pas de temps — tu envoies au bon moment, à la bonne personne.",
+    desc: config.region === "europe"
+      ? `${config.appName} regroupe automatiquement tes clients inactifs depuis 3, 6 ou 9 mois. Tu ne perds pas de temps — tu envoies au bon moment, à la bonne personne.`
+      : "L'IA identifie tes clients inactifs depuis 3, 6 ou 9 mois. Tu ne perds pas de temps — tu envoies au bon moment, à la bonne personne.",
   },
   {
     icon: (
@@ -16,8 +18,10 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
       </svg>
     ),
-    title: "Tu envoies sur WhatsApp en 2 minutes",
-    desc: "Tes clients lisent et répondent le jour même sur un canal qu'ils consultent déjà tous les jours. Fini les SMS ignorés et les emails perdus dans les spams.",
+    title: config.region === "europe" ? "Tu envoies sur WhatsApp en 10 minutes" : "Tu envoies sur WhatsApp en 2 minutes",
+    desc: config.region === "europe"
+      ? "Une fois ton WhatsApp connecté, tu prépares et envoies une campagne en 10 minutes, sur un canal que tes clients consultent tous les jours."
+      : "Tes clients lisent et répondent le jour même sur un canal qu'ils consultent déjà tous les jours. Fini les SMS ignorés et les emails perdus dans les spams.",
   },
   {
     icon: (

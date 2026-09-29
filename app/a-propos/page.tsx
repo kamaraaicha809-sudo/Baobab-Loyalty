@@ -22,13 +22,21 @@ const markets = [
   { name: "Ghana", href: "/ghana" },
 ];
 
-const facts = [
-  { label: "Statut", value: isEurope ? "Baobab Loyalty SAS" : "FIRST DIGITAL PROD SARL (Baobab Loyalty)" },
-  { label: "Siège social", value: isEurope ? "Plateau, Abidjan, Côte d'Ivoire" : "Grand-Bassam CAFOP 1, Côte d'Ivoire" },
-  { label: "Secteur", value: "SaaS / Hôtellerie / Technologie pour l'Afrique" },
-  { label: "Canal principal", value: "WhatsApp Business API" },
-  { label: "Devise", value: "FCFA (XOF)" },
-];
+// Europe : ni statut ni siège affichés tant que l'entité juridique Loyavia
+// n'est pas fixée (aucune "Baobab Loyalty SAS" n'existe).
+const facts = isEurope
+  ? [
+      { label: "Secteur", value: "SaaS / Hôtellerie" },
+      { label: "Canal principal", value: "WhatsApp Business API" },
+      { label: "Devise", value: "Euro (EUR)" },
+    ]
+  : [
+      { label: "Statut", value: "FIRST DIGITAL PROD SARL (Baobab Loyalty)" },
+      { label: "Siège social", value: "Grand-Bassam CAFOP 1, Côte d'Ivoire" },
+      { label: "Secteur", value: "SaaS / Hôtellerie / Technologie pour l'Afrique" },
+      { label: "Canal principal", value: "WhatsApp Business API" },
+      { label: "Devise", value: "FCFA (XOF)" },
+    ];
 
 export default function AProposPage() {
   return (

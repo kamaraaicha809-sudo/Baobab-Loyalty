@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { signupNote } from "@/src/lib/region-copy";
 import { getSEOTags } from "@/libs/seo";
 
 const isEurope = config.region === "europe";
@@ -42,7 +43,7 @@ const features = [
       </svg>
     ),
     title: "Import clients en un clic",
-    desc: `Chargez votre fichier Excel ou CSV existant. ${config.appName} détecte automatiquement les colonnes (nom, téléphone, email, date de dernière visite) et importe votre base entière en moins de 2 minutes.`,
+    desc: `Chargez votre fichier Excel ou CSV existant. ${config.appName} détecte automatiquement les colonnes (nom, téléphone, email, date de dernière visite) ${isEurope ? "et importe votre base, avec l'accord de chaque client par canal lorsqu'il figure dans le fichier." : "et importe votre base entière en moins de 2 minutes."}`,
     points: [
       "Compatible Excel (.xlsx) et CSV",
       "Détection automatique des colonnes",
@@ -287,7 +288,9 @@ export default function FonctionnalitesPage() {
                   {[
                     "Chaque client est recontacté automatiquement",
                     "Segments inactifs identifiés en 1 clic",
-                    "Campagnes en masse en moins de 10 minutes",
+                    isEurope
+                      ? "Campagne préparée et envoyée en 10 minutes, une fois WhatsApp connecté"
+                      : "Campagnes en masse en moins de 10 minutes",
                     "Réservations directes sans commission",
                     "Tracking complet : clics, réservations, revenus",
                     `Dashboard temps réel en ${config.billing.currency === "EUR" ? "euros" : "FCFA"}`,
@@ -318,7 +321,7 @@ export default function FonctionnalitesPage() {
               Prêt à mettre ces fonctionnalités au service de votre hôtel ?
             </h2>
             <p className="text-[#a3c4b5] text-base sm:text-lg mb-8 leading-relaxed">
-              Démarrez gratuitement. Aucune carte bancaire requise. Opérationnel en 10 minutes.
+              {signupNote("Démarrez gratuitement. Aucune carte bancaire requise. Opérationnel en 10 minutes.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

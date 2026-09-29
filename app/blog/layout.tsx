@@ -1,7 +1,11 @@
+import type { Metadata } from "next";
 import { getSEOTags } from "@/libs/seo";
 import { ReactNode } from "react";
+import config from "@/config";
 
-export const metadata = getSEOTags({
+// Europe : le blog ne contient que des articles Afrique (FCFA, Abidjan,
+// Dakar...) signés Baobab Loyalty, il est masqué sur Loyavia (pages en 404).
+export const metadata: Metadata = config.region === "europe" ? { robots: { index: false, follow: false } } : getSEOTags({
   title: "Blog — Stratégies de fidélisation hôtelière en Afrique de l'Ouest",
   description:
     "Conseils et stratégies pour fidéliser vos clients d'hôtel en Côte d'Ivoire, Sénégal, Cameroun et Ghana. WhatsApp marketing, segmentation, réservations directes.",

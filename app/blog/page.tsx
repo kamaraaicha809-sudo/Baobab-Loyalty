@@ -4,6 +4,8 @@ import { NewsletterBanner } from "@/components/newsletter/NewsletterBanner";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import config from "@/config";
 import { getSEOTags, renderBreadcrumbSchema } from "@/libs/seo";
 
 export const metadata = getSEOTags({
@@ -13,6 +15,7 @@ export const metadata = getSEOTags({
 });
 
 export default function BlogPage() {
+  if (config.region === "europe") notFound();
   const posts = getAllPosts();
   const featuredPosts = getFeaturedPosts();
   const categories = getAllCategories();

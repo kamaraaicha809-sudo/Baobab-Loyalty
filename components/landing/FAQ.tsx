@@ -51,7 +51,15 @@ const faqList: FAQItem[] = [
     question: "Mes données clients sont-elles en sécurité ?",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Oui. Tes données sont hébergées sur des serveurs sécurisés (chiffrement SSL, accès protégé). Tu restes propriétaire de ta base clients — nous n&apos;y accédons pas et ne la partageons jamais avec des tiers. Tu peux exporter ou supprimer tes données à tout moment.
+        {config.region === "europe" ? (
+          <>
+            Oui. Ta base de données est hébergée dans l&apos;Union européenne (Francfort), avec des échanges chiffrés (HTTPS) et un accès protégé. Tu restes propriétaire de ta base clients : nous la traitons uniquement pour faire fonctionner le service, selon tes instructions, et ne la vendons ni ne la louons jamais. Les prestataires techniques indispensables (par exemple Meta pour l&apos;envoi WhatsApp) sont listés dans notre politique de confidentialité. Tu peux exporter ou supprimer tes données à tout moment.
+          </>
+        ) : (
+          <>
+            Oui. Tes données sont hébergées sur des serveurs sécurisés (chiffrement SSL, accès protégé). Tu restes propriétaire de ta base clients — nous n&apos;y accédons pas et ne la partageons jamais avec des tiers. Tu peux exporter ou supprimer tes données à tout moment.
+          </>
+        )}
       </div>
     ),
   },
@@ -59,7 +67,15 @@ const faqList: FAQItem[] = [
     question: "Est-ce facile à utiliser ? Je ne suis pas technique.",
     answer: (
       <div className="space-y-2 leading-relaxed">
-        Très facile. À l&apos;inscription, tu saisis les informations de ton hôtel et tu importes ta base de données clients — une seule fois. Une fois cette étape faite, chaque nouvelle promotion se lance en moins de 2 minutes. Pas de formation nécessaire. Et si tu bloques quelque part, notre équipe t&apos;accompagne personnellement les 30 premiers jours.
+        {config.region === "europe" ? (
+          <>
+            Très facile. À l&apos;inscription, tu saisis les informations de ton hôtel et tu importes ta base de données clients — une seule fois. Une fois ton WhatsApp connecté, tu prépares et envoies une campagne en 10 minutes. Pas de formation nécessaire. Et si tu bloques quelque part, notre équipe t&apos;accompagne personnellement les 30 premiers jours.
+          </>
+        ) : (
+          <>
+            Très facile. À l&apos;inscription, tu saisis les informations de ton hôtel et tu importes ta base de données clients — une seule fois. Une fois cette étape faite, chaque nouvelle promotion se lance en moins de 2 minutes. Pas de formation nécessaire. Et si tu bloques quelque part, notre équipe t&apos;accompagne personnellement les 30 premiers jours.
+          </>
+        )}
       </div>
     ),
   },

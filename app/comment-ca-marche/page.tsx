@@ -3,13 +3,16 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { EUROPE_CAMPAIGN_DELAY, signupNote } from "@/src/lib/region-copy";
 import { getSEOTags } from "@/libs/seo";
 
 const isEurope = config.region === "europe";
 
 export const metadata = getSEOTags({
   title: `Comment fonctionne ${config.appName} — Guide étape par étape`,
-  description: "Importez votre CSV → segmentez vos clients → lancez une campagne WhatsApp en 10 min. Zéro commission, zéro compétence technique. Résultats dès le premier envoi.",
+  description: isEurope
+    ? `Importez votre base clients, segmentez-la et lancez vos campagnes WhatsApp. ${EUROPE_CAMPAIGN_DELAY} Sans commission, sans compétence technique.`
+    : "Importez votre CSV → segmentez vos clients → lancez une campagne WhatsApp en 10 min. Zéro commission, zéro compétence technique. Résultats dès le premier envoi.",
   canonicalUrlRelative: "/comment-ca-marche",
 });
 
@@ -67,7 +70,9 @@ const faqs = [
   },
   {
     q: "Combien de temps faut-il pour envoyer une première campagne ?",
-    a: "De la création du compte à l'envoi de la première campagne, il faut en moyenne 10 minutes. La majorité du temps est consacrée à l'import de votre base clients.",
+    a: isEurope
+      ? `${EUROPE_CAMPAIGN_DELAY} La connexion de votre compte WhatsApp Business (validée par Meta) et l'import de votre base clients se font au préalable et ne sont pas compris dans ce délai.`
+      : "De la création du compte à l'envoi de la première campagne, il faut en moyenne 10 minutes. La majorité du temps est consacrée à l'import de votre base clients.",
   },
   {
     q: "Mes clients reçoivent-ils les messages sur leur WhatsApp personnel ?",
@@ -83,8 +88,9 @@ const howToSchema = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: `Comment fidéliser vos clients hôtel avec ${config.appName}`,
-  description:
-    "Guide pas-à-pas pour créer votre compte, importer vos clients, segmenter et lancer votre première campagne WhatsApp en moins de 10 minutes.",
+  description: isEurope
+    ? `Guide pas-à-pas pour créer votre compte, importer vos clients, segmenter et lancer votre première campagne WhatsApp. ${EUROPE_CAMPAIGN_DELAY}`
+    : "Guide pas-à-pas pour créer votre compte, importer vos clients, segmenter et lancer votre première campagne WhatsApp en moins de 10 minutes.",
   totalTime: "PT10M",
   estimatedCost: isEurope
     ? { "@type": "MonetaryAmount", currency: "EUR", value: String(config.billing.plansEurope[0].price) }
@@ -154,16 +160,32 @@ export default function CommentCaMarchePage() {
             <p className="inline-block mb-5 px-4 py-1.5 rounded-full bg-[#1a2f2a]/8 text-[#1a2f2a] text-xs font-semibold uppercase tracking-widest">
               Comment ça marche
             </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-5">
-              De zéro à votre{" "}
-              <span className="text-[#1a2f2a]">première campagne WhatsApp</span>{" "}
-              en 10 minutes
-            </h1>
-            <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
-              Pas de complexité technique, pas d&apos;intégration longue. Importez votre base
-              clients, segmentez et envoyez — en moins de 10 minutes, vos anciens clients
-              reçoivent une offre personnalisée sur WhatsApp.
-            </p>
+            {isEurope ? (
+              <>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-5">
+                  De votre base clients à votre{" "}
+                  <span className="text-[#1a2f2a]">première campagne WhatsApp</span>
+                </h1>
+                <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
+                  Pas de complexité technique. Importez votre base clients et segmentez-la.{" "}
+                  {EUROPE_CAMPAIGN_DELAY} Vos anciens clients qui ont donné leur accord reçoivent
+                  une offre personnalisée sur WhatsApp.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C2C2C] leading-tight mb-5">
+                  De zéro à votre{" "}
+                  <span className="text-[#1a2f2a]">première campagne WhatsApp</span>{" "}
+                  en 10 minutes
+                </h1>
+                <p className="text-slate-500 text-base sm:text-lg leading-relaxed mb-8">
+                  Pas de complexité technique, pas d&apos;intégration longue. Importez votre base
+                  clients, segmentez et envoyez — en moins de 10 minutes, vos anciens clients
+                  reçoivent une offre personnalisée sur WhatsApp.
+                </p>
+              </>
+            )}
             <Link
               href="/demo"
               className="inline-block px-7 py-3.5 rounded-xl bg-[#1a2f2a] text-white text-sm font-bold hover:bg-[#243d38] transition-colors"
@@ -221,7 +243,7 @@ export default function CommentCaMarchePage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
               {(isEurope
                 ? [
-                    { value: "10 min", label: "Pour lancer votre première campagne" },
+                    { value: "10 min", label: "Pour préparer et envoyer une campagne, une fois WhatsApp connecté" },
                     { value: "0%", label: "Commission sur vos réservations directes" },
                     { value: "WhatsApp", label: "Canal de communication principal" },
                   ]
@@ -270,7 +292,7 @@ export default function CommentCaMarchePage() {
             </h2>
             <p className="text-slate-500 text-base sm:text-lg mb-8 leading-relaxed">
               {isEurope
-                ? "Rejoignez les hôteliers qui fidélisent leurs clients via WhatsApp. Démarrez gratuitement, sans engagement."
+                ? "Fidélisez vos clients via WhatsApp, sans commission sur vos réservations directes. Démarrez gratuitement, sans engagement."
                 : <>Fidélisez vos clients via WhatsApp, en FCFA et sans commission.
                   Démarrez gratuitement, sans engagement.</>}
             </p>
@@ -289,7 +311,7 @@ export default function CommentCaMarchePage() {
               </Link>
             </div>
             <p className="text-slate-400 text-xs mt-4">
-              Aucune carte bancaire requise. Fonctionnel en 10 minutes.
+              {signupNote("Aucune carte bancaire requise. Fonctionnel en 10 minutes.")}
             </p>
           </div>
         </section>

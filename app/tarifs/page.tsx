@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { signupNote } from "@/src/lib/region-copy";
 import { getSEOTags } from "@/libs/seo";
 
 const isEurope = config.region === "europe";
@@ -529,7 +530,7 @@ export default function TarifsPage() {
               Commencez gratuitement aujourd&apos;hui
             </h2>
             <p className="text-[#a3c4b5] text-base sm:text-lg mb-8 leading-relaxed">
-              Aucune carte bancaire requise. Fonctionnel en 10 minutes.
+              {signupNote("Aucune carte bancaire requise. Fonctionnel en 10 minutes.")}{" "}
               Passez à un plan payant uniquement si vous êtes convaincu.
             </p>
             <Link

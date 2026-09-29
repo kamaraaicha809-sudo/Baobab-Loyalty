@@ -12,7 +12,9 @@ import config from "@/config";
 
 export const metadata = getSEOTags({
   title: `${config.appName} — Remplissez vos chambres vides sans Booking.com`,
-  description: "Vos clients oublient votre hôtel ? Relancez-les via WhatsApp en 2 min — 0% commission sur vos réservations directes. Essai gratuit, résultats dès la 1ère campagne.",
+  description: config.region === "europe"
+    ? "Vos clients oublient votre hôtel ? Relancez-les via WhatsApp, avec leur accord, et récupérez des réservations directes sans commission. Essai gratuit."
+    : "Vos clients oublient votre hôtel ? Relancez-les via WhatsApp en 2 min — 0% commission sur vos réservations directes. Essai gratuit, résultats dès la 1ère campagne.",
   canonicalUrlRelative: "/",
 });
 

@@ -43,7 +43,10 @@ export interface Client {
  *
  * "legacy" (defaut, Afrique) : import ecrit seulement clients.marketing_consent,
  * comportement strictement inchange.
- * "channel_rgpd" (Europe, via NEXT_PUBLIC_CONSENT_MODEL="channel_rgpd") :
+ * "channel_rgpd" (Europe : region "europe", ou NEXT_PUBLIC_CONSENT_MODEL=
+ * "channel_rgpd") -- la variable n'etant pas definie sur le projet Vercel
+ * Europe, la region suffit pour que le frontend suive la meme politique que
+ * les Edge Functions Europe (CONSENT_MODEL du Vault) :
  * l'import n'invente jamais de consentement. Seule une information de
  * consentement explicitement presente dans le fichier (colonne
  * whatsapp_consent/email_consent/sms_consent) est enregistree, canal par
@@ -54,7 +57,7 @@ export interface Client {
 export type ConsentModel = "legacy" | "channel_rgpd";
 
 export function getConsentModel(): ConsentModel {
-  return process.env.NEXT_PUBLIC_CONSENT_MODEL === "channel_rgpd" ? "channel_rgpd" : "legacy";
+  return config.region === "europe" || process.env.NEXT_PUBLIC_CONSENT_MODEL === "channel_rgpd" ? "channel_rgpd" : "legacy";
 }
 
 export interface SegmentFilters {
@@ -153,6 +156,91 @@ export async function setMarketingConsent(clientId: string, consent: boolean): P
   if (error) throw error;
 }
 
+export type ConsentChannel = "whatsapp" | "email" | "sms";
+
+export interface ChannelConsentState {
+  optedIn: boolean;
+  updatedAt: string;
+}
+
+export type ChannelConsents = Partial<Record<ConsentChannel, ChannelConsentState>>;
+
+/**
+ * Europe (channel_rgpd) : enregistre l'accord ou le retrait d'un client pour
+ * un canal, via set_communication_preference — la date et l'origine sont
+ * posées côté serveur (consent_records.created_at, method), jamais par le
+ * navigateur. `method` décrit l'origine (ex. "registre", "bascule_manuelle").
+ */
+export async function setChannelConsent(
+  profileId: string,
+  clientId: string,
+  channel: ConsentChannel,
+  optedIn: boolean,
+  method: string
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("set_communication_preference", {
+    p_profile_id: profileId,
+    p_client_id: clientId,
+    p_channel: channel,
+    p_opted_in: optedIn,
+    p_method: method,
+    p_policy_version: null,
+    p_ip: null,
+    p_user_agent: null,
+  });
+  if (error) throw error;
+}
+
+/**
+ * Europe (channel_rgpd) : état courant de l'accord par canal pour une liste
+ * de clients. Aucun enregistrement pour un canal = aucun accord.
+ */
+export async function getChannelConsents(clientIds: string[]): Promise<Record<string, ChannelConsents>> {
+  if (clientIds.length === 0) return {};
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("communication_preferences")
+    .select("client_id, channel, opted_in, updated_at")
+    .in("client_id", clientIds);
+  if (error) throw error;
+
+  return (data ?? []).reduce<Record<string, ChannelConsents>>((acc, row) => {
+    const channel = row.channel as ConsentChannel;
+    const current = acc[row.client_id] ?? {};
+    return { ...acc, [row.client_id]: { ...current, [channel]: { optedIn: row.opted_in, updatedAt: row.updated_at } } };
+  }, {});
+}
+
+/**
+ * Europe (channel_rgpd) : état de l'accord sur un canal pour tous les clients
+ * d'un hôtel (lu par pages de 1000, limite par défaut de l'API).
+ */
+export async function getProfileChannelConsents(
+  profileId: string,
+  channel: ConsentChannel
+): Promise<Record<string, ChannelConsentState>> {
+  const supabase = createClient();
+  const PAGE = 1000;
+  let result: Record<string, ChannelConsentState> = {};
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("communication_preferences")
+      .select("client_id, opted_in, updated_at")
+      .eq("profile_id", profileId)
+      .eq("channel", channel)
+      .order("client_id")
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    const rows = data ?? [];
+    result = rows.reduce(
+      (acc, row) => ({ ...acc, [row.client_id]: { optedIn: row.opted_in, updatedAt: row.updated_at } }),
+      result
+    );
+    if (rows.length < PAGE) return result;
+  }
+}
+
 export interface UnsubscribeResult {
   hotelName: string | null;
   alreadyUnsubscribed: boolean;
@@ -180,6 +268,9 @@ export interface AddClientInput {
   // Accord du client, recueilli à la réception, pour recevoir les offres de
   // l'hôtel par WhatsApp (Afrique). Non coché = aucun accord enregistré.
   whatsappConsent?: boolean;
+  // Europe (channel_rgpd) : canaux pour lesquels le client vient de donner
+  // son accord à la réception. Un canal absent n'est jamais modifié.
+  channelConsents?: ConsentChannel[];
 }
 
 /**
@@ -218,24 +309,18 @@ export async function addClient(profileId: string, input: AddClientInput): Promi
       ? { marketing_consent: true, marketing_consent_source: "registre" }
       : {};
 
-  if (existingId) {
-    const { data, error } = await supabase
-      .from("clients")
-      .update({ ...row, ...consentFields })
-      .eq("id", existingId)
-      .select()
-      .single();
-    if (error) throw error;
-    return data as Client;
-  }
-
-  const { data, error } = await supabase
-    .from("clients")
-    .insert({ ...row, ...consentFields, profile_id: profileId })
-    .select()
-    .single();
+  const { data, error } = existingId
+    ? await supabase.from("clients").update({ ...row, ...consentFields }).eq("id", existingId).select().single()
+    : await supabase.from("clients").insert({ ...row, ...consentFields, profile_id: profileId }).select().single();
   if (error) throw error;
-  return data as Client;
+  const saved = data as Client;
+
+  if (getConsentModel() === "channel_rgpd") {
+    for (const channel of input.channelConsents ?? []) {
+      await setChannelConsent(profileId, saved.id, channel, true, "registre");
+    }
+  }
+  return saved;
 }
 
 export interface ImportClientRow {
@@ -503,20 +588,31 @@ export function previewImport(rows: ImportClientRow[]): ImportPreview {
  * (canal absent du fichier) ne déclenche aucun écrit : on n'invente jamais
  * un consentement, un contact sans information reste non éligible sur ce
  * canal (voir communication_preferences, aucune ligne = non consentant).
+ * Un client existant désinscrit (lien de désinscription, STOP) ou ayant
+ * refusé un canal n'est jamais réabonné par un import : seul un nouvel accord
+ * explicite (registre, bascule manuelle) le peut. Renvoie le nombre de
+ * canaux ainsi ignorés.
  */
 async function recordImportConsent(
   supabase: ReturnType<typeof createClient>,
   profileId: string,
   clientId: string,
-  source: ImportClientRow
-): Promise<void> {
-  const channels: { channel: "whatsapp" | "email" | "sms"; consent: boolean | undefined }[] = [
+  source: ImportClientRow,
+  existing: { optedOut: boolean; consents: ChannelConsents } | null = null
+): Promise<number> {
+  const channels: { channel: ConsentChannel; consent: boolean | undefined }[] = [
     { channel: "whatsapp", consent: source.whatsappConsent },
     { channel: "email", consent: source.emailConsent },
     { channel: "sms", consent: source.smsConsent },
   ];
+  let skipped = 0;
   for (const { channel, consent } of channels) {
     if (consent === undefined) continue;
+    const refused = existing !== null && (existing.optedOut || existing.consents[channel]?.optedIn === false);
+    if (consent && refused) {
+      skipped++;
+      continue;
+    }
     await supabase.rpc("set_communication_preference", {
       p_profile_id: profileId,
       p_client_id: clientId,
@@ -529,6 +625,7 @@ async function recordImportConsent(
       p_original_consent_date: source.consentDate || null,
     });
   }
+  return skipped;
 }
 
 export async function importClients(
@@ -580,6 +677,8 @@ export async function importClients(
     return { marketing_consent: false, marketing_consent_source: null, marketing_consent_at: null };
   };
   let skippedOptedOut = 0;
+  const existingConsents =
+    consentModel === "channel_rgpd" ? await getChannelConsents(toUpdate.map((u) => u.id)) : {};
 
   let inserted = 0;
 
@@ -652,7 +751,8 @@ export async function importClients(
     } else {
       inserted++;
       if (consentModel === "channel_rgpd") {
-        await recordImportConsent(supabase, profileId, id, row.source);
+        const existing = { optedOut, consents: existingConsents[id] ?? {} };
+        if ((await recordImportConsent(supabase, profileId, id, row.source, existing)) > 0) skippedOptedOut++;
       }
     }
   }
@@ -916,6 +1016,9 @@ export const clients = {
   matchesAdvancedFilters,
   buildClientsCSV,
   setMarketingConsent,
+  setChannelConsent,
+  getChannelConsents,
+  getProfileChannelConsents,
   unsubscribe,
   getConsentModel,
 };

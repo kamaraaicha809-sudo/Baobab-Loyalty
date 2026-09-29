@@ -22,7 +22,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) return {};
+  if (!post || config.region === "europe") return {};
 
   return {
     title: `${post.title} — Baobab Loyalty`,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) notFound();
+  if (!post || config.region === "europe") notFound();
 
   const relatedPosts = getRelatedPosts(slug, 3);
   const contentHtml = markdownToHtml(post.content);

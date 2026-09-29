@@ -210,5 +210,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // blog module not yet created
   }
 
-  return [...staticRoutes, ...blogRoutes];
+  if (config.region !== "europe") return [...staticRoutes, ...blogRoutes];
+
+  // Europe : ne jamais annoncer les pages masquées sur Loyavia (pays
+  // africains, presse, blog) -- elles renvoient une 404 sur ce site.
+  const hiddenOnEurope = ["/blog", "/presse", "/cote-divoire", "/senegal", "/cameroun", "/ghana", "/accra", "/abidjan", "/dakar", "/douala"];
+  return staticRoutes.filter((route) => !hiddenOnEurope.some((path) => route.url === `${BASE_URL}${path}`));
 }

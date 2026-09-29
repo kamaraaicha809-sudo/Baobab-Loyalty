@@ -96,10 +96,14 @@ const Footer = () => {
           <Link href="/logiciel-fidelisation-hotel" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Logiciel de fidélisation
           </Link>
-          <span className="text-slate-300 text-xs">·</span>
-          <Link href="/blog" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
-            Blog
-          </Link>
+          {config.region !== "europe" && (
+            <>
+              <span className="text-slate-300 text-xs">·</span>
+              <Link href="/blog" className="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+                Blog
+              </Link>
+            </>
+          )}
         </div>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 mt-3 mb-1">
           <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Entreprise</span>

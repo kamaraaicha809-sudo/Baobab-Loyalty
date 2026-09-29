@@ -6,7 +6,7 @@ const isEurope = config.region === "europe";
 export const metadata: Metadata = {
   title: `Comment ça marche — 5 étapes pour fidéliser vos clients | ${config.appName}`,
   description: isEurope
-    ? "Créez votre compte, importez vos clients, segmentez et lancez votre première campagne WhatsApp en moins de 10 minutes. Guide complet pour les hôteliers."
+    ? "Créez votre compte, importez vos clients et segmentez-les. Une fois votre WhatsApp connecté, préparez et envoyez une campagne en 10 minutes. Guide complet pour les hôteliers."
     : "Créez votre compte, importez vos clients, segmentez et lancez votre première campagne WhatsApp en moins de 10 minutes. Guide complet pour les hôteliers d'Afrique.",
   keywords: isEurope
     ? [

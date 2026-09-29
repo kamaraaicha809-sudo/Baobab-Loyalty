@@ -24,7 +24,7 @@ export function NewsletterBanner() {
         {/* Subtitle */}
         <p className="mb-8 text-base text-[#a3c4b5] leading-relaxed">
           {config.region === "europe"
-            ? "Rejoignez les hôteliers qui reçoivent nos stratégies exclusives pour remplir leurs chambres et fidéliser leurs clients."
+            ? "Chaque mois, nos stratégies pour remplir vos chambres et fidéliser vos clients."
             : <>Chaque mois, nos stratégies pour remplir vos chambres et fidéliser vos clients,
               pensées pour les hôtels d&apos;Afrique de l&apos;Ouest.</>}
         </p>

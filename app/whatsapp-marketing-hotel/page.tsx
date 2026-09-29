@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import config from "@/config";
+import { signupNote } from "@/src/lib/region-copy";
 import { getSEOTags, renderBreadcrumbSchema, renderFAQSchema } from "@/libs/seo";
 
 const isEurope = config.region === "europe";
@@ -10,7 +11,7 @@ const isEurope = config.region === "europe";
 export const metadata = getSEOTags({
   title: `WhatsApp Marketing pour hôtels — ${config.appName}`,
   description: isEurope
-    ? "WhatsApp est un canal de communication direct et personnel pour vos clients d'hôtel. Découvrez comment lancer des campagnes WhatsApp ciblées, avec l'IA, en 2 minutes."
+    ? "WhatsApp est un canal de communication direct et personnel pour vos clients d'hôtel. Une fois votre WhatsApp connecté, préparez et envoyez une campagne ciblée, avec l'IA, en 10 minutes."
     : "WhatsApp est le canal de communication prioritaire des clients d'hôtel en Afrique. Découvrez comment lancer des campagnes WhatsApp ciblées, avec l'IA, en 2 minutes.",
   canonicalUrlRelative: "/whatsapp-marketing-hotel",
 });
@@ -192,7 +193,7 @@ export default function WhatsappMarketingHotelPage() {
               Lancez votre première campagne WhatsApp
             </h2>
             <p className="text-[#a3c4b5] text-base mb-8 leading-relaxed">
-              Sans carte bancaire. Opérationnel en 10 minutes.
+              {signupNote("Sans carte bancaire. Opérationnel en 10 minutes.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/demo" className="inline-block px-8 py-4 rounded-xl bg-[#EBC161] text-[#1a2f2a] text-sm font-bold hover:bg-[#d4a94d] transition-colors">
