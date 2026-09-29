@@ -215,7 +215,7 @@ const data: CountryPageData = {
   ],
   ctaTitle: "Prêt à fidéliser vos clients à Abidjan ?",
   ctaSubtitle:
-    "Rejoignez les hôteliers ivoiriens qui augmentent leurs réservations directes. Lancez-vous en 10 minutes, sans carte bancaire.",
+    "Faites partie des premiers hôteliers ivoiriens à utiliser Baobab Loyalty. Découvrez la démo, sans carte bancaire.",
   ctaButton: "Essayer gratuitement",
   relatedBlog: {
     slug: "marketing-hotel-abidjan-cote-ivoire",

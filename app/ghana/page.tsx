@@ -46,6 +46,8 @@ const localBusinessSchema = {
 const data: CountryPageData = {
   locale: "en",
   country: "Ghana",
+  availabilityNote:
+    "Baobab Loyalty is live in Côte d'Ivoire. The Ghana launch is being prepared: you can explore the demo today.",
   countryCode: "GH",
   heroEyebrow: "Hotel Guest Loyalty · Ghana",
   heroTitle: "Grow your hotel's direct bookings in",
@@ -149,7 +151,7 @@ const data: CountryPageData = {
   ],
   ctaTitle: "Ready to grow your Accra hotel's direct bookings?",
   ctaSubtitle:
-    "Join Ghanaian hoteliers who are increasing direct reservations with Baobab Loyalty. Up and running in 10 minutes, no credit card required.",
+    "Be among the first hoteliers in Ghana to hear when Baobab Loyalty launches. Explore the demo today, no credit card required.",
   ctaButton: "Start for free",
   relatedBlog: {
     slug: "hotel-loyalty-program-ghana-accra",

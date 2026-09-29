@@ -18,7 +18,7 @@ export function generateMetadata() {
 }
 
 const keyFacts = [
-  { value: "4", label: "marchés disponibles", detail: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
+  { value: "1", label: "marché de lancement", detail: "Côte d'Ivoire — Sénégal, Cameroun et Ghana en préparation" },
   { value: "10 min", label: "pour lancer une campagne", detail: "De l'import CSV au premier envoi WhatsApp" },
   { value: "0%", label: "commission sur les réservations directes", detail: "Contre 15 à 20% chez les OTAs" },
   { value: "39 000 FCFA", label: "prix d'entrée par mois", detail: "Sans engagement" },
@@ -123,7 +123,8 @@ export default function PressePage() {
                 <p className="text-slate-500 text-sm leading-relaxed mb-4">
                   Conçue spécifiquement pour le marché africain — WhatsApp comme canal
                   principal, facturation en FCFA, interface en français — Baobab Loyalty est
-                  disponible pour les hôteliers de Côte d&apos;Ivoire, du Sénégal, du Cameroun et du Ghana.
+                  lancé en Côte d&apos;Ivoire. Le Sénégal, le Cameroun et le Ghana sont les prochains
+                  marchés prévus.
                 </p>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   La plateforme est accessible à partir de 39 000 FCFA par mois, sans
@@ -135,7 +136,7 @@ export default function PressePage() {
                 <dl className="space-y-3">
                   {[
                     { label: "Secteur", value: "SaaS / Hôtellerie / Tech for Africa" },
-                    { label: "Marchés", value: "Côte d'Ivoire, Sénégal, Cameroun, Ghana" },
+                    { label: "Marchés", value: "Côte d'Ivoire (lancement) ; Sénégal, Cameroun, Ghana (en préparation)" },
                     { label: "Canal principal", value: "WhatsApp Business API" },
                     { label: "Devise", value: "FCFA (XOF)" },
                     { label: "Site web", value: "baobabloyalty.com" },

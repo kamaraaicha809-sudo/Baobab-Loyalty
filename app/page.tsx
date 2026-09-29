@@ -27,7 +27,7 @@ export default function Home() {
       {renderSchemaTags()}
       {renderOrganizationSchema()}
       {/* Ces questions affirment des faits propres à l'Afrique (pays desservis,
-          conformité ARTCI, prix FCFA) — jamais vrais pour l'Europe et jamais
+          loi ivoirienne, prix FCFA) — jamais vrais pour l'Europe et jamais
           inventer un équivalent RGPD non validé juridiquement ici. Suspendu
           pour l'Europe tant qu'un contenu FAQ Europe réel n'a pas été rédigé
           et validé (cf. audit Phase "pages publiques Europe", non commencé). */}
@@ -35,7 +35,7 @@ export default function Home() {
         {
           question: "Qu'est-ce que Baobab Loyalty ?",
           answer:
-            "Baobab Loyalty est une solution SaaS de fidélisation client pour les hôtels en Afrique de l'Ouest (Côte d'Ivoire, Sénégal, Cameroun, Ghana). Elle permet d'envoyer des campagnes WhatsApp personnalisées à vos clients inactifs en 2 minutes, grâce à l'IA et à la segmentation automatique.",
+            "Baobab Loyalty est une solution SaaS de fidélisation client pour les hôtels d'Afrique de l'Ouest, lancée en Côte d'Ivoire. Elle permet d'envoyer des campagnes WhatsApp personnalisées aux clients inactifs qui ont donné leur accord, grâce à l'IA et à la segmentation automatique.",
         },
         {
           question: "Combien coûte Baobab Loyalty ?",
@@ -45,7 +45,7 @@ export default function Home() {
         {
           question: "Dans quels pays est disponible Baobab Loyalty ?",
           answer:
-            "Baobab Loyalty est disponible en Côte d'Ivoire, au Sénégal, au Cameroun et au Ghana. La solution est entièrement en français pour les marchés francophones, et une version anglaise est disponible pour le Ghana.",
+            "Baobab Loyalty est lancé en Côte d'Ivoire. Le Sénégal, le Cameroun et le Ghana sont les prochains marchés prévus. La solution est en français, avec une version anglaise préparée pour le Ghana.",
         },
         {
           question: "Faut-il un compte WhatsApp Business pour utiliser Baobab Loyalty ?",
@@ -58,9 +58,9 @@ export default function Home() {
             "L'import se fait via un fichier CSV depuis votre logiciel hôtelier existant. Baobab Loyalty détecte automatiquement les colonnes (nom, email, téléphone, WhatsApp, dernière visite) et importe vos clients en quelques secondes.",
         },
         {
-          question: "Baobab Loyalty est-il conforme au RGPD et à la réglementation ARTCI ?",
+          question: "Comment Baobab Loyalty protège-t-il les données de mes clients ?",
           answer:
-            "Oui. Baobab Loyalty est conçu pour être conforme à la réglementation sur la protection des données personnelles en Côte d'Ivoire (ARTCI) et dans les pays de la région. Les données clients sont stockées de manière sécurisée et chaque message inclut une option de désinscription.",
+            "Baobab Loyalty applique la loi ivoirienne n° 2013-450 sur la protection des données personnelles : données cloisonnées par hôtel, messages WhatsApp envoyés uniquement aux clients qui ont donné leur accord, et lien de désinscription dans chaque message. Les formalités auprès de l'ARTCI (déclaration et autorisation de transfert des données) sont en préparation.",
         },
       ])}
       <Suspense>

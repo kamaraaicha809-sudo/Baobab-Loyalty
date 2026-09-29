@@ -40,6 +40,9 @@ export interface CountryPageData {
   ctaSubtitle: string;
   ctaButton: string;
   relatedBlog?: { slug: string; title: string; readingTime: number };
+  // Marché pas encore ouvert : affiché sous le titre pour ne pas laisser
+  // croire que le service y est déjà disponible.
+  availabilityNote?: string;
 }
 
 export function CountryLandingPage({ data }: { data: CountryPageData }) {
@@ -58,6 +61,11 @@ export function CountryLandingPage({ data }: { data: CountryPageData }) {
           <p className="text-slate-500 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
             {data.heroSubtitle}
           </p>
+          {data.availabilityNote && (
+            <p className="max-w-2xl mx-auto mb-8 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm leading-relaxed">
+              {data.availabilityNote}
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/demo"

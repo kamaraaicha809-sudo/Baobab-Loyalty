@@ -46,6 +46,8 @@ const localBusinessSchema = {
 const data: CountryPageData = {
   locale: "fr",
   country: "Cameroun",
+  availabilityNote:
+    "Baobab Loyalty est lancé en Côte d'Ivoire. Le lancement au Cameroun est en préparation : vous pouvez dès maintenant découvrir la démo.",
   countryCode: "CM",
   heroEyebrow: "Fidélisation hôtelière · Douala",
   heroTitle: "Fidélisez vos clients hôtel à",
@@ -150,7 +152,7 @@ const data: CountryPageData = {
   ],
   ctaTitle: "Prêt à fidéliser vos clients à Douala ?",
   ctaSubtitle:
-    "Rejoignez les hôteliers doualais qui augmentent leurs réservations directes avec Baobab Loyalty. Opérationnel en 10 minutes, sans carte bancaire.",
+    "Soyez parmi les premiers hôteliers doualais informés du lancement de Baobab Loyalty au Cameroun. Découvrez la démo dès maintenant, sans carte bancaire.",
   ctaButton: "Essayer gratuitement",
   relatedBlog: {
     slug: "crm-hotelier-afrique-solutions",

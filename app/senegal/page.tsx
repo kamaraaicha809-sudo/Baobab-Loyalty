@@ -41,6 +41,8 @@ const localBusinessSchema = {
 const data: CountryPageData = {
   locale: "fr",
   country: "Sénégal",
+  availabilityNote:
+    "Baobab Loyalty est lancé en Côte d'Ivoire. Le lancement au Sénégal est en préparation : vous pouvez dès maintenant découvrir la démo.",
   countryCode: "SN",
   heroEyebrow: "Fidélisation hôtelière · Sénégal",
   heroTitle: "Fidélisez vos clients hôtel au",
@@ -145,7 +147,7 @@ const data: CountryPageData = {
   ],
   ctaTitle: "Prêt à fidéliser vos clients à Dakar ?",
   ctaSubtitle:
-    "Rejoignez les hôteliers sénégalais qui augmentent leurs réservations directes avec Baobab Loyalty. Opérationnel en 10 minutes.",
+    "Soyez parmi les premiers hôteliers sénégalais informés du lancement de Baobab Loyalty au Sénégal. Découvrez la démo dès maintenant.",
   ctaButton: "Essayer gratuitement",
   relatedBlog: {
     slug: "fidelisation-hotel-dakar-senegal",

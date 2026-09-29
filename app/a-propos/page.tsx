@@ -125,8 +125,8 @@ export default function AProposPage() {
                 Où sommes-nous disponibles ?
               </h2>
               <p className="text-[#a3c4b5] text-sm sm:text-base mb-10 max-w-xl mx-auto leading-relaxed">
-                Baobab Loyalty est disponible dans quatre marchés d&apos;Afrique francophone
-                et anglophone.
+                Baobab Loyalty est lancé en Côte d&apos;Ivoire. Le Sénégal, le Cameroun et le
+                Ghana sont les prochains marchés prévus.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 {markets.map((market) => (

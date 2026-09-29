@@ -212,12 +212,9 @@ export const renderOrganizationSchema = () => {
               name: "RCCM",
               value: "CI-BAS-01-2026-B12-00604",
             },
-            areaServed: [
-              { "@type": "Country", name: "Côte d'Ivoire" },
-              { "@type": "Country", name: "Sénégal" },
-              { "@type": "Country", name: "Cameroun" },
-              { "@type": "Country", name: "Ghana" },
-            ],
+            // Seul marché réellement ouvert. Sénégal, Cameroun et Ghana à
+            // rajouter ici le jour de leur lancement effectif.
+            areaServed: [{ "@type": "Country", name: "Côte d'Ivoire" }],
           }),
           knowsLanguage: ["fr", "en"],
           contactPoint: {
