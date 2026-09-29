@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 function ConfidentialiteEurope() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 15 septembre 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <p className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-8 inline-block">
         Document provisoire — base à faire valider par un professionnel du droit RGPD avant mise en production commerciale.
       </p>
@@ -56,15 +56,17 @@ function ConfidentialiteEurope() {
               </ul>
             </div>
             <div className="bg-slate-50 rounded-lg p-4">
-              <p className="font-medium text-slate-700 mb-2">Données de mesure d&apos;audience (visiteurs du site, uniquement avec votre consentement)</p>
+              <p className="font-medium text-slate-700 mb-2">Données de mesure d&apos;audience (visiteurs du site) — non collectées à ce jour</p>
               <ul className="text-slate-600 text-sm space-y-1 list-disc list-inside">
                 <li>Pages consultées et parcours de navigation sur nos pages publiques</li>
                 <li>Interactions avec les éléments de la page (clics, défilement)</li>
                 <li>Informations techniques : type d&apos;appareil, navigateur, pays approximatif</li>
               </ul>
               <p className="text-slate-500 text-xs mt-2">
-                Collectées via PostHog uniquement si vous cliquez sur « Accepter » dans le bandeau
-                cookies. Aucune collecte si vous refusez ou avant votre choix. Ces outils ne
+                Aucun outil de mesure d&apos;audience n&apos;est activé à ce jour sur Loyavia : aucune de
+                ces données n&apos;est collectée. S&apos;il est activé (PostHog), il ne fonctionnera que si vous
+                cliquez sur « Accepter » dans le bandeau cookies, et cette politique sera mise à jour
+                auparavant. Aucune collecte si vous refusez ou avant votre choix. Ces outils ne
                 tournent jamais dans votre espace hôtelier (tableau de bord) : ils ne touchent
                 jamais les données de vos propres clients. Voir la{" "}
                 <a href="/legal/cookies" className="text-primary hover:underline">politique cookies</a>.
@@ -81,7 +83,7 @@ function ConfidentialiteEurope() {
             <li>Envoi d&apos;emails transactionnels (confirmation, factures)</li>
             <li>Support client et assistance technique</li>
             <li>Amélioration du service (données anonymisées)</li>
-            <li>Mesure d&apos;audience de notre site web (uniquement avec votre consentement)</li>
+            <li>Mesure d&apos;audience de notre site web (non activée à ce jour ; uniquement avec votre consentement si elle l&apos;est)</li>
           </ul>
         </section>
 
@@ -92,7 +94,7 @@ function ConfidentialiteEurope() {
           </p>
           <ul className="mt-3 space-y-2 text-slate-600 list-disc list-inside">
             <li><strong>L&apos;exécution du contrat</strong> (art. 6.1.b RGPD) : pour vous fournir le service souscrit</li>
-            <li><strong>Le consentement</strong> (art. 6.1.a RGPD) : pour la mesure d&apos;audience (PostHog) et les communications marketing, le cas échéant</li>
+            <li><strong>Le consentement</strong> (art. 6.1.a RGPD) : pour la mesure d&apos;audience (si elle est activée) et les communications marketing, le cas échéant</li>
             <li><strong>L&apos;intérêt légitime</strong> (art. 6.1.f RGPD) : pour améliorer le service et prévenir la fraude</li>
             <li><strong>L&apos;obligation légale</strong> (art. 6.1.c RGPD) : pour la conservation des données de facturation</li>
           </ul>
@@ -104,7 +106,7 @@ function ConfidentialiteEurope() {
             <li><strong>Données de compte :</strong> durée de l&apos;abonnement + 3 ans après résiliation</li>
             <li><strong>Données de facturation :</strong> durée légale de conservation comptable applicable une fois l&apos;entité juridique et son pays d&apos;immatriculation connus (à confirmer)</li>
             <li><strong>Journaux d&apos;activité :</strong> 12 mois</li>
-            <li><strong>Données de mesure d&apos;audience (PostHog) :</strong> durée définie par les paramètres du compte PostHog de Loyavia ; supprimées immédiatement si vous refusez le dépôt de cookies non essentiels</li>
+            <li><strong>Données de mesure d&apos;audience :</strong> sans objet à ce jour (aucune collecte) ; la durée sera précisée ici avant toute activation</li>
           </ul>
         </section>
 
@@ -126,7 +128,7 @@ function ConfidentialiteEurope() {
                 <tr>
                   <td className="p-3 border border-slate-200">Supabase</td>
                   <td className="p-3 border border-slate-200">Base de données & authentification</td>
-                  <td className="p-3 border border-slate-200">Données hébergées à Frankfurt, Allemagne (UE) — pas de transfert hors UE pour le stockage. Société éditrice basée aux États-Unis, DPA avec clauses contractuelles types disponible.</td>
+                  <td className="p-3 border border-slate-200">Données stockées à Francfort, Allemagne (UE). Supabase Inc. est une société américaine : les accès techniques éventuels depuis les États-Unis (support, maintenance) relèvent des clauses contractuelles types (modules 2 et 3) intégrées au DPA de Supabase. Supabase n&apos;est pas certifiée EU-US Data Privacy Framework et met à disposition une analyse d&apos;impact des transferts. L&apos;acceptation formelle de ce DPA par Loyavia n&apos;est pas encore finalisée.</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Vercel</td>
@@ -154,9 +156,9 @@ function ConfidentialiteEurope() {
                   <td className="p-3 border border-slate-200">Entité européenne Stripe Payments Europe Limited (Irlande) ; transferts vers les États-Unis couverts par un addendum de transfert de données (clauses contractuelles types + EU-US Data Privacy Framework)</td>
                 </tr>
                 <tr>
-                  <td className="p-3 border border-slate-200">PostHog</td>
-                  <td className="p-3 border border-slate-200">Mesure d&apos;audience du site (uniquement avec consentement, jamais dans le tableau de bord hôtelier)</td>
-                  <td className="p-3 border border-slate-200">États-Unis (aucun hébergement UE configuré à ce jour pour Loyavia ; PostHog propose une option d&apos;hébergement UE à Frankfurt, non activée) — clauses contractuelles types + participation de PostHog au cadre EU-US Data Privacy Framework.</td>
+                  <td className="p-3 border border-slate-200">PostHog <span className="text-xs text-slate-400">(non activé)</span></td>
+                  <td className="p-3 border border-slate-200">Mesure d&apos;audience du site, si elle est activée (uniquement avec consentement, jamais dans le tableau de bord hôtelier)</td>
+                  <td className="p-3 border border-slate-200">Aucune donnée transmise à ce jour : l&apos;outil n&apos;est pas configuré sur Loyavia. En cas d&apos;activation : hébergement UE (Francfort) proposé par PostHog, ou États-Unis couverts par la certification EU-US Data Privacy Framework de PostHog.</td>
                 </tr>
               </tbody>
             </table>
@@ -176,7 +178,7 @@ function ConfidentialiteEurope() {
             <li><strong>Droit à la limitation du traitement :</strong> demander la suspension temporaire d&apos;un traitement dans certains cas prévus par le RGPD</li>
             <li><strong>Droit à la portabilité :</strong> recevoir vos données dans un format structuré et couramment utilisé</li>
             <li><strong>Droit d&apos;opposition :</strong> vous opposer à certains traitements, notamment ceux fondés sur l&apos;intérêt légitime</li>
-            <li><strong>Droit de retirer votre consentement à tout moment :</strong> pour les traitements dont le consentement est la base légale (mesure d&apos;audience PostHog), sans affecter la licéité du traitement effectué avant ce retrait</li>
+            <li><strong>Droit de retirer votre consentement à tout moment :</strong> pour les traitements dont le consentement est la base légale (par exemple la mesure d&apos;audience, si elle est activée), sans affecter la licéité du traitement effectué avant ce retrait</li>
           </ul>
           <p className="text-slate-600 leading-relaxed mt-3">
             <strong>Décision entièrement automatisée (art. 22 RGPD) :</strong> Loyavia utilise une segmentation automatique et une génération de messages assistée par IA, mais ce sont des outils d&apos;aide à la décision pour l&apos;hôtelier. Aucune décision individuelle entièrement automatisée produisant des effets juridiques vous concernant ou vous affectant de manière significative n&apos;est mise en œuvre à ce jour. Ce point sera réévalué si les fonctionnalités du service évoluent.

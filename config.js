@@ -310,6 +310,12 @@ const config = {
   legal: {
     termsVersion: "2026-09-29",
     requireTermsAcceptance: region !== "europe",
+    // Europe : clause d'acceptation electronique du DPA, redigee mais masquee
+    // tant que ses modalites (qui peut accepter au nom de l'hotel, preuve)
+    // ne sont pas validees juridiquement. A activer en meme temps que
+    // requireTermsAcceptance et qu'une version publiee dans
+    // legal_document_versions (migration Europe 016). Sans effet en Afrique.
+    dpaElectronicAcceptanceEurope: false,
   },
 
 };

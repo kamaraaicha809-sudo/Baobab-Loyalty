@@ -5,17 +5,41 @@ export const metadata: Metadata = {
   title: config.region === "europe" ? "Accord de sous-traitance (DPA) | Loyavia" : "Accord de sous-traitance (DPA) | Baobab Loyalty",
 };
 
+/**
+ * Clause d'acceptation electronique (Europe), redigee mais masquee tant que
+ * config.legal.dpaElectronicAcceptanceEurope est false : ses modalites
+ * (personne habilitee, valeur probante) restent a valider juridiquement.
+ * Elle decrit le mecanisme technique deja en place (migration Europe 016).
+ */
+function DPAElectronicAcceptanceClause() {
+  return (
+    <div className="text-slate-500 mb-10 space-y-3">
+      <p>
+        Ce document précise les rôles et obligations de chaque partie concernant les données personnelles des clients de l&apos;hôtel traitées via Loyavia. Il fait partie intégrante des <a href="/legal/cgu" className="text-primary hover:underline">CGU</a> et des <a href="/legal/cgv" className="text-primary hover:underline">CGV</a>.
+      </p>
+      <p>
+        <strong>Acceptation électronique.</strong> Le présent accord est conclu par voie électronique. Lors de sa première connexion au tableau de bord, puis à chaque nouvelle version, l&apos;hôtel doit accepter les CGU, les CGV et le présent accord en cochant une case avant de pouvoir utiliser le service. Loyavia enregistre, pour chaque acceptation, la version acceptée, la liste des documents, la date et l&apos;heure (posées par ses serveurs), le compte hôtel concerné et l&apos;utilisateur ayant accepté. Cet enregistrement ne peut être modifié ni par l&apos;hôtel ni par l&apos;utilisateur ; l&apos;hôtel peut le consulter sur demande.
+      </p>
+      <p>[Personne habilitée à accepter au nom de l&apos;hôtel : modalités à valider juridiquement.]</p>
+    </div>
+  );
+}
+
 function DPAEurope() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 15 septembre 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <p className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-8 inline-block">
         Document provisoire — base à faire valider par un professionnel du droit RGPD avant mise en production commerciale.
       </p>
       <h1 className="text-3xl font-bold text-slate-900 mb-4">Accord de sous-traitance des données (DPA)</h1>
-      <p className="text-slate-500 mb-10">
-        Ce document précise les rôles et obligations de chaque partie concernant les données personnelles des clients de l&apos;hôtel traitées via Loyavia. Il fait partie intégrante des <a href="/legal/cgu" className="text-primary hover:underline">CGU</a> et des <a href="/legal/cgv" className="text-primary hover:underline">CGV</a> et s&apos;applique automatiquement à tout compte hôtelier créé sur la plateforme.
-      </p>
+      {config.legal.dpaElectronicAcceptanceEurope ? (
+        <DPAElectronicAcceptanceClause />
+      ) : (
+        <p className="text-slate-500 mb-10">
+          Ce document précise les rôles et obligations de chaque partie concernant les données personnelles des clients de l&apos;hôtel traitées via Loyavia. Il fait partie intégrante des <a href="/legal/cgu" className="text-primary hover:underline">CGU</a> et des <a href="/legal/cgv" className="text-primary hover:underline">CGV</a> et s&apos;applique automatiquement à tout compte hôtelier créé sur la plateforme.
+        </p>
+      )}
 
       <div className="prose prose-slate max-w-none space-y-8">
 
@@ -38,7 +62,7 @@ function DPAEurope() {
               <tbody>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium text-slate-700 w-1/3">Nature des opérations</td>
-                  <td className="p-3 border border-slate-200">Import, stockage, segmentation, génération de messages, envoi de campagnes WhatsApp/email, suivi des réservations et des redemptions</td>
+                  <td className="p-3 border border-slate-200">Import, saisie au registre, stockage, segmentation, enregistrement des accords et des retraits de chaque client par canal, génération de messages, envoi de campagnes WhatsApp/email, suivi des réservations et des redemptions</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200 font-medium text-slate-700">Finalité</td>
@@ -50,7 +74,7 @@ function DPAEurope() {
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200 font-medium text-slate-700">Catégories de données</td>
-                  <td className="p-3 border border-slate-200">Nom, numéro de téléphone/WhatsApp, email, date et fréquence de séjour, historique de réservation</td>
+                  <td className="p-3 border border-slate-200">Nom, numéro de téléphone/WhatsApp, email, date et fréquence de séjour, historique de réservation et montant dépensé, type de chambre préféré, date de naissance (facultative), notes saisies par l&apos;hôtel, accords et retraits par canal (avec leur date et leur origine)</td>
                 </tr>
                 <tr>
                   <td className="p-3 border border-slate-200 font-medium text-slate-700">Durée du traitement</td>
@@ -59,6 +83,10 @@ function DPAEurope() {
               </tbody>
             </table>
           </div>
+          <h3 className="text-base font-semibold text-slate-800 mt-6 mb-2">Traçabilité des accords de communication, canal par canal</h3>
+          <p className="text-slate-600 leading-relaxed">
+            Pour chaque client et pour chaque canal (WhatsApp, email, SMS), Loyavia enregistre, sur instruction de l&apos;hôtel, l&apos;état de l&apos;accord (donné ou retiré), la date et l&apos;heure de l&apos;enregistrement (posées par les serveurs de Loyavia), son origine (saisie au registre, import d&apos;un fichier, modification manuelle par l&apos;hôtel, lien de désinscription, réponse « STOP » sur WhatsApp) et, pour un import, la date d&apos;accord d&apos;origine indiquée dans le fichier. Un client sans accord enregistré sur un canal ne reçoit aucune campagne sur ce canal ; un import ne peut jamais réinscrire un client qui s&apos;est désinscrit. Ces enregistrements sont consultables et exportables par l&apos;hôtel. Il appartient à l&apos;hôtel, responsable du traitement, de recueillir ces accords (voir article 6).
+          </p>
         </section>
 
         <section>
@@ -93,7 +121,7 @@ function DPAEurope() {
                 <tr>
                   <td className="p-3 border border-slate-200">Supabase</td>
                   <td className="p-3 border border-slate-200">Hébergement base de données & authentification</td>
-                  <td className="p-3 border border-slate-200">Frankfurt, Allemagne (UE) — pas de transfert hors UE pour le stockage. Société éditrice basée aux États-Unis, DPA avec clauses contractuelles types disponible.</td>
+                  <td className="p-3 border border-slate-200">Données stockées à Francfort, Allemagne (UE). Supabase Inc. est une société américaine : les accès techniques éventuels depuis les États-Unis (support, maintenance) relèvent des clauses contractuelles types (modules 2 et 3) intégrées au DPA de Supabase. Supabase n&apos;est pas certifiée EU-US Data Privacy Framework et met à disposition une analyse d&apos;impact des transferts. L&apos;acceptation formelle de ce DPA par Loyavia n&apos;est pas encore finalisée.</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-3 border border-slate-200">Vercel</td>
@@ -127,7 +155,7 @@ function DPAEurope() {
             Loyavia informera l&apos;hôtel de tout changement prévu concernant l&apos;ajout ou le remplacement d&apos;un sous-traitant ultérieur, lui donnant ainsi la possibilité de s&apos;y opposer.
           </p>
           <p className="text-slate-600 leading-relaxed mt-3">
-            PostHog (mesure d&apos;audience du site public de Loyavia) n&apos;apparaît pas
+            PostHog (outil de mesure d&apos;audience du site public, non activé à ce jour sur Loyavia) n&apos;apparaît pas
             dans ce tableau : il ne reçoit et ne traite jamais les données des clients de
             l&apos;hôtel, qui restent exclusivement dans l&apos;espace hôtelier (tableau de bord),
             zone dans laquelle cet outil ne fonctionne à aucun moment.

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 function CookiesEurope() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
-      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 15 septembre 2026</p>
+      <p className="text-sm text-slate-400 mb-2">Dernière mise à jour : 29 septembre 2026</p>
       <h1 className="text-3xl font-bold text-slate-900 mb-10">Politique de Cookies</h1>
 
       <div className="prose prose-slate max-w-none space-y-8">
@@ -46,14 +46,11 @@ function CookiesEurope() {
 
             <div className="border border-slate-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded">Consentement requis</span>
+                <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-xs font-medium rounded">Non utilisés à ce jour</span>
                 <p className="font-medium text-slate-700">Cookies d&apos;analyse (PostHog)</p>
               </div>
               <p className="text-slate-600 text-sm">
-                Nous aident à comprendre comment les visiteurs utilisent nos pages publiques (pages vues, clics). Ces cookies ne sont déposés que si vous cliquez sur « Accepter » dans le bandeau, et jamais dans votre espace hôtelier (tableau de bord). Durée : 12 mois. Vous pouvez les refuser ou retirer votre consentement à tout moment.
-              </p>
-              <p className="text-slate-400 text-xs mt-2">
-                Hébergement confirmé : États-Unis (aucune configuration d&apos;hébergement UE activée pour Loyavia à ce jour).
+                Aucun outil de mesure d&apos;audience n&apos;est configuré à ce jour sur Loyavia : aucun cookie d&apos;analyse n&apos;est déposé, même si vous cliquez sur « Accepter ». S&apos;il est activé, ces cookies ne seront déposés qu&apos;avec votre consentement et jamais dans votre espace hôtelier (tableau de bord) ; cette politique sera mise à jour auparavant (durée, hébergement).
               </p>
             </div>
           </div>
@@ -66,7 +63,7 @@ function CookiesEurope() {
           </p>
           <ul className="mt-3 space-y-2 text-slate-600 list-disc list-inside">
             <li><strong>Stripe</strong> <span className="text-xs text-slate-400">(prévu, non encore activé)</span> : cookies nécessaires au traitement sécurisé des paiements, une fois la facturation activée</li>
-            <li><strong>PostHog :</strong> cookies de mesure d&apos;audience, déposés uniquement avec votre consentement</li>
+            <li><strong>PostHog</strong> <span className="text-xs text-slate-400">(non activé)</span> : aucun cookie déposé à ce jour</li>
           </ul>
         </section>
 

@@ -114,9 +114,13 @@ Vérifié le 29/09/2026 sur les pages officielles des prestataires.
 
 ## Points ouverts
 
-1. Fixer l'entité juridique, l'autorité chef de file et la désignation éventuelle d'un DPO.
-2. Accepter formellement le DPA Supabase (et conserver la TIA) ; accepter les DPA Vercel et Resend.
-3. OpenRouter : sans DPA signé, envisager l'offre Enterprise, le routage UE, ou l'AI Gateway avec un fournisseur UE (Mistral) avant d'activer l'IA en Europe.
-4. Fixer les durées de conservation (comptes, preuves d'acceptation, demandes RGPD, registre des violations).
-5. Ajouter dans l'interface IA un rappel : « N'écrivez jamais de données de vos clients dans ce champ ».
-6. Mettre à jour le tableau `subprocessors_registry` en base à chaque changement (migration Europe 017 : Vercel et OpenRouter ajoutés, Resend et PostHog corrigés).
+Le suivi détaillé (corrigé / en attente technique / à valider juridiquement) est tenu dans [SUIVI_CONFORMITE_LOYAVIA.md](SUIVI_CONFORMITE_LOYAVIA.md). En résumé, restent à valider juridiquement, sans décision prise à ce jour :
+
+1. Entité juridique, autorité chef de file, droit applicable, TVA ; désignation éventuelle d'un DPO.
+2. Acceptation formelle des DPA Supabase (et conservation de sa TIA), Vercel et Resend.
+3. OpenRouter : usage sans DPA signé, ou offre Enterprise / routage UE / fournisseur UE via l'AI Gateway, avant d'activer l'IA en Europe.
+4. Durées de conservation (comptes, preuves d'acceptation, demandes RGPD, registre des violations, facturation).
+5. Personne habilitée à accepter le DPA au nom de l'hôtel (clause d'acceptation électronique rédigée, masquée).
+6. Soft opt-in pour les clients existants des hôtels.
+
+Fait depuis la création du registre : rappel « n'écrivez jamais de données de vos clients » sous les champs envoyés à l'IA (page Templates) ; pages légales Europe alignées sur la réalité (PostHog non activé, situation de Supabase, traçabilité des accords par canal). Le tableau `subprocessors_registry` en base doit être mis à jour à chaque changement de prestataire (dernière mise à jour : migration Europe 017).

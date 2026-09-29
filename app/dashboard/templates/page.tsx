@@ -16,6 +16,12 @@ import {
   demoProfile,
 } from "@/src/lib/demo";
 import type { MessageTemplate } from "@/src/sdk/linkedin";
+import config from "@/config";
+
+// Europe : ces champs sont envoyés au fournisseur d'IA ; rappel de ne jamais
+// y saisir de données de clients (registre des traitements Europe, B5).
+const AI_NO_CLIENT_DATA_HINT =
+  config.region === "europe" ? "Ce texte est envoyé à l'IA : n'y écrivez jamais le nom ni les coordonnées d'un client." : null;
 
 const SEGMENT_NAMES: Record<string, string> = {
   "3-6mois":  "Clients 3 à 6 mois",
@@ -563,6 +569,7 @@ function OffresTab({
                       rows={2}
                       className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                     />
+                    {AI_NO_CLIENT_DATA_HINT && <p className="text-xs text-slate-400 mt-1.5">{AI_NO_CLIENT_DATA_HINT}</p>}
                   </div>
 
                   <button
@@ -1198,6 +1205,7 @@ function LinkedInPostTab() {
             rows={3}
             className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-sm"
           />
+          {AI_NO_CLIENT_DATA_HINT && <p className="text-xs text-slate-400 mt-1.5">{AI_NO_CLIENT_DATA_HINT}</p>}
         </div>
 
         <div>

@@ -50,7 +50,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 				<link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-				<link rel="dns-prefetch" href="https://us.i.posthog.com" />
+				{/* PostHog n'est pas configure sur Loyavia (Europe) : aucune resolution vers ses serveurs. */}
+				{config.region !== "europe" && <link rel="dns-prefetch" href="https://us.i.posthog.com" />}
 				{renderWebSiteSchema()}
 			</head>
 			<body>
