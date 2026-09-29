@@ -4,6 +4,8 @@ Document de suivi interne. À mettre à jour à chaque étape. Dernière mise à
 
 Ce document garde la trace de trois choses : ce qui a été corrigé, ce qui attend un élément technique extérieur, et ce qui attend une validation juridique. **Aucune question juridique de fond n'a été tranchée** : elles sont listées en partie C, pour le futur juriste.
 
+**Statut au 29/09/2026** : corrections validées par l'utilisatrice et conservées, prêtes à déployer, sur la branche `fix/loyavia-conformite-rgpd`. **Ne pas pousser sur `main` sans GO explicite** (le push redéploie aussi Baobab Afrique). Les tests Meta réels du STOP WhatsApp sont à refaire dès que le secret Meta Europe sera disponible (voir B1).
+
 Documents liés : [registre des traitements](REGISTRE_TRAITEMENTS_EUROPE.md) · [procédure en cas de violation](PROCEDURE_VIOLATION_DONNEES_EUROPE.md).
 
 Règle constante : chaque changement Loyavia passe par la région (`config.region === "europe"` côté site, `CONSENT_MODEL` / `APP_BRAND` côté serveur). Baobab Afrique n'est jamais modifié.
