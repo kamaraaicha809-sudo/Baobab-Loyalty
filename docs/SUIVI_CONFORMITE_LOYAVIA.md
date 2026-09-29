@@ -4,7 +4,9 @@ Document de suivi interne. À mettre à jour à chaque étape. Dernière mise à
 
 Ce document garde la trace de trois choses : ce qui a été corrigé, ce qui attend un élément technique extérieur, et ce qui attend une validation juridique. **Aucune question juridique de fond n'a été tranchée** : elles sont listées en partie C, pour le futur juriste.
 
-**Statut au 29/09/2026** : corrections validées par l'utilisatrice et conservées, prêtes à déployer, sur la branche `fix/loyavia-conformite-rgpd`. **Ne pas pousser sur `main` sans GO explicite** (le push redéploie aussi Baobab Afrique). Les tests Meta réels du STOP WhatsApp sont à refaire dès que le secret Meta Europe sera disponible (voir B1).
+**Statut au 29/09/2026** : corrections validées par l'utilisatrice. **Loyavia Europe déployé seul en production** depuis la branche `fix/loyavia-conformite-rgpd` (commit `6f2ecdc`), par un déploiement Vercel ciblant uniquement le projet `loyavia-europe` : `main` n'a pas été modifiée et Baobab Afrique n'a été ni reconstruit ni redéployé. La clause d'acceptation électronique du DPA reste désactivée ; les points de la partie C restent non validés juridiquement. Les tests Meta réels du STOP WhatsApp sont à refaire dès que le secret Meta Europe sera disponible (voir B1).
+
+> **Attention — `main` est en retard sur la production Loyavia.** Tant que la branche n'est pas fusionnée dans `main`, tout push sur `main` (par exemple pour Baobab) redéploierait Loyavia **sans** ces corrections. Avant le prochain push sur `main`, fusionner d'abord `fix/loyavia-conformite-rgpd` (comparaison Afrique déjà faite : 74/74 pages identiques) — avec le GO de l'utilisatrice, puisque cela redéploie Baobab. Retour arrière Loyavia possible vers l'ancienne production `dpl_FAAu8F8xPeuqoz9LTmzSeKcvYTZa` (commit `f6eb631`).
 
 Documents liés : [registre des traitements](REGISTRE_TRAITEMENTS_EUROPE.md) · [procédure en cas de violation](PROCEDURE_VIOLATION_DONNEES_EUROPE.md).
 
@@ -51,7 +53,7 @@ Règle constante : chaque changement Loyavia passe par la région (`config.regio
 | # | Sujet | Ce qui bloque | Ce qu'il faudra faire |
 |---|---|---|---|
 | B1 | Test STOP WhatsApp signé | Aucune application Meta Europe ; le Vault Europe ne contient ni `META_APP_SECRET` ni `WHATSAPP_WEBHOOK_VERIFY_TOKEN` : **le webhook Europe ne peut traiter aucun message aujourd'hui** | Créer l'app Meta Europe, mettre le secret dans le Vault Europe et dans `.env.europe.local`, relancer `node scripts/regression-tests/europe-whatsapp-stop.mjs` |
-| B2 | Mise en ligne sur loyavia.com | Push sur `main` en attente du GO de l'utilisatrice (redéploie aussi Baobab) | Rebuild des deux régions, push, vérifier les deux déploiements Vercel |
+| B2 | Fusion de la branche dans `main` | Loyavia est en ligne via un déploiement séparé ; la fusion redéploierait Baobab (contenu Afrique identique, mais nouveau déploiement) : GO de l'utilisatrice requis | Fusionner avant tout autre push sur `main`, puis vérifier les deux déploiements Vercel |
 | B3 | Aperçus Vercel Baobab | Les clés Supabase d'aperçu du projet baobab-loyalty sont limitées à la branche `dev` : tout aperçu d'une autre branche échoue | Choix de l'utilisatrice : étendre ces variables aux aperçus de toutes les branches, ou continuer à vérifier Baobab par build local |
 | B4 | Bandeau cookies Europe | Il demande un accord alors qu'aucun outil d'analyse n'est configuré | À revoir au moment où l'on décide d'activer (ou non) la mesure d'audience |
 | B5 | IA en Europe | `OPENROUTER_API_KEY` absent du Vault Europe : la génération IA ne fonctionne pas en Europe | Dépend de la décision C4 |
