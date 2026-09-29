@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import OnboardingGate from "@/components/onboarding/OnboardingGate";
 import SubscriptionGate from "@/components/dashboard/SubscriptionGate";
+import TermsGate from "@/components/dashboard/TermsGate";
 import TrialBanner from "@/components/dashboard/TrialBanner";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
@@ -59,6 +60,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <DashboardLayout>
       <OnboardingGate />
+      <TermsGate />
       <SubscriptionGate />
       <TrialBanner />
       {children}

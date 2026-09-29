@@ -6,6 +6,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { isDemoMode, demoSegmentCounts, demoClients } from "@/src/lib/demo";
 import { clients, Client, SegmentFilters, matchesAdvancedFilters } from "@/src/sdk/clients";
 import { createClient } from "@/libs/supabase/client";
+import config from "@/config";
+
+const isEurope = config.region === "europe";
 
 function matchesSegmentDateRange(client: Client, segmentId: string): boolean {
   if (segmentId === "tous") return true;
@@ -185,6 +188,12 @@ function ConfirmContent() {
           {hasActiveFilters && (
             <p className="mt-2 text-xs text-slate-400">
               Filtres combinables appliqués en plus du segment.
+            </p>
+          )}
+          {!isEurope && (
+            <p className="mt-2 text-xs text-slate-500">
+              Seuls les clients qui vous ont donné leur accord WhatsApp recevront ce message. Les autres sont exclus
+              automatiquement (accord à enregistrer depuis le registre ou la liste des clients).
             </p>
           )}
           {!stillLoadingFilteredCount && clientCount === 0 && (

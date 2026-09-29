@@ -14,6 +14,7 @@
     "test:posthog-entrypoint": "node scripts/regression-tests/posthog-single-entrypoint.mjs",
     "test:beta-trial-activation": "node scripts/regression-tests/beta-trial-activation.mjs",
     "test:pilot-journey": "node scripts/regression-tests/pilot-hotel-journey.mjs",
+    "test:legal-consent": "node scripts/regression-tests/legal-terms-and-consent-proof.mjs",
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
     "build": "next build",

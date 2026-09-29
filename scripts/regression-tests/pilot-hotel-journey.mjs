@@ -104,7 +104,9 @@ try {
 
   // 4. Import de la base clients CSV (memes colonnes que importClients() de
   // src/sdk/clients.ts), reparti sur les 4 segments pour verifier la
-  // segmentation ensuite
+  // segmentation ensuite. Depuis la migration 058, un client importe sans
+  // accord WhatsApp n'est jamais cible : les lignes portent donc l'accord,
+  // comme un fichier avec la colonne consentement_whatsapp a "oui".
   const today = new Date();
   const monthsAgo = (n) => new Date(today.getFullYear(), today.getMonth() - n, today.getDate()).toISOString().split("T")[0];
   const csvClients = [
@@ -116,7 +118,9 @@ try {
   ];
   const importRes = await restAs(token, "clients", {
     method: "POST",
-    body: JSON.stringify(csvClients.map((c) => ({ ...c, profile_id: userId }))),
+    body: JSON.stringify(
+      csvClients.map((c) => ({ ...c, profile_id: userId, marketing_consent: true, marketing_consent_source: "import_fichier" }))
+    ),
   });
   log(
     "4. Import base clients CSV (5 lignes)",

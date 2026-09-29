@@ -160,6 +160,12 @@ export default function BetaPage() {
                   {loading ? "Envoi en cours..." : "Recevoir mon code"}
                 </button>
               </form>
+              <p className="mt-4 text-center text-xs text-slate-400 leading-relaxed">
+                À votre première connexion, il vous sera demandé d&apos;accepter nos{" "}
+                <a href="/legal/cgu" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">CGU</a>,{" "}
+                <a href="/legal/cgv" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">CGV</a> et notre{" "}
+                <a href="/legal/dpa" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">accord de sous-traitance (DPA)</a>.
+              </p>
             </>
           ) : (
             <>

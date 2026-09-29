@@ -299,6 +299,17 @@ const config = {
     setupUrl: "/dashboard/configuration",  // Page de configuration pour les nouveaux comptes
   },
 
+  // ============================================
+  // 8. DOCUMENTS LÉGAUX
+  // ============================================
+  // Version (date AAAA-MM-JJ) des CGU/CGV/DPA à accepter depuis le dashboard.
+  // La changer redemande l'acceptation à tous les comptes. Afrique uniquement
+  // (migration 059) : aucun effet sur l'Europe.
+  legal: {
+    termsVersion: "2026-09-29",
+    requireTermsAcceptance: region !== "europe",
+  },
+
 };
 
 export default config;

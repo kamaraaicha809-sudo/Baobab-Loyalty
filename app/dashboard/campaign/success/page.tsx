@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, demoUser, demoProfile } from "@/src/lib/demo";
 import toast from "react-hot-toast";
+import config from "@/config";
+
+const isEurope = config.region === "europe";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -100,7 +103,9 @@ function SuccessContent() {
               {excludedOptOutCount > 0 && (
                 <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-slate-900">{excludedOptOutCount}</p>
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Désabonnés exclus</p>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">
+                    {isEurope ? "Désabonnés exclus" : "Sans accord ou désinscrits"}
+                  </p>
                 </div>
               )}
             </div>

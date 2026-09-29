@@ -4,6 +4,9 @@ import { useState, useRef } from "react";
 import { createClient } from "@/libs/supabase/client";
 import { clients } from "@/src/sdk/clients";
 import toast from "react-hot-toast";
+import config from "@/config";
+
+const isEurope = config.region === "europe";
 
 interface Props {
   profileId: string;
@@ -20,6 +23,7 @@ export default function Step2ImportClients({ profileId, onNext }: Props) {
   const [preview, setPreview] = useState<ParsedPreview | null>(null);
   const [importing, setImporting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [attestWhatsappConsent, setAttestWhatsappConsent] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
@@ -59,7 +63,9 @@ export default function Step2ImportClients({ profileId, onNext }: Props) {
         .update({ onboarding_step: 2 })
         .eq("id", profileId);
 
-      const { inserted } = await clients.importClients(profileId, rows);
+      const { inserted } = await clients.importClients(profileId, rows, {
+        attestWhatsappConsent: !isEurope && attestWhatsappConsent,
+      });
       onNext(inserted);
     } catch {
       toast.error("Erreur lors de l'import");
@@ -166,6 +172,23 @@ export default function Step2ImportClients({ profileId, onNext }: Props) {
           </div>
         )}
       </div>
+
+      {!isEurope && csvFile && preview && (
+        <label htmlFor="onboarding-attest-consent" className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 cursor-pointer">
+          <input
+            id="onboarding-attest-consent"
+            type="checkbox"
+            checked={attestWhatsappConsent}
+            onChange={(e) => setAttestWhatsappConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-amber-300"
+          />
+          <span className="text-xs text-amber-900 leading-relaxed">
+            Je certifie que les clients de ce fichier (sauf ceux marqués « non » dans une colonne
+            consentement_whatsapp) m&apos;ont donné leur accord pour recevoir les offres de l&apos;hôtel par
+            WhatsApp. Sans cette case, ils sont importés mais ne reçoivent aucune campagne (loi n° 2013-546, art. 14).
+          </span>
+        </label>
+      )}
 
       {/* Actions */}
       <div className="flex flex-col gap-3">

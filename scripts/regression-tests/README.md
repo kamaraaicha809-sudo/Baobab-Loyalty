@@ -39,6 +39,10 @@ suite `whatsapp-consent` configure volontairement une fausse clé BSP
   segmentation, ou `campaign-send` — rejoue tout le parcours (compte →
   connexion → configuration → import → segmentation → campagne → exclusion
   d'un client désinscrit → suivi des résultats) de bout en bout.
+- `legal-consent` : avant toute modification de `TermsGate`, de la RPC
+  `accept_legal_terms` (migration 059), du trigger
+  `stamp_marketing_consent` (migration 058) ou de la logique d'accord
+  WhatsApp de `src/sdk/clients.ts` (registre, import, bascule manuelle).
 
 ## Lancer les tests
 
@@ -50,6 +54,7 @@ npm run test:billing-webhook-security
 npm run test:posthog-entrypoint
 npm run test:beta-trial-activation
 npm run test:pilot-journey
+npm run test:legal-consent
 ```
 
 Chaque script affiche un JSON avec un `pass: true/false` par vérification, et

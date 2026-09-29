@@ -3,7 +3,12 @@
  */
 
 import { createClient } from "@/libs/supabase/client";
+import config from "@/config";
 import { callEdgeFunction } from "./_core";
+
+// Colonnes marketing_consent_at / marketing_consent_source : schema Afrique
+// uniquement (migration 058). Le projet Europe n'a pas ces colonnes.
+const tracksConsentProof = config.region !== "europe";
 
 export interface Client {
   id: string;
@@ -21,10 +26,12 @@ export interface Client {
   montant_total_depense: number;
   type_chambre_preferee: string | null;
   saison_habituelle: string | null;
-  // Absent sur les données de démo (littéraux statiques) : à traiter comme
-  // `true`/`null` (valeurs par défaut réelles en base, migration 050).
+  // Absent sur les données de démo (littéraux statiques). En base Afrique, la
+  // valeur par défaut est `false` depuis la migration 058 (accord préalable).
   marketing_consent?: boolean;
   opted_out_at?: string | null;
+  marketing_consent_at?: string | null;
+  marketing_consent_source?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -108,23 +115,30 @@ export async function getSegmentCounts(profileId: string): Promise<SegmentCounts
 export async function getClients(profileId: string, limit = 1000): Promise<Client[]> {
   const supabase = createClient();
 
+  const columns =
+    "id, profile_id, nom, email, telephone, whatsapp, derniere_visite, date_naissance, notes, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle, marketing_consent, opted_out_at, created_at, updated_at";
+  // Typé `string` : la liste dépend de la région, le parseur de types de
+  // Supabase ne sait pas analyser une chaîne conditionnelle.
+  const select: string = tracksConsentProof
+    ? `${columns}, marketing_consent_at, marketing_consent_source`
+    : columns;
   const { data, error } = await supabase
     .from("clients")
-    .select(
-      "id, profile_id, nom, email, telephone, whatsapp, derniere_visite, date_naissance, notes, nombre_reservations, montant_total_depense, type_chambre_preferee, saison_habituelle, marketing_consent, opted_out_at, created_at, updated_at"
-    )
+    .select(select)
     .eq("profile_id", profileId)
     .order("derniere_visite", { ascending: false })
     .limit(limit);
 
   if (error) throw error;
-  return (data || []) as Client[];
+  return (data || []) as unknown as Client[];
 }
 
 /**
  * Bascule manuellement le consentement marketing d'un client (toggle
  * hôtelier depuis le dashboard). Écriture directe sous RLS (l'hôtelier est
  * déjà propriétaire de ses clients), pas besoin d'Edge Function ici.
+ * En Afrique, un passage à `true` est une déclaration de l'hôtel qu'il a
+ * recueilli l'accord du client : la date est posée côté serveur (trigger 058).
  */
 export async function setMarketingConsent(clientId: string, consent: boolean): Promise<void> {
   const supabase = createClient();
@@ -133,6 +147,7 @@ export async function setMarketingConsent(clientId: string, consent: boolean): P
     .update({
       marketing_consent: consent,
       opted_out_at: consent ? null : new Date().toISOString(),
+      ...(tracksConsentProof && consent ? { marketing_consent_source: "manuel" } : {}),
     })
     .eq("id", clientId);
   if (error) throw error;
@@ -162,14 +177,18 @@ export interface AddClientInput {
   date_naissance?: string;
   type_chambre_preferee?: string;
   notes?: string;
+  // Accord du client, recueilli à la réception, pour recevoir les offres de
+  // l'hôtel par WhatsApp (Afrique). Non coché = aucun accord enregistré.
+  whatsappConsent?: boolean;
 }
 
 /**
  * Ajoute un client un par un depuis le registre numérique
- * (/dashboard/registre) — la saisie continue qui remplace le cahier papier
- * pour les nouveaux clients, au fil de l'eau. Dédoublonne par téléphone
- * comme importClients() : un client déjà connu est mis à jour plutôt que
- * dupliqué.
+ * (/dashboard/registre) — la saisie continue des nouveaux clients, au fil de
+ * l'eau. Ne remplace pas la fiche de police de l'hôtel. Dédoublonne par
+ * téléphone comme importClients() : un client déjà connu est mis à jour
+ * plutôt que dupliqué. Un accord coché est enregistré (y compris pour un
+ * client déjà connu) ; non coché, l'accord existant n'est jamais modifié.
  */
 export async function addClient(profileId: string, input: AddClientInput): Promise<Client> {
   const supabase = createClient();
@@ -194,16 +213,25 @@ export async function addClient(profileId: string, input: AddClientInput): Promi
   }
 
   const row = { nom, telephone, whatsapp, derniere_visite: input.derniere_visite, date_naissance, type_chambre_preferee, notes };
+  const consentFields =
+    tracksConsentProof && input.whatsappConsent
+      ? { marketing_consent: true, marketing_consent_source: "registre" }
+      : {};
 
   if (existingId) {
-    const { data, error } = await supabase.from("clients").update(row).eq("id", existingId).select().single();
+    const { data, error } = await supabase
+      .from("clients")
+      .update({ ...row, ...consentFields })
+      .eq("id", existingId)
+      .select()
+      .single();
     if (error) throw error;
     return data as Client;
   }
 
   const { data, error } = await supabase
     .from("clients")
-    .insert({ ...row, profile_id: profileId })
+    .insert({ ...row, ...consentFields, profile_id: profileId })
     .select()
     .single();
   if (error) throw error;
@@ -281,6 +309,37 @@ export interface ImportPreview {
   // consentement documenté dans le fichier — ces contacts seront importés
   // dans le CRM mais non éligibles aux campagnes marketing correspondantes.
   noConsentProofCount: number;
+  // Lignes valides dont la colonne consentement_whatsapp vaut "oui".
+  whatsappConsentInFile: number;
+}
+
+export interface ImportOptions {
+  // Afrique : l'hôtel certifie avoir recueilli l'accord WhatsApp de tous les
+  // clients du fichier pour lesquels le fichier ne dit rien (jamais appliqué
+  // à un "non" explicite, ni à un client qui s'est désinscrit).
+  attestWhatsappConsent?: boolean;
+}
+
+type LegacyConsentFields =
+  | { marketing_consent: false }
+  | { marketing_consent: true; marketing_consent_source: string; marketing_consent_at?: string };
+
+/**
+ * Traduit l'information de consentement d'une ligne importée (Afrique).
+ * `null` = aucune information : un nouveau client reste sans accord, un
+ * client existant garde son accord actuel.
+ */
+function legacyConsentFields(source: ImportClientRow, attest: boolean): LegacyConsentFields | null {
+  if (source.whatsappConsent === false) return { marketing_consent: false };
+  if (source.whatsappConsent === true) {
+    return {
+      marketing_consent: true,
+      marketing_consent_source: source.consentSource?.trim().slice(0, 100) || "import_fichier",
+      ...(source.consentDate ? { marketing_consent_at: source.consentDate } : {}),
+    };
+  }
+  if (attest) return { marketing_consent: true, marketing_consent_source: "import_attestation" };
+  return null;
 }
 
 /**
@@ -388,6 +447,8 @@ function validateAndDedupeRows(profileId: string, rows: ImportClientRow[]) {
     );
   }
 
+  const whatsappConsentInFile = validRows.filter((row) => row.source.whatsappConsent === true).length;
+
   return {
     validRows,
     errors,
@@ -399,6 +460,7 @@ function validateAndDedupeRows(profileId: string, rows: ImportClientRow[]) {
     missingCountryCode,
     invalidPhoneFormat,
     noConsentProofCount,
+    whatsappConsentInFile,
   };
 }
 
@@ -420,6 +482,7 @@ export function previewImport(rows: ImportClientRow[]): ImportPreview {
     missingCountryCode: result.missingCountryCode,
     invalidPhoneFormat: result.invalidPhoneFormat,
     noConsentProofCount: result.noConsentProofCount,
+    whatsappConsentInFile: result.whatsappConsentInFile,
   };
 }
 
@@ -470,34 +533,53 @@ async function recordImportConsent(
 
 export async function importClients(
   profileId: string,
-  rows: ImportClientRow[]
+  rows: ImportClientRow[],
+  options: ImportOptions = {}
 ): Promise<{ inserted: number; errors: string[]; warnings: string[]; failedRows: ImportClientRow[] }> {
   const supabase = createClient();
   const { validRows, errors, warnings, failedRows } = validateAndDedupeRows(profileId, rows);
   const consentModel = getConsentModel();
+  const attest = options.attestWhatsappConsent === true;
 
   const phones = [...new Set(validRows.map((r) => r.telephone).filter((t): t is string => !!t))];
-  const existingByPhone = new Map<string, string>();
+  const existingByPhone = new Map<string, { id: string; optedOut: boolean }>();
 
   if (phones.length > 0) {
     const { data: existing } = await supabase
       .from("clients")
-      .select("id, telephone")
+      .select("id, telephone, opted_out_at")
       .eq("profile_id", profileId)
       .in("telephone", phones);
     for (const c of existing ?? []) {
-      if (c.telephone) existingByPhone.set(c.telephone, c.id);
+      if (c.telephone) existingByPhone.set(c.telephone, { id: c.id, optedOut: !!c.opted_out_at });
     }
   }
 
   const toInsert: ValidRow[] = [];
-  const toUpdate: { id: string; row: ValidRow }[] = [];
+  const toUpdate: { id: string; optedOut: boolean; row: ValidRow }[] = [];
 
   for (const row of validRows) {
-    const existingId = row.telephone ? existingByPhone.get(row.telephone) : undefined;
-    if (existingId) toUpdate.push({ id: existingId, row });
+    const existing = row.telephone ? existingByPhone.get(row.telephone) : undefined;
+    if (existing) toUpdate.push({ id: existing.id, optedOut: existing.optedOut, row });
     else toInsert.push(row);
   }
+
+  // Toutes les lignes d'un même lot doivent porter les mêmes colonnes : une
+  // colonne absente d'une ligne serait envoyée à NULL (marketing_consent est
+  // NOT NULL), d'où des valeurs explicites même sans accord.
+  const insertConsentColumns = (source: ImportClientRow) => {
+    if (!tracksConsentProof) return {};
+    const fields = legacyConsentFields(source, attest);
+    if (fields?.marketing_consent) {
+      return {
+        marketing_consent: true,
+        marketing_consent_source: fields.marketing_consent_source,
+        marketing_consent_at: fields.marketing_consent_at ?? null,
+      };
+    }
+    return { marketing_consent: false, marketing_consent_source: null, marketing_consent_at: null };
+  };
+  let skippedOptedOut = 0;
 
   let inserted = 0;
 
@@ -524,7 +606,7 @@ export async function importClients(
       const batch = toInsert.slice(i, i + BATCH);
       const { data, error } = await supabase
         .from("clients")
-        .insert(batch.map(({ source: _source, ...r }) => r))
+        .insert(batch.map(({ source, ...r }) => ({ ...r, ...insertConsentColumns(source) })))
         .select("id");
 
       if (error) {
@@ -536,7 +618,15 @@ export async function importClients(
     }
   }
 
-  for (const { id, row } of toUpdate) {
+  for (const { id, optedOut, row } of toUpdate) {
+    // Un client désinscrit n'est jamais réabonné par un import : seul un
+    // nouvel accord explicite (registre, bascule manuelle) peut le faire.
+    let consentUpdate: LegacyConsentFields | null = null;
+    if (tracksConsentProof && consentModel !== "channel_rgpd") {
+      const fields = legacyConsentFields(row.source, attest);
+      if (fields?.marketing_consent && optedOut) skippedOptedOut++;
+      else consentUpdate = fields;
+    }
     // Les champs optionnels absents du CSV restent `undefined` et sont donc
     // ignorés par .update() : un ré-import sans colonne "montant depense" ne
     // doit pas écraser une valeur déjà mise à jour automatiquement par
@@ -553,6 +643,7 @@ export async function importClients(
         montant_total_depense: row.montant_total_depense,
         type_chambre_preferee: row.type_chambre_preferee,
         saison_habituelle: row.saison_habituelle,
+        ...(consentUpdate ?? {}),
       })
       .eq("id", id);
     if (error) {
@@ -564,6 +655,12 @@ export async function importClients(
         await recordImportConsent(supabase, profileId, id, row.source);
       }
     }
+  }
+
+  if (skippedOptedOut > 0) {
+    warnings.push(
+      `${skippedOptedOut} client(s) désinscrit(s) n'ont pas été réabonnés : seul un nouvel accord explicite du client (registre ou bascule manuelle) peut les réabonner.`
+    );
   }
 
   return { inserted, errors, warnings, failedRows };
@@ -727,11 +824,15 @@ export function parseClientsCSV(csvText: string): ImportClientRow[] {
  * (aucun accès réseau) : le déclenchement du téléchargement reste côté UI.
  */
 export function buildClientsCSV(clientsList: Client[]): string {
-  const header = "nom,email,telephone,whatsapp,derniere_visite,date_naissance,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
+  const baseHeader = "nom,email,telephone,whatsapp,derniere_visite,date_naissance,nombre_reservations,montant_total_depense,type_chambre_preferee,saison_habituelle";
+  // Afrique : l'accord WhatsApp est exporté pour qu'un ré-import le conserve.
+  const header = tracksConsentProof
+    ? `${baseHeader},consentement_whatsapp,date_consentement,source_consentement`
+    : baseHeader;
   const escape = (v: string): string =>
     /[,"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-  const lines = clientsList.map((c) =>
-    [
+  const lines = clientsList.map((c) => {
+    const cells: (string | number)[] = [
       escape(c.nom || ""),
       escape(c.email || ""),
       escape(c.telephone || ""),
@@ -742,8 +843,17 @@ export function buildClientsCSV(clientsList: Client[]): string {
       c.montant_total_depense ?? "",
       escape(c.type_chambre_preferee || ""),
       escape(c.saison_habituelle || ""),
-    ].join(",")
-  );
+    ];
+    if (tracksConsentProof) {
+      const consented = c.marketing_consent === true;
+      cells.push(
+        consented ? "oui" : "non",
+        consented && c.marketing_consent_at ? c.marketing_consent_at.split("T")[0] : "",
+        consented ? escape(c.marketing_consent_source || "") : ""
+      );
+    }
+    return cells.join(",");
+  });
   return [header, ...lines].join("\n");
 }
 

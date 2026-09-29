@@ -7,6 +7,8 @@ import { clients, type Client } from "@/src/sdk/clients";
 import { isDemoMode, demoProfile, demoClients } from "@/src/lib/demo";
 import config from "@/config";
 
+const isEurope = config.region === "europe";
+
 const emptyForm = {
   nom: "",
   telephone: "",
@@ -30,6 +32,7 @@ export default function RegistrePage() {
   const [loading, setLoading] = useState(!isDemoMode);
   const [recent, setRecent] = useState<Client[]>(isDemoMode ? (demoClients as unknown as Client[]).slice(0, 10) : []);
   const [form, setForm] = useState(emptyForm);
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const set = (field: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -70,6 +73,7 @@ export default function RegistrePage() {
     if (isDemoMode) {
       toast.success(`${form.nom} ajouté au registre (démo)`);
       setForm(emptyForm);
+      setWhatsappConsent(false);
       return;
     }
     if (!profileId) return;
@@ -88,9 +92,11 @@ export default function RegistrePage() {
         date_naissance: form.date_naissance || undefined,
         type_chambre_preferee: form.type_chambre_preferee || undefined,
         notes: form.notes || undefined,
+        whatsappConsent: !isEurope && whatsappConsent,
       });
       setRecent((r) => [created, ...r.filter((c) => c.id !== created.id)].slice(0, 20));
       setForm({ ...emptyForm, derniere_visite: new Date().toISOString().split("T")[0] });
+      setWhatsappConsent(false);
       toast.success(`${created.nom} ajouté au registre`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Impossible d'ajouter ce client.");
@@ -103,11 +109,24 @@ export default function RegistrePage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Registre numérique</h1>
-        <p className="text-slate-600 text-base">
-          Saisissez ici chaque nouveau client à la réception, à la place du cahier papier — chaque fiche est
-          enregistrée immédiatement dans votre base clients {config.appName} et disponible pour vos segments et
-          campagnes.
-        </p>
+        {isEurope ? (
+          <p className="text-slate-600 text-base">
+            Saisissez ici chaque nouveau client à la réception, à la place du cahier papier — chaque fiche est
+            enregistrée immédiatement dans votre base clients {config.appName} et disponible pour vos segments et
+            campagnes.
+          </p>
+        ) : (
+          <>
+            <p className="text-slate-600 text-base">
+              Saisissez ici chaque nouveau client à la réception — chaque fiche est enregistrée immédiatement dans
+              votre base clients {config.appName} et disponible pour vos segments et campagnes.
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Ce registre sert à la fidélisation. Il ne remplace pas la fiche de police que votre hôtel doit
+              continuer à remplir pour chaque voyageur.
+            </p>
+          </>
+        )}
       </header>
 
       <div className="grid lg:grid-cols-5 gap-6">
@@ -187,6 +206,26 @@ export default function RegistrePage() {
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
+            {!isEurope && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <label htmlFor="registre-whatsapp-consent" className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    id="registre-whatsapp-consent"
+                    type="checkbox"
+                    checked={whatsappConsent}
+                    onChange={(e) => setWhatsappConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm text-slate-700">
+                    Le client accepte de recevoir les offres de l&apos;hôtel par WhatsApp
+                  </span>
+                </label>
+                <p className="mt-1.5 pl-6 text-xs text-slate-500">
+                  Cochez seulement si le client vient de vous donner son accord. Sans accord, il ne recevra
+                  aucune campagne ni message d&apos;anniversaire (loi n° 2013-546, art. 14).
+                </p>
+              </div>
+            )}
             <button
               type="submit"
               disabled={saving}
@@ -218,7 +257,14 @@ export default function RegistrePage() {
                       {c.type_chambre_preferee ? ` · ${c.type_chambre_preferee}` : ""}
                     </p>
                   </div>
-                  <span className="shrink-0 text-xs text-slate-400">{formatDate(c.derniere_visite)}</span>
+                  <div className="shrink-0 flex items-center gap-2">
+                    {!isEurope && c.marketing_consent === true && (
+                      <span className="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700">
+                        Accord WhatsApp
+                      </span>
+                    )}
+                    <span className="text-xs text-slate-400">{formatDate(c.derniere_visite)}</span>
+                  </div>
                 </li>
               ))}
             </ul>

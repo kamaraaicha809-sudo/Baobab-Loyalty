@@ -90,9 +90,42 @@ export async function updateBirthdaySettings(profileId: string, input: BirthdayS
   if (error) throw error;
 }
 
+export interface TermsAcceptance {
+  termsVersion: string | null;
+  acceptedAt: string | null;
+}
+
+/**
+ * Version des CGU/CGV/DPA acceptée par le compte connecté (Afrique,
+ * migration 059). Colonnes en lecture seule côté navigateur.
+ */
+export async function getTermsAcceptance(userId: string): Promise<TermsAcceptance> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("terms_version, terms_accepted_at")
+    .eq("id", userId)
+    .single();
+  if (error) throw error;
+  return { termsVersion: data?.terms_version ?? null, acceptedAt: data?.terms_accepted_at ?? null };
+}
+
+/**
+ * Enregistre l'acceptation des CGU/CGV/DPA. La date est posée par le
+ * serveur (accept_legal_terms, SECURITY DEFINER), jamais par le navigateur.
+ */
+export async function acceptTerms(version: string): Promise<string> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("accept_legal_terms", { p_version: version });
+  if (error) throw error;
+  return data as string;
+}
+
 // Export as namespace
 export const user = {
   getProfile,
   activateBetaTrial,
   updateBirthdaySettings,
+  getTermsAcceptance,
+  acceptTerms,
 };

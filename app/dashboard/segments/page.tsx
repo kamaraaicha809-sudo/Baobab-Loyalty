@@ -10,6 +10,8 @@ import { clients as clientsSDK, Client, SegmentFilters, matchesAdvancedFilters }
 import { isDemoMode, demoSegmentCounts } from "@/src/lib/demo";
 import { formatCurrency } from "@/src/lib/currency";
 
+const isEurope = config.region === "europe";
+
 interface SegmentDef {
   id: string;
   name: string;
@@ -204,6 +206,9 @@ export default function SegmentsPage() {
   const [allClients, setAllClients] = useState<Client[] | null>(null);
   const [loadingClients, setLoadingClients] = useState(false);
   const [updatingConsentId, setUpdatingConsentId] = useState<string | null>(null);
+  // Afrique : enregistrer un accord WhatsApp demande une confirmation
+  // explicite de l'hôtelier (c'est sa déclaration d'avoir recueilli l'accord).
+  const [confirmConsentId, setConfirmConsentId] = useState<string | null>(null);
 
   // Filtres combinables (P5) : en plus des segments basés sur la dernière
   // visite, on peut affiner par montant dépensé, nombre de réservations,
@@ -336,6 +341,7 @@ export default function SegmentsPage() {
       toast.error("Impossible de mettre à jour le statut d'abonnement.");
     } finally {
       setUpdatingConsentId(null);
+      setConfirmConsentId(null);
     }
   }
 
@@ -702,22 +708,62 @@ export default function SegmentsPage() {
                               })}
                             </td>
                             <td className="py-3 whitespace-nowrap">
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    isOptedOut ? "bg-slate-100 text-slate-500" : "bg-green-50 text-green-700"
-                                  }`}
-                                >
-                                  {isOptedOut ? "Désinscrit" : "Abonné"}
-                                </span>
-                                <button
-                                  onClick={() => handleToggleConsent(client)}
-                                  disabled={updatingConsentId === client.id}
-                                  className="text-xs text-[var(--color-primary)] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {isOptedOut ? "Réabonner" : "Désinscrire"}
-                                </button>
-                              </div>
+                              {isEurope ? (
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                      isOptedOut ? "bg-slate-100 text-slate-500" : "bg-green-50 text-green-700"
+                                    }`}
+                                  >
+                                    {isOptedOut ? "Désinscrit" : "Abonné"}
+                                  </span>
+                                  <button
+                                    onClick={() => handleToggleConsent(client)}
+                                    disabled={updatingConsentId === client.id}
+                                    className="text-xs text-[var(--color-primary)] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isOptedOut ? "Réabonner" : "Désinscrire"}
+                                  </button>
+                                </div>
+                              ) : confirmConsentId === client.id ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-slate-700">Le client vous a donné son accord ?</span>
+                                  <button
+                                    onClick={() => handleToggleConsent(client)}
+                                    disabled={updatingConsentId === client.id}
+                                    className="text-xs font-semibold text-green-700 hover:underline disabled:opacity-50"
+                                  >
+                                    Oui, enregistrer
+                                  </button>
+                                  <button
+                                    onClick={() => setConfirmConsentId(null)}
+                                    className="text-xs text-slate-500 hover:underline"
+                                  >
+                                    Annuler
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                      !isOptedOut
+                                        ? "bg-green-50 text-green-700"
+                                        : client.opted_out_at
+                                          ? "bg-slate-100 text-slate-500"
+                                          : "bg-amber-50 text-amber-700"
+                                    }`}
+                                  >
+                                    {!isOptedOut ? "Accord WhatsApp" : client.opted_out_at ? "Désinscrit" : "Sans accord"}
+                                  </span>
+                                  <button
+                                    onClick={() => (isOptedOut ? setConfirmConsentId(client.id) : handleToggleConsent(client))}
+                                    disabled={updatingConsentId === client.id}
+                                    className="text-xs text-[var(--color-primary)] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isOptedOut ? "Enregistrer son accord" : "Retirer l'accord"}
+                                  </button>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         );

@@ -107,6 +107,7 @@ export default function ConfigurationPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [csvPreview, setCsvPreview] = useState<ImportPreview | null>(null);
   const [pendingRows, setPendingRows] = useState<ImportClientRow[] | null>(null);
+  const [attestWhatsappConsent, setAttestWhatsappConsent] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({ "3-6mois": 0, "6-9mois": 0, "9-12mois": 0, "1an+": 0, tous: 0 });
   const [profileId, setProfileId] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>({ connected: false });
@@ -406,6 +407,7 @@ export default function ConfigurationPage() {
         return;
       }
       setPendingRows(rows);
+      setAttestWhatsappConsent(false);
       setCsvPreview(clients.previewImport(rows));
     } catch {
       toast.error("Erreur lors de la lecture du fichier");
@@ -432,7 +434,9 @@ export default function ConfigurationPage() {
     setImporting(true);
     setImportStatus(`Importation de ${pendingRows.length} client(s)...`);
     try {
-      const { inserted, errors, warnings, failedRows } = await clients.importClients(profileId, pendingRows);
+      const { inserted, errors, warnings, failedRows } = await clients.importClients(profileId, pendingRows, {
+        attestWhatsappConsent: !isEurope && attestWhatsappConsent,
+      });
       setFailedImportRows(failedRows);
       if (inserted > 0) {
         toast.success(`${inserted} client(s) importé(s)`);
@@ -1027,6 +1031,11 @@ export default function ConfigurationPage() {
         <p className="text-slate-500 text-xs mb-4">
           Colonnes optionnelles pour affiner vos segments : <strong>nombre_reservations</strong>, <strong>montant_total_depense</strong>, <strong>type_chambre_preferee</strong>, <strong>saison_habituelle</strong>. Ajoutez une colonne <strong>date_naissance</strong> (JJ/MM/AAAA) pour activer les messages d&apos;anniversaire automatiques (voir Anniversaires). Taille maximale : {MAX_CSV_FILE_SIZE_BYTES / (1024 * 1024)} Mo. Les fichiers Excel accentués (Windows ou Mac) sont pris en charge automatiquement.
         </p>
+        {!isEurope && (
+          <p className="text-slate-500 text-xs mb-4">
+            Accord WhatsApp : ajoutez une colonne <strong>consentement_whatsapp</strong> (oui / non), et si possible <strong>date_consentement</strong> et <strong>source_consentement</strong> (ex : fiche d&apos;accueil). Un client sans accord est importé, mais ne reçoit aucune campagne WhatsApp.
+          </p>
+        )}
         {!csvPreview && (
           <form onSubmit={handleAnalyzeCSV} className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
@@ -1108,6 +1117,32 @@ export default function ConfigurationPage() {
                 Ils ne pourront pas être ciblés par les campagnes correspondantes tant qu&apos;une base
                 légale/autorisation appropriée n&apos;aura pas été enregistrée.
               </p>
+            )}
+            {!isEurope && (
+              <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-900">
+                <p className="font-medium">
+                  Accord WhatsApp indiqué dans le fichier : {csvPreview.whatsappConsentInFile} client(s) sur {csvPreview.validRows}.
+                </p>
+                <p className="mt-1 text-xs text-amber-800">
+                  La loi ivoirienne (n° 2013-546, art. 14) interdit d&apos;envoyer des offres par WhatsApp sans l&apos;accord
+                  préalable du client. Les clients sans accord seront importés, mais exclus des campagnes et des messages
+                  d&apos;anniversaire.
+                </p>
+                <label htmlFor="import-attest-consent" className="mt-3 flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    id="import-attest-consent"
+                    type="checkbox"
+                    checked={attestWhatsappConsent}
+                    onChange={(e) => setAttestWhatsappConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-amber-300 text-primary focus:ring-primary"
+                  />
+                  <span className="text-xs text-amber-900">
+                    Je certifie que tous les clients de ce fichier sans mention « non » m&apos;ont donné leur accord pour
+                    recevoir les offres de l&apos;hôtel par WhatsApp. L&apos;hôtel reste responsable de cette déclaration.
+                    Un client marqué « non » ou déjà désinscrit ne sera jamais réabonné.
+                  </span>
+                </label>
+              </div>
             )}
             <div className="flex items-center gap-3">
               <button
