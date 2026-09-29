@@ -102,7 +102,11 @@ const CTA = () => {
           </div>
 
           <p className="text-white/60 text-xs sm:text-sm mt-6 sm:mt-8 px-2">
-            <span className="hidden sm:inline">Sans engagement • Résultats dès la première campagne • Accompagnement inclus le premier mois</span>
+            <span className="hidden sm:inline">
+              {config.region === "europe"
+                ? "Sans engagement • Accompagnement inclus le premier mois"
+                : "Sans engagement • Résultats dès la première campagne • Accompagnement inclus le premier mois"}
+            </span>
             <span className="sm:hidden">Sans engagement • Support inclus</span>
           </p>
         </div>

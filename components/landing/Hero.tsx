@@ -83,7 +83,9 @@ const Hero = () => {
           </Link>
         </div>
 
-        <p className="text-xs text-slate-400 mt-5">Sans engagement — Résultats dès la première campagne</p>
+        <p className="text-xs text-slate-400 mt-5">
+          {config.region === "europe" ? "Sans engagement" : "Sans engagement — Résultats dès la première campagne"}
+        </p>
       </div>
     </section>
   );

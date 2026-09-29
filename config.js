@@ -39,7 +39,9 @@ const config = {
   //   pour l'instant tant qu'aucun email Loyavia réel (domaine vérifié
   //   Resend) n'a été communiqué — ne pas inventer de valeurs ici.
 
-  appDescription: "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et leur base de données clients en automatisant l'envoi via WhatsApp en 2 minutes",
+  appDescription: region === "europe"
+    ? "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et à leur base de clients, avec des campagnes WhatsApp envoyées aux clients qui ont donné leur accord."
+    : "Aide les propriétaires d'hôtels à remplir leurs chambres vides grâce à l'IA et leur base de données clients en automatisant l'envoi via WhatsApp en 2 minutes",
   // → Description courte pour le SEO et la homepage
 
   domainName: region === "europe" ? "loyavia.com" : "baobabloyalty.com",
