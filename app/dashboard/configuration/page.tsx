@@ -12,6 +12,7 @@ import { billing } from "@/src/sdk/billing";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
 import { hasPersonalizedAiAccess } from "@/src/lib/plan";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
+import ReservationSoundSettings from "@/components/dashboard/ReservationSoundSettings";
 
 const isEurope = config.region === "europe";
 
@@ -973,6 +974,8 @@ export default function ConfigurationPage() {
           onStatusChange={(connected) => setWaStatus((s) => ({ ...s, connected }))}
         />
       </section>
+
+      {config.notifications.recoveredReservation.enabled && <ReservationSoundSettings />}
 
       {/* Frais d'intégration — produit Moneroo/Afrique uniquement (FCFA) ;
           pas d'équivalent Europe tant que la facturation Europe (Stripe) est

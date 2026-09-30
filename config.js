@@ -318,6 +318,19 @@ const config = {
     dpaElectronicAcceptanceEurope: false,
   },
 
+  // ============================================
+  // 9. NOTIFICATIONS DU DASHBOARD
+  // ============================================
+  // Carte + son quand une réservation venue d'une campagne est confirmée.
+  // Afrique uniquement pour l'instant : aucun effet sur l'Europe.
+  notifications: {
+    recoveredReservation: {
+      enabled: region !== "europe",
+      title: "Nouvelle réservation",
+      message: "réservation récupérée grâce à Baobab",
+    },
+  },
+
 };
 
 export default config;
