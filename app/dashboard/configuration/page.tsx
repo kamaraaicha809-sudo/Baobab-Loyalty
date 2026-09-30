@@ -12,6 +12,7 @@ import { billing } from "@/src/sdk/billing";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
 import { hasPersonalizedAiAccess } from "@/src/lib/plan";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
+import ReservationSoundSettings from "@/components/dashboard/ReservationSoundSettings";
 
 const isEurope = config.region === "europe";
 
@@ -859,6 +860,9 @@ export default function ConfigurationPage() {
           </div>
         )}
       </section>
+
+      {/* Notifications de réservation (Loyavia uniquement pour l'instant) */}
+      {isEurope && <ReservationSoundSettings />}
 
       {/* Types de chambres */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
