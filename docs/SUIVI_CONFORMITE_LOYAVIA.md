@@ -46,6 +46,14 @@ Règle constante : chaque changement Loyavia passe par la région (`config.regio
 | Pré-résolution PostHog | Retirée sur Loyavia (outil non utilisé) | `app/layout.tsx` |
 | Test STOP complet | Écrit et lancé : 3/3 vérifications non signées OK ; les 2 vérifications signées attendent le secret Meta (voir B1) | `scripts/regression-tests/europe-whatsapp-stop.mjs` |
 
+### Fonctionnalité ajoutée sur la branche (30/09/2026, commit c76c697) — hors conformité
+
+| Sujet | Ce qui a été fait | Où |
+|---|---|---|
+| Notification « Nouvelle réservation » | Message + son discret (~1,2 s) quand une demande issue d'une campagne arrive (statut « à confirmer », attribuée à une offre). Jamais au chargement ni à l'actualisation, jamais en démo, une seule fois par réservation. Réglage du son (activé par défaut, propre à l'appareil) et bouton « Tester le son » dans Configuration. **Loyavia uniquement** | `components/dashboard/ReservationNotifier.tsx`, `ReservationSoundSettings.tsx`, `src/lib/notification-sound.ts`, `src/lib/reservation-notification.ts` |
+| Test réel | 7/7 (Realtime + RLS, isolation entre hôtels) | `scripts/regression-tests/europe-reservation-notification.mjs` |
+| Baobab Afrique | Build comparé : 74/74 pages identiques (sitemap hors dates) | — |
+
 ---
 
 ## B. En attente d'un élément technique extérieur (pas de juriste nécessaire)
