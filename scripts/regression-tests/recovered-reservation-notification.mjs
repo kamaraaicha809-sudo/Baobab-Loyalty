@@ -49,7 +49,7 @@ async function signedInClient(email) {
   return { client, token: data.session.access_token };
 }
 
-// Meme abonnement que ReservationNotifier : tous les changements de
+// Meme abonnement que RecoveredReservationNotifier : tous les changements de
 // reservations filtres sur un profile_id.
 function listen(client, name, profileId) {
   const events = [];

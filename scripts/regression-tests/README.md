@@ -44,7 +44,7 @@ suite `whatsapp-consent` configure volontairement une fausse clé BSP
   `stamp_marketing_consent` (migration 058) ou de la logique d'accord
   WhatsApp de `src/sdk/clients.ts` (registre, import, bascule manuelle).
 - `reservation-notification` : avant toute modification de la notification
-  « Nouvelle réservation » (`ReservationNotifier`,
+  « Nouvelle réservation » Afrique (`RecoveredReservationNotifier`,
   `src/lib/recovered-reservation.ts`), de `reservations-confirm` ou de
   l'API `/api/reservations/create`. Crée une vraie demande via l'API de
   production, la confirme, et vérifie le flux Realtime reçu par l'hôtel.

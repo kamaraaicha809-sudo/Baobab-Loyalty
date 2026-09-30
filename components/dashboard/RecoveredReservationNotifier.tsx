@@ -21,7 +21,7 @@ import { showRecoveredReservationToast } from "@/components/dashboard/RecoveredR
  * Afrique uniquement ; jamais actif en mode démo (voir le bouton de test dans
  * la page Configuration).
  */
-export default function ReservationNotifier() {
+export default function RecoveredReservationNotifier() {
   const notifiedIds = useRef(new Set<string>());
 
   useEffect(() => {

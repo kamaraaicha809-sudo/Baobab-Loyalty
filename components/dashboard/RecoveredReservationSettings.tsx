@@ -14,7 +14,7 @@ import { showRecoveredReservationToast } from "@/components/dashboard/RecoveredR
  * (sur cet appareil) et bouton de test, qui montre aussi la carte. Le test
  * fonctionne en mode démo.
  */
-export default function ReservationSoundSettings() {
+export default function RecoveredReservationSettings() {
   const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {

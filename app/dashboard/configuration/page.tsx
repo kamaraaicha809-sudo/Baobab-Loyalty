@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, startTransition } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Icons } from "@/components/common/Icons";
+import RecoveredReservationSettings from "@/components/dashboard/RecoveredReservationSettings";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import { clients, MAX_CSV_FILE_SIZE_BYTES, type Client, type ImportClientRow, type ImportPreview } from "@/src/sdk/clients";
@@ -12,7 +13,6 @@ import { billing } from "@/src/sdk/billing";
 import { isDemoMode, demoUser, demoProfile, demoSegmentCounts, demoClients } from "@/src/lib/demo";
 import { hasPersonalizedAiAccess } from "@/src/lib/plan";
 import WhatsAppConnectButton from "@/components/dashboard/WhatsAppConnectButton";
-import ReservationSoundSettings from "@/components/dashboard/ReservationSoundSettings";
 
 const isEurope = config.region === "europe";
 
@@ -975,7 +975,7 @@ export default function ConfigurationPage() {
         />
       </section>
 
-      {config.notifications.recoveredReservation.enabled && <ReservationSoundSettings />}
+      {config.notifications.recoveredReservation.enabled && <RecoveredReservationSettings />}
 
       {/* Frais d'intégration — produit Moneroo/Afrique uniquement (FCFA) ;
           pas d'équivalent Europe tant que la facturation Europe (Stripe) est

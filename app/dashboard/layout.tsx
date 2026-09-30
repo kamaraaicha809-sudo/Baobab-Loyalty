@@ -2,7 +2,6 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import OnboardingGate from "@/components/onboarding/OnboardingGate";
 import SubscriptionGate from "@/components/dashboard/SubscriptionGate";
 import TermsGate from "@/components/dashboard/TermsGate";
-import ReservationNotifier from "@/components/dashboard/ReservationNotifier";
 import TrialBanner from "@/components/dashboard/TrialBanner";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
@@ -10,6 +9,7 @@ import { ReactNode } from "react";
 import { createClient } from "@/libs/supabase/server";
 import { redirect } from "next/navigation";
 import { isDemoMode } from "@/src/lib/demo";
+import RecoveredReservationNotifier from "@/components/dashboard/RecoveredReservationNotifier";
 
 // Metadata noindex pour les pages privées du dashboard
 export const metadata = getSEOTags({
@@ -62,7 +62,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
     <DashboardLayout>
       <OnboardingGate />
       <TermsGate />
-      <ReservationNotifier />
+      <RecoveredReservationNotifier />
       <SubscriptionGate />
       <TrialBanner />
       {children}
