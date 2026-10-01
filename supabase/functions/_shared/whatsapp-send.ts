@@ -14,6 +14,16 @@ export function buildUnsubscribeSuffix(clientId: string): string {
   return `\n\nPour ne plus recevoir nos offres : ${siteUrl}/desinscription?c=${clientId}`;
 }
 
+// Indicatif ajoute aux numeros saisis au format local a la reception (ex :
+// "0585347176" en Cote d'Ivoire, 10 chiffres commencant par 0, le 0 est
+// conserve apres +225). Europe (APP_BRAND defini) : aucun indicatif implicite,
+// sauf si DEFAULT_PHONE_COUNTRY_CODE est configure.
+function defaultCountryCode(): string | null {
+  const configured = Deno.env.get("DEFAULT_PHONE_COUNTRY_CODE")?.replace(/\D/g, "");
+  if (configured) return configured;
+  return Deno.env.get("APP_BRAND") ? null : "225";
+}
+
 export function formatE164(raw: string): string | null {
   // Remove spaces and special chars except leading +
   let cleaned = raw.replace(/[\s\-().]/g, "");
@@ -21,6 +31,11 @@ export function formatE164(raw: string): string | null {
   // "00" prefix → "+"
   if (cleaned.startsWith("00")) {
     cleaned = "+" + cleaned.slice(2);
+  }
+
+  const countryCode = defaultCountryCode();
+  if (countryCode && /^0\d{9}$/.test(cleaned)) {
+    cleaned = `+${countryCode}${cleaned}`;
   }
 
   // Ensure starts with +
@@ -56,6 +71,40 @@ export function extractErrorInfo(rawBody: string): { code?: string; message: str
   return { message: rawBody.slice(0, 500) || "Erreur inconnue du fournisseur WhatsApp" };
 }
 
+// Meta refuse tout parametre de template contenant un retour a la ligne, une
+// tabulation ou plus de 4 espaces consecutifs (erreur 132018). Le suffixe de
+// desinscription et les messages IA contiennent des retours a la ligne : on
+// les remplace par un separateur visible avant l'envoi.
+export function sanitizeTemplateParam(text: string): string {
+  return text
+    .replace(/\s*[\r\n\t]+\s*/g, " - ")
+    .replace(/ {4,}/g, " ")
+    .trim();
+}
+
+// Prenom affiche dans "Bonjour {{1}}" : premier mot du nom saisi, avec une
+// majuscule (la reception tape souvent "yasmine kone").
+export function firstNameOf(clientName: string): string {
+  const first = clientName.trim().split(/\s+/)[0] || "";
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+
+// Les messages generes (IA ou modeles du dashboard) contiennent {{nom}} et
+// {{hotel_name}} : ils sont remplaces ici, client par client. Les templates
+// Meta commencent deja par "Bonjour {{1}}", donc la salutation d'ouverture du
+// message ("Bonjour {{nom}},", "Cher {{nom}},", "{{nom}},") est retiree pour
+// eviter un double "Bonjour".
+export function personalizeCampaignBody(message: string, firstName: string, hotelName: string): string {
+  const withoutGreeting = message.replace(
+    /^\s*(?:(?:bonjour|bonsoir|hello|salut|cher|chère)\s+)?\{\{\s*nom\s*\}\}\s*[,!.:]?\s*/i,
+    "",
+  );
+  const filled = withoutGreeting
+    .replace(/\{\{\s*nom\s*\}\}/gi, firstName)
+    .replace(/\{\{\s*hotel_name\s*\}\}/gi, hotelName);
+  return filled.charAt(0).toUpperCase() + filled.slice(1);
+}
+
 export interface SendResult {
   ok: boolean;
   providerMessageId?: string;
@@ -63,16 +112,19 @@ export interface SendResult {
   errorMsg?: string;
 }
 
-export async function sendViaMeta(
+interface MetaTemplate {
+  name: string;
+  language: { code: string };
+  components: Record<string, unknown>[];
+}
+
+async function postMetaTemplate(
   phoneNumberId: string,
   accessToken: string,
   to: string,
-  clientName: string,
-  templateName: string,
-  messageBody: string,
+  template: MetaTemplate,
 ): Promise<SendResult> {
   try {
-    const firstName = clientName.split(" ")[0];
     const res = await fetch(
       `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`,
       {
@@ -86,19 +138,7 @@ export async function sendViaMeta(
           recipient_type: "individual",
           to,
           type: "template",
-          template: {
-            name: templateName,
-            language: { code: "fr" },
-            components: [
-              {
-                type: "body",
-                parameters: [
-                  { type: "text", text: firstName },
-                  { type: "text", text: messageBody },
-                ],
-              },
-            ],
-          },
+          template,
         }),
       },
     );
@@ -121,6 +161,79 @@ export async function sendViaMeta(
   } catch (err) {
     return { ok: false, errorMsg: err instanceof Error ? err.message : "Network error" };
   }
+}
+
+// Template texte seul "Bonjour {{1}} 👋 {{2}} ..." (baobab_offre_hotel) : le
+// lien de desinscription doit etre inclus dans messageBody par l'appelant.
+export function sendViaMeta(
+  phoneNumberId: string,
+  accessToken: string,
+  to: string,
+  clientName: string,
+  templateName: string,
+  messageBody: string,
+): Promise<SendResult> {
+  const firstName = clientName.split(" ")[0];
+  return postMetaTemplate(phoneNumberId, accessToken, to, {
+    name: templateName,
+    language: { code: "fr" },
+    components: [
+      {
+        type: "body",
+        parameters: [
+          { type: "text", text: sanitizeTemplateParam(firstName) },
+          { type: "text", text: sanitizeTemplateParam(messageBody) },
+        ],
+      },
+    ],
+  });
+}
+
+export const RESERVATION_TEMPLATE_NAME = "baobab_offre_reservation";
+
+export interface ReservationTemplateParams {
+  firstName: string;
+  body: string;
+  hotelName: string;
+  sentMessageId: string;
+  clientId: string;
+}
+
+function urlButton(index: number, value: string): Record<string, unknown> {
+  return {
+    type: "button",
+    sub_type: "url",
+    index: String(index),
+    parameters: [{ type: "text", text: value }],
+  };
+}
+
+// Template baobab_offre_reservation : "Bonjour {{1}} 👋 {{2}} L'equipe de
+// {{3}} ..." + bouton "Reserver mon offre" (https://baobabloyalty.com/o/{{1}},
+// id du sent_messages) + bouton "Se desinscrire" (/desinscription?c={{1}},
+// id du client). Le lien de desinscription n'est donc pas ajoute au texte.
+export function sendReservationTemplateViaMeta(
+  phoneNumberId: string,
+  accessToken: string,
+  to: string,
+  params: ReservationTemplateParams,
+): Promise<SendResult> {
+  return postMetaTemplate(phoneNumberId, accessToken, to, {
+    name: RESERVATION_TEMPLATE_NAME,
+    language: { code: "fr" },
+    components: [
+      {
+        type: "body",
+        parameters: [
+          { type: "text", text: sanitizeTemplateParam(params.firstName) },
+          { type: "text", text: sanitizeTemplateParam(params.body) },
+          { type: "text", text: sanitizeTemplateParam(params.hotelName) },
+        ],
+      },
+      urlButton(0, params.sentMessageId),
+      urlButton(1, params.clientId),
+    ],
+  });
 }
 
 // BSP path: 360dialog v2 API

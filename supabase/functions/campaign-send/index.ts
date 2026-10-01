@@ -15,7 +15,16 @@ import { getMonthlyRelanceQuota, startOfCurrentMonthIso } from "../_shared/plan.
 import { resolveProfile } from "../_shared/team.ts";
 import { logAudit } from "../_shared/audit.ts";
 import { filterConsentedClients, isClientStillConsented, getConsentModel } from "../_shared/consent-policy.ts";
-import { buildUnsubscribeSuffix, formatE164, sendViaBsp, sendViaMeta } from "../_shared/whatsapp-send.ts";
+import {
+  buildUnsubscribeSuffix,
+  firstNameOf,
+  formatE164,
+  personalizeCampaignBody,
+  RESERVATION_TEMPLATE_NAME,
+  sendReservationTemplateViaMeta,
+  sendViaBsp,
+  sendViaMeta,
+} from "../_shared/whatsapp-send.ts";
 
 interface Client {
   id: string;
@@ -78,6 +87,13 @@ function clientMatchesSegment(client: Client, segmentCode: string, customMonths?
   return true;
 }
 
+// Le template a boutons (Reserver / Se desinscrire) n'est utilise qu'une fois
+// approuve par Meta et active via WHATSAPP_CAMPAIGN_TEMPLATE ; sinon l'ancien
+// template texte seul reste utilise (lien de desinscription dans le texte).
+function usesReservationTemplate(hasBsp: boolean): boolean {
+  return !hasBsp && Deno.env.get("WHATSAPP_CAMPAIGN_TEMPLATE") === RESERVATION_TEMPLATE_NAME;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCors();
 
@@ -133,7 +149,7 @@ Deno.serve(async (req) => {
     // Fetch WhatsApp credentials — BSP path takes priority over legacy Meta direct path
     const { data: profile, error: profileError } = await db
       .from("profiles")
-      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status, price_id, has_access, access_until, trial_ends_at")
+      .select("whatsapp_phone_number_id, whatsapp_access_token, bsp_api_key, bsp_status, price_id, has_access, access_until, trial_ends_at, hotel_name")
       .eq("id", profileId)
       .single();
 
@@ -226,11 +242,18 @@ Deno.serve(async (req) => {
         campaign_type: "manual",
         status: "sending",
         recipient_count: targets.length,
+        // Texte de l'offre, relu par /o/[id] pour pre-remplir la page /offre.
+        // Colonne ajoutee par la migration 060 (Afrique uniquement).
+        ...(Deno.env.get("APP_BRAND")
+          ? {}
+          : { avantage: typeof avantage === "string" ? avantage.trim().slice(0, 500) || null : null }),
       })
       .select("id")
       .single();
 
     const campaignId = campaign?.id ?? null;
+    const hotelName = profile?.hotel_name?.trim() || "notre hôtel";
+    const withButtons = usesReservationTemplate(!!hasBsp);
 
     let sent = 0;
     let failed = 0;
@@ -265,7 +288,12 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        const personalizedMessage = message + buildUnsubscribeSuffix(client.id);
+        const firstName = firstNameOf(client.nom);
+        const body = personalizeCampaignBody(message, firstName, hotelName);
+        const personalizedMessage = withButtons ? body : body + buildUnsubscribeSuffix(client.id);
+        // Id genere avant l'envoi : il sert de parametre au bouton "Reserver"
+        // (https://baobabloyalty.com/o/{id}) puis de cle de la ligne sent_messages.
+        const sentMessageId = crypto.randomUUID();
         const rawNumber = client.whatsapp || client.telephone;
         if (!rawNumber) {
           failed++;
@@ -293,20 +321,28 @@ Deno.serve(async (req) => {
           ? await sendViaBsp(
               profile.bsp_api_key!,
               e164,
-              client.nom,
+              firstName,
               "baobab_offre_hotel",
               personalizedMessage,
+            )
+          : withButtons
+          ? await sendReservationTemplateViaMeta(
+              profile.whatsapp_phone_number_id!,
+              profile.whatsapp_access_token!,
+              e164,
+              { firstName, body, hotelName, sentMessageId, clientId: client.id },
             )
           : await sendViaMeta(
               profile.whatsapp_phone_number_id!,
               profile.whatsapp_access_token!,
               e164,
-              client.nom,
+              firstName,
               "baobab_offre_hotel",
               personalizedMessage,
             );
 
         await db.from("sent_messages").insert({
+          id: sentMessageId,
           campaign_id: campaignId,
           client_id: client.id,
           profile_id: profileId,
