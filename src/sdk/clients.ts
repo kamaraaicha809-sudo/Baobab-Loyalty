@@ -281,14 +281,32 @@ export interface AddClientInput {
  * plutôt que dupliqué. Un accord coché est enregistré (y compris pour un
  * client déjà connu) ; non coché, l'accord existant n'est jamais modifié.
  */
+/**
+ * Afrique : un numéro saisi au format local ivoirien (10 chiffres commençant
+ * par 0, ex. "07 12 34 56 78") est enregistré au format international
+ * "+2250712345678" — même règle que l'envoi WhatsApp (formatE164 côté Edge
+ * Function), pour que la fiche affiche le numéro réellement utilisé.
+ * Europe : saisie conservée telle quelle.
+ */
+export function normalizePhone(raw: string | undefined | null): string | null {
+  const trimmed = raw?.trim();
+  if (!trimmed) return null;
+  if (!tracksConsentProof) return trimmed;
+  const compact = trimmed.replace(/[\s\-().]/g, "");
+  if (/^0\d{9}$/.test(compact)) return `+225${compact}`;
+  if (/^00\d{7,15}$/.test(compact)) return `+${compact.slice(2)}`;
+  if (/^\d{11,15}$/.test(compact)) return `+${compact}`;
+  return compact;
+}
+
 export async function addClient(profileId: string, input: AddClientInput): Promise<Client> {
   const supabase = createClient();
   const nom = input.nom.trim();
   if (!nom) throw new Error("Le nom du client est requis.");
   if (!input.derniere_visite) throw new Error("La date de visite est requise.");
 
-  const telephone = input.telephone?.trim() || null;
-  const whatsapp = input.whatsapp?.trim() || null;
+  const telephone = normalizePhone(input.telephone);
+  const whatsapp = normalizePhone(input.whatsapp);
   const notes = input.notes?.trim() || null;
   const type_chambre_preferee = input.type_chambre_preferee?.trim() || null;
   const date_naissance = input.date_naissance?.trim() || null;
@@ -321,6 +339,95 @@ export async function addClient(profileId: string, input: AddClientInput): Promi
     }
   }
   return saved;
+}
+
+export interface UpdateClientInput {
+  nom: string;
+  telephone?: string;
+  whatsapp?: string;
+  derniere_visite: string;
+  date_naissance?: string;
+  type_chambre_preferee?: string;
+  notes?: string;
+  // Afrique uniquement : nouvel état de l'accord WhatsApp. `undefined` =
+  // accord inchangé (jamais modifié sans action explicite de l'hôtelier).
+  whatsappConsent?: boolean;
+}
+
+async function findClientUsingNumber(
+  profileId: string,
+  clientId: string,
+  numbers: string[],
+): Promise<string | null> {
+  if (numbers.length === 0) return null;
+  const supabase = createClient();
+  const filters = numbers.flatMap((n) => [`whatsapp.eq.${n}`, `telephone.eq.${n}`]).join(",");
+  const { data } = await supabase
+    .from("clients")
+    .select("nom")
+    .eq("profile_id", profileId)
+    .neq("id", clientId)
+    .or(filters)
+    .limit(1)
+    .maybeSingle();
+  return (data as { nom: string } | null)?.nom ?? null;
+}
+
+function consentUpdate(consent: boolean | undefined): Record<string, unknown> {
+  if (!tracksConsentProof || consent === undefined) return {};
+  return consent
+    ? { marketing_consent: true, marketing_consent_source: "registre", opted_out_at: null }
+    : { marketing_consent: false, opted_out_at: new Date().toISOString() };
+}
+
+/**
+ * Corrige une fiche du registre (numéro mal saisi, date de naissance...).
+ * Refuse un numéro déjà attribué à un autre client de l'hôtel, pour ne
+ * jamais créer de doublon qui recevrait deux fois la même campagne.
+ */
+export async function updateClient(profileId: string, clientId: string, input: UpdateClientInput): Promise<Client> {
+  const nom = input.nom.trim();
+  if (!nom) throw new Error("Le nom du client est requis.");
+  if (!input.derniere_visite) throw new Error("La date de visite est requise.");
+
+  const telephone = normalizePhone(input.telephone);
+  const whatsapp = normalizePhone(input.whatsapp);
+  const numbers = [...new Set([telephone, whatsapp].filter((n): n is string => !!n))];
+  const owner = await findClientUsingNumber(profileId, clientId, numbers);
+  if (owner) throw new Error(`Ce numéro est déjà enregistré pour ${owner}.`);
+
+  const row = {
+    nom,
+    telephone,
+    whatsapp,
+    derniere_visite: input.derniere_visite,
+    date_naissance: input.date_naissance?.trim() || null,
+    type_chambre_preferee: input.type_chambre_preferee?.trim() || null,
+    notes: input.notes?.trim() || null,
+    ...consentUpdate(input.whatsappConsent),
+  };
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("clients")
+    .update(row)
+    .eq("id", clientId)
+    .eq("profile_id", profileId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Client;
+}
+
+/**
+ * Supprime définitivement une fiche du registre (erreur de saisie, doublon).
+ * L'historique d'envoi du client est supprimé avec lui ; les réservations
+ * déjà enregistrées sont conservées (le lien vers la fiche est simplement
+ * retiré), donc le revenu généré reste compté.
+ */
+export async function deleteClient(profileId: string, clientId: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.from("clients").delete().eq("id", clientId).eq("profile_id", profileId);
+  if (error) throw error;
 }
 
 export interface ImportClientRow {
@@ -1009,6 +1116,9 @@ export const clients = {
   getSegmentCounts,
   getClients,
   addClient,
+  updateClient,
+  deleteClient,
+  normalizePhone,
   importClients,
   previewImport,
   parseClientsCSV,

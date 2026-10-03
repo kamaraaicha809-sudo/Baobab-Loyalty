@@ -43,8 +43,11 @@ export default function RegistrePage() {
   const [channelChoices, setChannelChoices] = useState<ConsentChannel[]>([]);
   const [consents, setConsents] = useState<Record<string, ChannelConsents>>({});
   const [saving, setSaving] = useState(false);
+  // Afrique uniquement : fiche en cours de correction (null = ajout d'un nouveau client).
+  const [editing, setEditing] = useState<Client | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const set = (field: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set =(field: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const loadRecent = useCallback(async (id: string) => {
@@ -78,8 +81,86 @@ export default function RegistrePage() {
     init();
   }, [loadRecent]);
 
+  const resetForm = () => {
+    setForm({ ...emptyForm, derniere_visite: new Date().toISOString().split("T")[0] });
+    setWhatsappConsent(false);
+    setChannelChoices([]);
+    setEditing(null);
+  };
+
+  const startEdit = (c: Client) => {
+    setEditing(c);
+    setForm({
+      nom: c.nom,
+      telephone: c.telephone ?? "",
+      whatsapp: c.whatsapp ?? "",
+      derniere_visite: c.derniere_visite?.split("T")[0] ?? emptyForm.derniere_visite,
+      date_naissance: c.date_naissance?.split("T")[0] ?? "",
+      type_chambre_preferee: c.type_chambre_preferee ?? "",
+      notes: c.notes ?? "",
+    });
+    setWhatsappConsent(c.marketing_consent === true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const saveEdit = async (current: Client) => {
+    if (isDemoMode) {
+      setRecent((r) => r.map((c) => (c.id === current.id ? { ...c, ...form } : c)));
+      toast.success(`Fiche de ${form.nom} modifiée (démo)`);
+      resetForm();
+      return;
+    }
+    if (!profileId) return;
+    const consentChanged = whatsappConsent !== (current.marketing_consent === true);
+    setSaving(true);
+    try {
+      const updated = await clients.updateClient(profileId, current.id, {
+        ...form,
+        whatsappConsent: consentChanged ? whatsappConsent : undefined,
+      });
+      setRecent((r) => r.map((c) => (c.id === updated.id ? updated : c)));
+      resetForm();
+      toast.success(`Fiche de ${updated.nom} modifiée`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Impossible de modifier cette fiche.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (c: Client) => {
+    if (isDemoMode) {
+      toast.error("La suppression est désactivée en mode démo.");
+      return;
+    }
+    if (!profileId) return;
+    const confirmed = window.confirm(
+      `Supprimer définitivement la fiche de ${c.nom} ?\n\nIl ne recevra plus aucune campagne. Les réservations déjà enregistrées restent comptées dans vos résultats.`,
+    );
+    if (!confirmed) return;
+    setDeletingId(c.id);
+    try {
+      await clients.deleteClient(profileId, c.id);
+      setRecent((r) => r.filter((x) => x.id !== c.id));
+      if (editing?.id === c.id) resetForm();
+      toast.success(`Fiche de ${c.nom} supprimée`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Impossible de supprimer cette fiche.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (editing) {
+      if (!form.nom.trim()) {
+        toast.error("Le nom du client est requis.");
+        return;
+      }
+      await saveEdit(editing);
+      return;
+    }
     if (isDemoMode) {
       toast.success(`${form.nom} ajouté au registre (démo)`);
       setForm(emptyForm);
@@ -111,9 +192,7 @@ export default function RegistrePage() {
         setConsents((c) => ({ ...c, ...fresh }));
       }
       setRecent((r) => [created, ...r.filter((c) => c.id !== created.id)].slice(0, 20));
-      setForm({ ...emptyForm, derniere_visite: new Date().toISOString().split("T")[0] });
-      setWhatsappConsent(false);
-      setChannelChoices([]);
+      resetForm();
       toast.success(`${created.nom} ajouté au registre`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Impossible d'ajouter ce client.");
@@ -156,7 +235,9 @@ export default function RegistrePage() {
 
       <div className="grid lg:grid-cols-5 gap-6">
         <section className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 sm:p-6 h-fit">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">Nouveau client</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">
+            {editing ? `Modifier la fiche de ${editing.nom}` : "Nouveau client"}
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Nom *</label>
@@ -176,7 +257,7 @@ export default function RegistrePage() {
                   type="tel"
                   value={form.telephone}
                   onChange={set("telephone")}
-                  placeholder={isEurope ? "+33 6 12 34 56 78" : "+221 77 123 45 67"}
+                  placeholder={isEurope ? "+33 6 12 34 56 78" : "07 12 34 56 78"}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
                 />
               </div>
@@ -186,10 +267,16 @@ export default function RegistrePage() {
                   type="tel"
                   value={form.whatsapp}
                   onChange={set("whatsapp")}
-                  placeholder={isEurope ? "+33612345678" : "+221771234567"}
+                  placeholder={isEurope ? "+33612345678" : "0712345678"}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
                 />
               </div>
+              {!isEurope && (
+                <p className="col-span-2 -mt-1 text-xs text-slate-400">
+                  Un numéro ivoirien à 10 chiffres (07..., 05..., 01...) reçoit automatiquement l&apos;indicatif +225.
+                  Pour un autre pays, saisissez l&apos;indicatif (ex : +221...).
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Date de visite *</label>
@@ -284,8 +371,20 @@ export default function RegistrePage() {
               disabled={saving}
               className="w-full py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors"
             >
-              {saving ? "Ajout..." : "Ajouter au registre"}
+              {editing
+                ? saving ? "Enregistrement..." : "Enregistrer les modifications"
+                : saving ? "Ajout..." : "Ajouter au registre"}
             </button>
+            {editing && (
+              <button
+                type="button"
+                onClick={resetForm}
+                disabled={saving}
+                className="w-full py-2.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              >
+                Annuler
+              </button>
+            )}
           </form>
         </section>
 
@@ -327,6 +426,25 @@ export default function RegistrePage() {
                       </span>
                     )}
                     <span className="text-xs text-slate-400">{formatDate(c.derniere_visite)}</span>
+                    {!isEurope && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => startEdit(c)}
+                          className="rounded-md px-2 py-1 text-xs font-medium text-primary hover:bg-slate-100"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(c)}
+                          disabled={deletingId === c.id}
+                          className="rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        >
+                          {deletingId === c.id ? "..." : "Supprimer"}
+                        </button>
+                      </>
+                    )}
                   </div>
                 </li>
               ))}
