@@ -7,6 +7,8 @@ import { reservations, type RevenueGenerated, type RecentActivityItem } from "@/
 import { campaigns as campaignsSdk, type RecentCampaign } from "@/src/sdk/campaigns";
 import { funnel, type CampaignFunnelStats } from "@/src/sdk/funnel";
 import { opportunities as opportunitiesSdk, type RevenueOpportunity } from "@/src/sdk/opportunities";
+import { clients as clientsSdk } from "@/src/sdk/clients";
+import { hasActiveAccess } from "@/src/lib/access";
 import { ai, OFFER_TEMPLATE_NAMES, type CampaignRecommendation } from "@/src/sdk/ai";
 import config from "@/config";
 import { isDemoMode, demoUser, demoChartData, demoFlux, demoCampagnesSummary, demoOpportunities, demoRecommendation, demoMetrics } from "@/src/lib/demo";
@@ -55,7 +57,11 @@ const maxChartFromData = (data: { directes: number; autres: number }[]) =>
   Math.max(1, ...data.flatMap((d) => d.directes + d.autres));
 
 export default function Dashboard() {
-  const [profile, setProfile] = useState<{ id?: string; email?: string } | null>(null);
+  const [profile, setProfile] = useState<
+    { id?: string; email?: string; has_access?: boolean; access_until?: string | null; trial_ends_at?: string | null } | null
+  >(null);
+  // Nombre total de clients : distingue "aucun client" de "aucun client à relancer" dans les Recommandations IA.
+  const [totalClients, setTotalClients] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState(demoChartData);
   const [impactCount, setImpactCount] = useState<number>(0);
@@ -133,6 +139,12 @@ export default function Dashboard() {
               setRevenueOpportunities(opportunitiesData);
             } catch {
               setRevenueOpportunities([]);
+            }
+            try {
+              const counts = await clientsSdk.getSegmentCounts(data.id);
+              setTotalClients(counts.tous ?? 0);
+            } catch {
+              setTotalClients(null);
             }
           } catch {
             setImpactCount(0);
@@ -278,7 +290,6 @@ export default function Dashboard() {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-slate-800">
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
             </svg>
-            <span className="text-xs font-semibold text-slate-700 bg-slate-900/10 px-2 py-1 rounded-full">+20% vs mois dernier</span>
           </div>
           <p className="text-5xl font-bold text-slate-900">{loading ? "—" : totalFromApp}</p>
           <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider mt-1.5">
@@ -340,7 +351,21 @@ export default function Dashboard() {
               Les campagnes que notre IA vous recommande actuellement, calculées à partir de vos données réelles.
             </p>
 
-            {opps.length === 0 ? (
+            {opps.length === 0 && !isDemoMode && totalClients !== null && totalClients > 0 ? (
+              <div className="p-4 rounded-lg border border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-sm text-slate-500">
+                  Bonne nouvelle : vos {totalClients} client{totalClients > 1 ? "s sont" : " est"} venu{totalClients > 1 ? "s" : ""} il y a
+                  moins de 3 mois, personne n&apos;est encore à relancer. Les recommandations apparaîtront automatiquement
+                  dès qu&apos;un client passera 3 mois sans visite.
+                </p>
+                <Link
+                  href="/dashboard/segments"
+                  className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
+                >
+                  Voir mes clients
+                </Link>
+              </div>
+            ) : opps.length === 0 ? (
               <div className="p-4 rounded-lg border border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <p className="text-sm text-slate-500">
                   Pas encore de recommandation disponible : importez votre historique clients pour que l&apos;IA puisse analyser vos opportunités.
@@ -690,10 +715,17 @@ export default function Dashboard() {
             <div>
               <span className="text-sm text-slate-500">Plan</span>
               <p>
-                <span className="inline-flex gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                  Actif
-                </span>
+                {isDemoMode || (profile && hasActiveAccess(profile)) ? (
+                  <span className="inline-flex gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                    Actif
+                  </span>
+                ) : (
+                  <span className="inline-flex gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-semibold">
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                    Expiré
+                  </span>
+                )}
               </p>
             </div>
             <Link

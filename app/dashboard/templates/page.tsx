@@ -18,6 +18,12 @@ import {
 import type { MessageTemplate } from "@/src/sdk/linkedin";
 import config from "@/config";
 
+// Afrique : le template WhatsApp approuvé (baobab_offre_reservation) n'a pas
+// d'en-tête image, la pièce jointe n'était donc jamais envoyée aux clients.
+// Champ masqué tant qu'un template avec image n'est pas approuvé par Meta.
+// Europe : comportement inchangé.
+const ATTACHMENTS_ENABLED = config.region === "europe";
+
 // Europe : ces champs sont envoyés au fournisseur d'IA ; rappel de ne jamais
 // y saisir de données de clients (registre des traitements Europe, B5).
 const AI_NO_CLIENT_DATA_HINT =
@@ -669,7 +675,8 @@ function OffresTab({
             </div>
           )}
 
-          {/* Ajouter un fichier — toujours visible */}
+          {/* Ajouter un fichier */}
+          {ATTACHMENTS_ENABLED && (
           <div className="mt-4 pt-4 border-t border-slate-100">
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               Pièce jointe (optionnel)
@@ -715,6 +722,7 @@ function OffresTab({
               </button>
             )}
           </div>
+          )}
         </div>
       </div>
     </div>

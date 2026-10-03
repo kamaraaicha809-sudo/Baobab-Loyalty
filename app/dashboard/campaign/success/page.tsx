@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, demoUser, demoProfile } from "@/src/lib/demo";
+import { user } from "@/src/sdk";
 import toast from "react-hot-toast";
 import config from "@/config";
 
@@ -20,6 +21,7 @@ function SuccessContent() {
   const [profileId, setProfileId] = useState<string | null>(isDemoMode ? demoUser.id : null);
   const [copied, setCopied] = useState(false);
   const [campaignImage, setCampaignImage] = useState<string | null>(null);
+  const [profileHotelName, setProfileHotelName] = useState<string | null>(null);
 
   const sentParam = searchParams.get("sent");
   const failedParam = searchParams.get("failed");
@@ -37,15 +39,20 @@ function SuccessContent() {
   useEffect(() => {
     if (isDemoMode) return;
     const load = async () => {
-      const { createClient } = await import("@/libs/supabase/client");
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) setProfileId(user.id);
+      try {
+        const profile = await user.getProfile();
+        if (profile?.id) setProfileId(profile.id);
+        if (profile?.hotel_name) setProfileHotelName(profile.hotel_name);
+      } catch {
+        // Aperçu seulement : sans profil, on garde le nom générique.
+      }
     };
     load();
   }, []);
 
-  const hotelName = isDemoMode ? demoProfile.hotel_name : "Hôtel Le Baobab";
+  // Nom réellement affiché aux clients (profil de l'hôtel), jamais un nom d'exemple.
+  const hotelName = isDemoMode ? demoProfile.hotel_name : profileHotelName || "Votre hôtel";
+  const sentAt = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const offreParams = new URLSearchParams();
   offreParams.set("avantage", avantage);
   offreParams.set("hotel", hotelName);
@@ -224,7 +231,7 @@ function SuccessContent() {
                       <span className="text-blue-600 font-medium text-sm">Réserver</span>
                     </Link>
                   )}
-                  <p className="text-slate-400 text-[10px] text-right mt-1">22:22</p>
+                  <p className="text-slate-400 text-[10px] text-right mt-1">{sentAt}</p>
                 </div>
               </div>
             </div>

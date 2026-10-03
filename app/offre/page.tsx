@@ -24,6 +24,15 @@ function OffreContent() {
   const [checkinDate, setCheckinDate] = useState(getTomorrow());
   const [nights, setNights] = useState(2);
   const clickTracked = useRef(false);
+  const [closeHint, setCloseHint] = useState(false);
+
+  // Le client arrive depuis WhatsApp : "Fermer" ne doit jamais l'envoyer sur
+  // le site de l'éditeur. On tente de fermer l'onglet ; si le navigateur le
+  // refuse (onglet non ouvert par script), on lui indique comment revenir.
+  const closePage = () => {
+    window.close();
+    setTimeout(() => setCloseHint(true), 300);
+  };
 
   const messageText = `Cher {nom}, revenez nous voir bientôt ! Pour toute réservation ce mois-ci, nous vous offrons : "${avantage}"`;
 
@@ -145,11 +154,16 @@ function OffreContent() {
             </div>
             <button
               type="button"
-              onClick={() => { window.location.href = "/"; }}
+              onClick={closePage}
               className="w-full max-w-xs py-3.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 active:bg-slate-700 transition-colors"
             >
               Fermer
             </button>
+            {closeHint && (
+              <p className="mt-4 text-sm text-slate-500 text-center max-w-xs">
+                C&apos;est terminé ! Vous pouvez fermer cette page et revenir sur WhatsApp.
+              </p>
+            )}
           </div>
         )}
 
@@ -175,11 +189,16 @@ function OffreContent() {
             </button>
             <button
               type="button"
-              onClick={() => { window.location.href = "/"; }}
+              onClick={closePage}
               className="w-full max-w-xs py-3 text-sm text-slate-500 hover:text-slate-700"
             >
               Fermer
             </button>
+            {closeHint && (
+              <p className="mt-2 text-sm text-slate-500 text-center max-w-xs">
+                Vous pouvez fermer cette page et revenir sur WhatsApp.
+              </p>
+            )}
           </div>
         )}
 
